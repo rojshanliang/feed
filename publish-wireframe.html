@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容发布页 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Row label ───────────────────────────────────────────── */
+  .row-label {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+    letter-spacing: 0.02em; display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 1630px;
+  }
+  .row-label::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  /* ─── Column headers ──────────────────────────────────────── */
+  .col-headers {
+    display: flex; gap: 32px; width: 100%; max-width: 1630px;
+  }
+  .col-header {
+    width: 375px; flex-shrink: 0;
+    text-align: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .col-header .state-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 5px;
+  }
+  .col-header.empty .state-dot { background: var(--border); }
+  .col-header.uploading .state-dot { background: #f59e0b; }
+  .col-header.done .state-dot { background: #16a34a; }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── H5 light status bar ─────────────────────────────────── */
+  .h5-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .h5-status-bar .mp-status-time { color: var(--fg); }
+  .h5-status-bar .mp-status-icons .bar { background: var(--fg); }
+  .h5-status-bar .wifi-icon::before { background: var(--fg); }
+  .h5-status-bar .battery-icon { border-color: rgba(13,17,23,0.7); }
+  .h5-status-bar .battery-icon::after { background: var(--fg); }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-publish-btn {
+    height: 28px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ─── H5 browser bar ──────────────────────────────────────── */
+  .h5-browser-bar {
+    height: 46px; background: #f2f2f7;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .h5-back { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.45); line-height: 1; width: 20px; text-align: center; flex-shrink: 0; }
+  .h5-addr { flex: 1; height: 28px; background: #ffffff; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; padding: 0 10px; gap: 4px; min-width: 0; }
+  .h5-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-url { font-family: var(--font-mono); font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h5-acts { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-act { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Section label ───────────────────────────────────────── */
+  .section-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 14px 16px 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .section-note { font-weight: 400; color: rgba(0,0,0,0.35); font-size: 10px; letter-spacing: 0.01em; }
+
+  /* ─── Upload area ─────────────────────────────────────────── */
+  .upload-wrap {
+    margin: 0 16px 14px;
+    display: flex; justify-content: center;
+  }
+
+  /* 竖版视频比例容器 — 固定宽度让高度保持 9:16 */
+  .upload-portrait {
+    width: 160px; /* 窄宽度以保持竖版视觉 */
+    aspect-ratio: 9 / 16;
+    border-radius: var(--radius-md);
+    position: relative; overflow: hidden;
+  }
+
+  /* 空状态 */
+  .upload-portrait.empty {
+    background: var(--border-soft);
+    border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+  }
+  .upload-portrait.empty .u-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #ffffff; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .upload-portrait.empty .u-text { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-align: center; line-height: 1.6; }
+  .upload-portrait.empty .u-text strong { display: block; color: var(--fg); font-size: 11px; margin-bottom: 2px; }
+  .upload-portrait.empty .u-format { font-family: var(--font-mono); font-size: 9px; color: rgba(0,0,0,0.3); }
+
+  /* 上传中状态 */
+  .upload-portrait.uploading {
+    background: #1a1d23;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .uploading-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+  }
+  .uploading-spinner {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .uploading-pct {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: #ffffff;
+  }
+  .uploading-label {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.6);
+  }
+  /* progress bar at bottom */
+  .upload-progress-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,0.2);
+  }
+  .upload-progress-fill { height: 100%; width: 68%; background: var(--accent); }
+  /* thumbnail bg placeholder */
+  .uploading-thumb-bg {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      135deg,
+      #1e2128 0px, #1e2128 10px,
+      #22252e 10px, #22252e 20px
+    );
+    opacity: 0.6;
+  }
+
+  /* 已上传状态 */
+  .upload-portrait.done {
+    background: #1a1d23;
+  }
+  .done-thumb-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #2a2d35 0%, #1a1d23 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: rgba(255,255,255,0.3);
+  }
+  .done-duration {
+    position: absolute; bottom: 8px; right: 8px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: #ffffff; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 3px;
+  }
+  .done-replace {
+    position: absolute; top: 8px; right: 8px;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    color: #ffffff; background: rgba(0,0,0,0.55); padding: 3px 7px; border-radius: var(--radius-pill);
+  }
+
+  /* ─── Form fields ─────────────────────────────────────────── */
+  .form-section { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-lbl { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg); letter-spacing: 0.02em; }
+  .title-input {
+    width: 100%; min-height: 48px;
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 9px 12px;
+    font-family: var(--font-body); font-size: 13px; color: var(--muted);
+    line-height: 1.5;
+  }
+  .title-input.filled { color: var(--fg); }
+  .field-hint { font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); text-align: right; }
+  .field-hint.filled { color: var(--fg); }
+  .topic-picker {
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 9px 12px;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  }
+  .topic-picker-left { display: flex; align-items: center; gap: 8px; }
+  .topic-picker-icon { font-size: 15px; line-height: 1; }
+  .topic-picker-text { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+  .topic-picker-text.filled { color: var(--fg); }
+  .topic-picker-arrow { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+  .topic-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .topic-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    color: #2563eb; background: #dbeafe;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+  }
+  .topic-chip .chip-x { color: rgba(37,99,235,0.5); font-size: 11px; line-height: 1; cursor: pointer; }
+
+  /* ─── Topic selection sheet ──────────────────────────────── */
+  .topic-sheet-screen {
+    position: relative; overflow: hidden;
+  }
+  /* Dimmed background */
+  .topic-sheet-screen .page-scroll {
+    filter: brightness(0.7);
+    pointer-events: none;
+    flex: 1;
+  }
+  /* Sheet itself */
+  .topic-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 70%;
+    background: #ffffff;
+    border-radius: 14px 14px 0 0;
+    border-top: 1px solid var(--border-soft);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column;
+    z-index: 50;
+  }
+  .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto; flex-shrink: 0; }
+  .sheet-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+    text-align: center; padding-bottom: 10px; flex-shrink: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  /* Search input row */
+  .sheet-search {
+    padding: 12px 16px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .sheet-search-box {
+    flex: 1; height: 36px;
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    display: flex; align-items: center; padding: 0 12px; gap: 6px;
+  }
+  .sheet-search-icon { font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  .sheet-search-placeholder { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+  .sheet-cancel { font-family: var(--font-mono); font-size: 12px; color: var(--muted); flex-shrink: 0; cursor: pointer; }
+  /* Create new topic row */
+  .sheet-create {
+    padding: 12px 16px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+  }
+  .sheet-create-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface-warm); border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600; color: var(--accent-on); flex-shrink: 0;
+  }
+  .sheet-create-text { font-family: var(--font-body); font-size: 13px; color: var(--fg); }
+  .sheet-create-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; }
+  /* Topic list */
+  .sheet-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .sheet-list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; cursor: pointer;
+  }
+  .sheet-list-item:hover { background: var(--border-soft); }
+  .sheet-item-left { display: flex; align-items: center; gap: 10px; }
+  .sheet-item-hash {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: #dbeafe; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #2563eb; flex-shrink: 0;
+  }
+  .sheet-item-name { font-family: var(--font-body); font-size: 13px; color: var(--fg); }
+  .sheet-item-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .sheet-item-check { font-size: 16px; color: var(--accent-on); background: var(--accent); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+
+  /* ─── Bottom bar ──────────────────────────────────────────── */
+  .bottom-bar {
+    height: 64px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .pub-btn {
+    flex: 1; height: 44px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .pub-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .pub-btn.uploading-btn { background: var(--border-soft); color: var(--muted); cursor: not-allowed; font-size: 12px; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>内容发布页 — 线框图</h1>
+  <p>小程序 vs H5 · 四态：未上传 / 上传中 / 已上传 / 选择话题 · 每行 2 屏 · 仅竖版视频</p>
+</div>
+
+<!-- ════════════ 行 1：小程序 ════════════ -->
+<div class="row-label">小程序 — 过程态</div>
+
+<div class="devices-row">
+
+  <!-- 小程序 · 未上传 -->
+  <div class="device-wrapper">
+    <div class="device-label">① 未上传</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn inactive" disabled>发布</button>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait empty">
+              <div class="u-icon">＋</div>
+              <div class="u-text"><strong>选择竖版视频</strong>从相册选取</div>
+              <span class="u-format">MP4 · MOV（仅 iOS）</span>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input">添加标题，让更多人看到你的内容…</div>
+              <div class="field-hint">0 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text">搜索或选择话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn inactive" disabled>上传视频后可发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 小程序 · 上传中 -->
+  <div class="device-wrapper">
+    <div class="device-label">② 上传中</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn inactive" disabled>发布</button>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait uploading">
+              <div class="uploading-thumb-bg"></div>
+              <div class="uploading-overlay">
+                <div class="uploading-spinner"></div>
+                <div class="uploading-pct">68%</div>
+                <div class="uploading-label">视频上传中…</div>
+              </div>
+              <div class="upload-progress-bar">
+                <div class="upload-progress-fill"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn uploading-btn" disabled>视频上传中，请稍候…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row 小程序 过程态 -->
+
+<!-- ════════════ 行 2：小程序 完成态 ════════════ -->
+<div class="row-label">小程序 — 完成态</div>
+
+<div class="devices-row">
+
+  <!-- 小程序 · 已上传 -->
+  <div class="device-wrapper">
+    <div class="device-label">③ 已上传（可发布）</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn">发布</button>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait done">
+              <div class="done-thumb-bg">▶</div>
+              <div class="done-duration">00:42</div>
+              <div class="done-replace">重新选择</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+                <div class="topic-chip">#热门话题<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn">发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 小程序 · 选择话题（底部 sheet 弹出） -->
+  <div class="device-wrapper">
+    <div class="device-label">④ 选择话题</div>
+    <div class="mp-device">
+      <div class="mp-screen topic-sheet-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn">发布</button>
+        </div>
+        <!-- 背景内容（变暗） -->
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait done">
+              <div class="done-thumb-bg">▶</div>
+              <div class="done-duration">00:42</div>
+              <div class="done-replace">重新选择</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker" style="border-color:var(--accent);background:var(--surface-warm);">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 话题选择 sheet -->
+        <div class="topic-sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title">选择话题</div>
+          <div class="sheet-search">
+            <div class="sheet-search-box">
+              <span class="sheet-search-icon">🔍</span>
+              <span class="sheet-search-placeholder">搜索话题…</span>
+            </div>
+            <span class="sheet-cancel">取消</span>
+          </div>
+          <!-- 已有话题列表 -->
+          <div class="sheet-list">
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">话题标签</div>
+                  <div class="sheet-item-count">12.6w 内容</div>
+                </div>
+              </div>
+              <div class="sheet-item-check">✓</div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">热门话题</div>
+                  <div class="sheet-item-count">8.3w 内容</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">推荐话题示例</div>
+                  <div class="sheet-item-count">5.1w 内容</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">另一个话题</div>
+                  <div class="sheet-item-count">2.7w 内容</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /topic-sheet -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row 小程序 完成态 -->
+
+<!-- ════════════ 行 2：H5 ════════════ -->
+<div class="row-label">H5 浏览器 — 过程态</div>
+
+<div class="devices-row">
+
+  <!-- H5 · 未上传 -->
+  <div class="device-wrapper">
+    <div class="device-label">① 未上传</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="h5-status-bar">
+          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
+          </div>
+        </div>
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
+          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait empty">
+              <div class="u-icon">＋</div>
+              <div class="u-text"><strong>选择竖版视频</strong>从相册选取</div>
+              <span class="u-format">MP4 · MOV（仅 iOS）</span>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input">添加标题，让更多人看到你的内容…</div>
+              <div class="field-hint">0 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text">搜索或选择话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn inactive" disabled>上传视频后可发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- H5 · 上传中 -->
+  <div class="device-wrapper">
+    <div class="device-label">② 上传中</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="h5-status-bar">
+          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
+          </div>
+        </div>
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
+          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait uploading">
+              <div class="uploading-thumb-bg"></div>
+              <div class="uploading-overlay">
+                <div class="uploading-spinner"></div>
+                <div class="uploading-pct">68%</div>
+                <div class="uploading-label">视频上传中…</div>
+              </div>
+              <div class="upload-progress-bar">
+                <div class="upload-progress-fill"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn uploading-btn" disabled>视频上传中，请稍候…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row H5 过程态 -->
+
+<!-- ════════════ H5 浏览器 完成态 ════════════ -->
+<div class="row-label">H5 浏览器 — 完成态</div>
+
+<div class="devices-row">
+
+  <!-- H5 · 已上传 -->
+  <div class="device-wrapper">
+    <div class="device-label">③ 已上传（可发布）</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="h5-status-bar">
+          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
+          </div>
+        </div>
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
+          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
+        </div>
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait done">
+              <div class="done-thumb-bg">▶</div>
+              <div class="done-duration">00:42</div>
+              <div class="done-replace">重新选择</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+                <div class="topic-chip">#热门话题<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn">发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- H5 · 选择话题（底部 sheet 弹出） -->
+  <div class="device-wrapper">
+    <div class="device-label">④ 选择话题</div>
+    <div class="mp-device">
+      <div class="mp-screen topic-sheet-screen">
+        <div class="h5-status-bar">
+          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
+          </div>
+        </div>
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
+          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
+        </div>
+        <!-- 背景内容（变暗） -->
+        <div class="page-scroll">
+          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
+          <div class="upload-wrap">
+            <div class="upload-portrait done">
+              <div class="done-thumb-bg">▶</div>
+              <div class="done-duration">00:42</div>
+              <div class="done-replace">重新选择</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">视频标题</div>
+              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="field-hint filled">18 / 50</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker" style="border-color:var(--accent);background:var(--surface-warm);">
+                <div class="topic-picker-left">
+                  <span class="topic-picker-icon">#</span>
+                  <span class="topic-picker-text filled">继续添加话题</span>
+                </div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 话题选择 sheet -->
+        <div class="topic-sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title">选择话题</div>
+          <div class="sheet-search">
+            <div class="sheet-search-box">
+              <span class="sheet-search-icon">🔍</span>
+              <span class="sheet-search-placeholder">搜索话题…</span>
+            </div>
+            <span class="sheet-cancel">取消</span>
+          </div>
+          <div class="sheet-create">
+            <div class="sheet-create-icon">＋</div>
+            <div>
+              <div class="sheet-create-text">创建新话题</div>
+              <div class="sheet-create-sub">把你的内容打上原创话题</div>
+            </div>
+          </div>
+          <div class="sheet-list">
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">话题标签</div>
+                  <div class="sheet-item-count">12.6w 内容</div>
+                </div>
+              </div>
+              <div class="sheet-item-check">✓</div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">热门话题</div>
+                  <div class="sheet-item-count">8.3w 内容</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">推荐话题示例</div>
+                  <div class="sheet-item-count">5.1w 内容</div>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-list-item">
+              <div class="sheet-item-left">
+                <div class="sheet-item-hash">#</div>
+                <div>
+                  <div class="sheet-item-name">另一个话题</div>
+                  <div class="sheet-item-count">2.7w 内容</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /topic-sheet -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row H5 完成态 -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:1630px;">
+  <h3>SPEC · 内容发布页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序：NavBar（返回 / 发布内容 / 发布按钮）&nbsp;&nbsp;→&nbsp;&nbsp;H5：浏览器地址栏 + 底部全宽发布按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">上传区</span>
+    <span class="spec-val">竖版 9:16 比例缩略图 · 仅支持竖版视频（MP4 / MOV 仅 iOS）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">① 未上传</span>
+    <span class="spec-val">虚线框 + ＋图标 · 发布按钮灰色禁用</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">② 上传中</span>
+    <span class="spec-val">竖版缩略图 + 旋转加载圈 + 进度百分比 + 底部进度条 · 发布按钮显示"上传中"禁用</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">③ 已上传</span>
+    <span class="spec-val">竖版缩略图 + 时长角标 + 重新选择 · 标题已填写 · 话题 Chip · 发布按钮黄色激活</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">④ 选择话题</span>
+    <span class="spec-val">点击话题 picker 触发底部 sheet · 内含：搜索框 / 创建新话题 / 已有话题列表（每项显示话题名 + 内容数） · 已选话题显示 ✓ · 背景页面变暗</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">两版差异</span>
+    <span class="spec-val">小程序发布按钮在 NavBar 右侧 · H5 发布按钮在底部全宽操作栏；话题 sheet 四态完全一致</span>
+  </div>
+</div>
+
+</body>
+</html>
