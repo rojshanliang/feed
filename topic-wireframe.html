@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>话题页 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Tab switcher ────────────────────────────────────────── */
+  .tab-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .tab-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms;
+  }
+  .tab-btn.active { background: var(--accent); color: var(--accent-on); }
+  .tab-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-more { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .nav-more span { width: 3px; height: 3px; border-radius: 50%; background: var(--fg); display: block; }
+
+  /* ─── H5 browser bar ──────────────────────────────────────── */
+  .h5-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .h5-status-bar .mp-status-time { color: var(--fg); }
+  .h5-status-bar .mp-status-icons .bar { background: var(--fg); }
+  .h5-status-bar .wifi-icon::before { background: var(--fg); }
+  .h5-status-bar .battery-icon { border-color: rgba(13,17,23,0.7); }
+  .h5-status-bar .battery-icon::after { background: var(--fg); }
+  .h5-browser-bar {
+    height: 46px; background: #f2f2f7;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .h5-back { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.45); line-height: 1; width: 20px; text-align: center; flex-shrink: 0; }
+  .h5-addr { flex: 1; height: 28px; background: #ffffff; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; padding: 0 10px; gap: 4px; min-width: 0; }
+  .h5-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-url { font-family: var(--font-mono); font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h5-url em { font-style: normal; color: var(--accent-on); background: var(--accent); padding: 0 3px; border-radius: 2px; font-size: 9px; }
+  .h5-acts { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-act { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+
+  /* ─── Scrollable content ──────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Topic hero banner ───────────────────────────────────── */
+  .topic-hero {
+    width: 100%; height: 140px; position: relative; flex-shrink: 0;
+    background: linear-gradient(135deg, #2a2d35 0%, #1a1d23 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 14px 16px;
+  }
+  .topic-hero-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.2); letter-spacing: 0.05em;
+  }
+  .topic-tag-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--accent);
+    letter-spacing: 0.05em; margin-bottom: 4px;
+    position: relative; z-index: 2;
+  }
+  .topic-name {
+    font-family: var(--font-display); font-size: 20px; font-weight: 600;
+    color: #ffffff; position: relative; z-index: 2; margin-bottom: 6px;
+  }
+  .topic-stats {
+    display: flex; align-items: center; gap: 8px;
+    position: relative; z-index: 2;
+  }
+  .topic-stat {
+    font-family: var(--font-mono); font-size: 11px;
+    color: rgba(255,255,255,0.65);
+  }
+  .topic-stat strong { color: #ffffff; font-weight: 600; }
+  .topic-stat-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+
+  /* ─── Stats + Publish row (single row) ───────────────────── */
+  .publish-row {
+    padding: 10px 16px; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  /* move stats here — override hero positioning */
+  .publish-row .topic-stats {
+    position: static; flex: 1;
+  }
+  .publish-row .topic-stat { color: var(--fg-2); font-family: var(--font-mono); font-size: 11px; }
+  .publish-row .topic-stat strong { color: var(--fg); }
+  .publish-row .topic-stat-sep { background: var(--border); }
+  .publish-btn {
+    height: 34px; padding: 0 18px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ─── Content tabs ────────────────────────────────────────── */
+  .content-tabs {
+    display: flex; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .content-tab {
+    flex: 1; padding: 10px 0; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); position: relative; cursor: pointer;
+  }
+  .content-tab.active {
+    color: var(--fg); font-weight: 600;
+  }
+  .content-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Content grid ────────────────────────────────────────── */
+  .content-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; background: #ffffff; flex: 1;
+  }
+  .content-thumb {
+    aspect-ratio: 9/16;
+    background: var(--wf-block);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .content-thumb::after { content: '▶'; font-size: 16px; color: rgba(255,255,255,0.5); }
+  .content-thumb:nth-child(3n+2) { background: #c8ccd2; }
+  .content-thumb:nth-child(3n+3) { background: #b8bcc4; }
+
+  /* 两个 Tab 内容展示相同，仅 Tab 激活态不同 */
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>话题页 — 线框图</h1>
+  <p>小程序 vs H5 · 推荐 / 最新两态</p>
+</div>
+
+<!-- Tab switcher -->
+<div class="tab-switcher" role="group">
+  <button class="tab-btn active" data-tab="recommended" onclick="switchTab('recommended')">推荐 Tab</button>
+  <button class="tab-btn"       data-tab="latest"      onclick="switchTab('latest')">最新 Tab</button>
+</div>
+
+<div class="devices-row">
+
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">话题页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">#话题页</div>
+          <div class="nav-more"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- Topic hero -->
+          <div class="topic-hero">
+            <div class="topic-hero-bg">TOPIC COVER IMAGE</div>
+            <div class="topic-tag-label"># 话题</div>
+            <div class="topic-name">话题名称标题</div>
+          </div>
+
+          <!-- Stats + Publish (同一行：数据左，发布右) -->
+          <div class="publish-row">
+            <div class="topic-stats">
+              <span class="topic-stat"><strong>12.6w</strong> 内容</span>
+              <span class="topic-stat-sep"></span>
+              <span class="topic-stat"><strong>3,421</strong> 参与</span>
+            </div>
+            <button class="publish-btn">＋ 发布内容</button>
+          </div>
+
+          <!-- Content tabs -->
+          <div class="content-tabs">
+            <div class="content-tab tab-recommended-btn active" onclick="switchTab('recommended')">推荐</div>
+            <div class="content-tab tab-latest-btn" onclick="switchTab('latest')">最新</div>
+          </div>
+
+          <!-- 推荐：3列网格 -->
+          <div class="content-grid">
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+          </div>
+
+        </div><!-- /page-scroll -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ② H5 -->
+  <div class="device-wrapper">
+    <div class="device-label">话题页 · H5 浏览器</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="h5-screen">
+
+        <!-- H5 白色状态栏 -->
+        <div class="h5-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- H5 浏览器地址栏 -->
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr">
+            <span class="h5-lock">🔒</span>
+            <span class="h5-url">h5.example.com/topic/<em>topic_id</em></span>
+          </div>
+          <div class="h5-acts">
+            <span class="h5-act">↗</span>
+            <span class="h5-act">×</span>
+          </div>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- Topic hero -->
+          <div class="topic-hero">
+            <div class="topic-hero-bg">TOPIC COVER IMAGE</div>
+            <div class="topic-tag-label"># 话题</div>
+            <div class="topic-name">话题名称标题</div>
+          </div>
+
+          <!-- Stats + Publish (同一行：数据左，发布右) -->
+          <div class="publish-row">
+            <div class="topic-stats">
+              <span class="topic-stat"><strong>12.6w</strong> 内容</span>
+              <span class="topic-stat-sep"></span>
+              <span class="topic-stat"><strong>3,421</strong> 参与</span>
+            </div>
+            <button class="publish-btn">＋ 发布内容</button>
+          </div>
+
+          <!-- Content tabs -->
+          <div class="content-tabs">
+            <div class="content-tab tab-recommended-btn active" onclick="switchTab('recommended')">推荐</div>
+            <div class="content-tab tab-latest-btn" onclick="switchTab('latest')">最新</div>
+          </div>
+
+          <!-- 推荐：3列网格 -->
+          <div class="content-grid">
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+            <div class="content-thumb"></div><div class="content-thumb"></div><div class="content-thumb"></div>
+          </div>
+
+        </div><!-- /page-scroll -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 话题页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序：NavBar（返回 / #话题页 / 更多）&nbsp;&nbsp;→&nbsp;&nbsp;H5：浏览器地址栏（返回 / URL / 分享 / 关闭）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">话题 Banner</span>
+    <span class="spec-val">封面图 · 话题名称 · 数据（内容数 + 参与数）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布入口</span>
+    <span class="spec-val">输入框占位 + 黄色「＋ 发布」按钮 — 点击跳转发布流程</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容 Tab</span>
+    <span class="spec-val"><span class="spec-badge">推荐</span> 3 列视频缩略图网格&nbsp;&nbsp;|&nbsp;&nbsp;<span class="spec-badge">最新</span> 按时间倒序列表（缩略图 + 标题 + 互动数）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">两版差异</span>
+    <span class="spec-val">仅顶部导航不同；内容区 100% 一致</span>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    ['mp-screen', 'h5-screen'].forEach(id => {
+      const screen = document.getElementById(id);
+      screen.querySelectorAll('.content-tab').forEach(el => el.classList.remove('active'));
+      const cls = tab === 'recommended' ? '.tab-recommended-btn' : '.tab-latest-btn';
+      screen.querySelector(cls)?.classList.add('active');
+    });
+  }
+</script>
+
+</body>
+</html>
