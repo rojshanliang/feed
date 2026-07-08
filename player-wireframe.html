@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>播放页 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #1a1d23;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: rgba(13,17,23,0.85); backdrop-filter: blur(8px);
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mp-nav-back {
+    width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: white; line-height: 1;
+  }
+  .mp-nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .mp-nav-more { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .mp-nav-more span { width: 3px; height: 3px; border-radius: 50%; background: white; display: block; }
+
+  /* ─── H5 browser bar ──────────────────────────────────────── */
+  .h5-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; z-index: 10;
+  }
+  .h5-browser-bar {
+    height: 46px; background: rgba(13,17,23,0.9); backdrop-filter: blur(8px);
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .h5-back { font-size: 22px; font-weight: 300; color: rgba(255,255,255,0.55); line-height: 1; width: 20px; text-align: center; flex-shrink: 0; }
+  .h5-addr { flex: 1; height: 28px; background: rgba(255,255,255,0.1); border-radius: 14px; display: flex; align-items: center; padding: 0 10px; gap: 4px; min-width: 0; }
+  .h5-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-url { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.65); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h5-url em { font-style: normal; color: var(--accent); }
+  .h5-acts { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-act { font-size: 14px; color: rgba(255,255,255,0.5); font-family: var(--font-mono); }
+
+  /* ─── Full-screen content area ────────────────────────────── */
+  .player-content {
+    flex: 1; position: relative; overflow: hidden;
+  }
+
+  /* ─── Video background ────────────────────────────────────── */
+  .video-bg {
+    position: absolute; inset: 0; background: #1a1d23;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .video-placeholder-inner { text-align: center; opacity: 0.3; }
+  .video-placeholder-inner .vp-icon { width: 64px; height: 40px; border: 2px solid white; border-radius: 4px; margin: 0 auto 8px; position: relative; }
+  .video-placeholder-inner .vp-icon::before { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-40%, -50%); border-left: 16px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+  .video-placeholder-inner p { font-family: var(--font-mono); font-size: 11px; color: white; letter-spacing: 0.05em; }
+
+  /* ─── Pause overlay ───────────────────────────────────────── */
+  .pause-overlay {
+    position: absolute; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    z-index: 15; background: rgba(0,0,0,0.25);
+  }
+  .pause-btn {
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .pause-btn-bars { display: flex; gap: 6px; align-items: center; }
+  .pause-btn-bars span { width: 5px; height: 22px; background: white; border-radius: 2px; display: block; }
+
+  /* ─── Progress bar ────────────────────────────────────────── */
+  .video-progress {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: rgba(255,255,255,0.25); z-index: 25;
+  }
+  .video-progress-fill { height: 100%; width: 38%; background: var(--accent); border-radius: 1px; position: relative; }
+  .video-progress-fill::after { content: ''; position: absolute; right: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+
+  /* ─── Progress visible in pause state ────────────────────── */
+  .state-pause .pause-overlay { display: flex; }
+
+  /* ─── Right interaction bar ───────────────────────────────── */
+  .right-bar {
+    position: absolute; right: 12px; bottom: 80px;
+    z-index: 20; display: flex; flex-direction: column; gap: 20px; align-items: center;
+  }
+  .right-bar-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+  .rb-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1; position: relative;
+  }
+  .rb-avatar .rb-icon { background: var(--wf-block-dark); border: 2px solid white; font-size: 18px; }
+  .rb-avatar .rb-icon::after {
+    content: '+'; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 16px; background: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--accent-on);
+    border: 1.5px solid rgba(13,17,23,0.8); line-height: 14px; text-align: center;
+  }
+  .rb-count { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+
+  /* ─── Bottom info ─────────────────────────────────────────── */
+  .bottom-info {
+    position: absolute; left: 12px; bottom: 8px; right: 68px; z-index: 20;
+  }
+  .creator-name {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: white;
+    margin-bottom: 4px; display: flex; align-items: center; gap: 6px;
+  }
+  .creator-name::before { content: ''; width: 24px; height: 24px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; display: inline-block; }
+  .follow-pill { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-on); background: var(--accent); padding: 2px 8px; border-radius: var(--radius-pill); flex-shrink: 0; }
+  .video-title { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.4; margin-bottom: 5px; font-family: var(--font-body); }
+  .video-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .video-tag { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7); }
+
+  /* ─── Comments drawer ─────────────────────────────────────── */
+  .comments-drawer {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70%;
+    background: rgba(20,22,28,0.97); border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0; z-index: 40; display: none; flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .drawer-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+  .drawer-header { padding: 10px 16px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+  .drawer-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .drawer-count { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .drawer-close { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: rgba(255,255,255,0.6); flex-shrink: 0; font-family: var(--font-mono); }
+  .comments-list { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .comment-item { display: flex; gap: 10px; align-items: flex-start; }
+  .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; }
+  .comment-body { flex: 1; }
+  .comment-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+  .comment-text { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.45; font-family: var(--font-body); }
+  .comment-text.ph { height: 12px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 6px; width: 80%; }
+  .comment-text.ph.short { width: 55%; }
+  .comment-time { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+  .drawer-input { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+  .input-field { height: 36px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; display: flex; align-items: center; padding: 0 14px; }
+  .input-placeholder { font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  /* ─── Share sheet ─────────────────────────────────────────── */
+  .share-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(20,22,28,0.97); border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0; z-index: 40; display: none; flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .share-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+  .share-header { padding: 10px 16px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+  .share-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .share-subtitle { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .share-close { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: rgba(255,255,255,0.6); font-family: var(--font-mono); flex-shrink: 0; }
+  .share-link-block { margin: 14px 16px 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .share-link-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+  .share-link-url { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.75); word-break: break-all; line-height: 1.5; }
+  .share-link-url em { font-style: normal; color: var(--accent); }
+  .share-copy-btn { flex-shrink: 0; height: 30px; padding: 0 12px; background: var(--accent); color: var(--accent-on); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; font-weight: 600; border: none; cursor: pointer; white-space: nowrap; }
+  .share-copy-btn.copied { background: #16a34a; color: white; }
+
+  /* ─── State visibility ────────────────────────────────────── */
+  .state-pause .pause-overlay   { display: flex; }
+  .state-comments .comments-drawer { display: flex; }
+  .state-share .share-sheet    { display: flex; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>播放页 — 线框图</h1>
+  <p>小程序 vs H5 · 全屏播放 · 四态交互</p>
+</div>
+
+<!-- State switcher (shared across both screens) -->
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="play"     onclick="setState('play')">① 播放中</button>
+  <button class="state-btn"        data-state="pause"    onclick="setState('pause')">② 暂停</button>
+  <button class="state-btn"        data-state="comments" onclick="setState('comments')">③ 评论展开</button>
+  <button class="state-btn"        data-state="share"    onclick="setState('share')">④ 分享弹窗</button>
+</div>
+
+<div class="devices-row">
+
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">播放页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">视频</div>
+          <div class="mp-nav-more"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="player-content">
+
+          <div class="video-bg">
+            <div class="video-placeholder-inner">
+              <div class="vp-icon"></div>
+              <p>VIDEO CONTENT</p>
+            </div>
+          </div>
+
+          <!-- Pause overlay -->
+          <div class="pause-overlay">
+            <div class="pause-btn">
+              <div class="pause-btn-bars"><span></span><span></span></div>
+            </div>
+          </div>
+
+          <!-- Progress bar (always visible) -->
+          <div class="video-progress">
+            <div class="video-progress-fill"></div>
+          </div>
+
+          <!-- Right bar -->
+          <div class="right-bar">
+            <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+            <div class="right-bar-item">
+              <div class="rb-icon">♡</div>
+              <span class="rb-count">14.2w</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+              <div class="rb-icon">💬</div>
+              <span class="rb-count">3,421</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+              <div class="rb-icon">↗</div>
+              <span class="rb-count">892</span>
+            </div>
+          </div>
+
+          <!-- Bottom info -->
+          <div class="bottom-info">
+            <div class="creator-name">@创作者昵称<span class="follow-pill">+ 关注</span></div>
+            <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
+            <div class="video-tags">
+              <span class="video-tag">#话题标签</span>
+              <span class="video-tag">#热门话题</span>
+            </div>
+          </div>
+
+          <!-- Comments drawer -->
+          <div class="comments-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">评论</div><div class="drawer-count">3,421 条评论</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="comments-list">
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_01</div>
+                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-time">2小时前</div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_02</div>
+                  <div class="comment-text">真的很实用，收藏了！</div>
+                  <div class="comment-text ph"></div>
+                  <div class="comment-time">4小时前</div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_03</div>
+                  <div class="comment-text ph short"></div>
+                  <div class="comment-time">昨天</div>
+                </div>
+              </div>
+            </div>
+            <div class="drawer-input">
+              <div class="input-field"><span class="input-placeholder">说点什么…</span></div>
+            </div>
+          </div>
+
+
+        </div><!-- /player-content -->
+      </div><!-- /mp-screen -->
+    </div>
+  </div>
+
+  <!-- ② H5 -->
+  <div class="device-wrapper">
+    <div class="device-label">播放页 · H5 浏览器</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="h5-screen">
+
+        <!-- H5 暗色状态栏 -->
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- H5 浏览器地址栏 -->
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr">
+            <span class="h5-lock">🔒</span>
+            <span class="h5-url">h5.example.com/video/<em>video_id_123456</em></span>
+          </div>
+          <div class="h5-acts">
+            <span class="h5-act">↗</span>
+            <span class="h5-act">×</span>
+          </div>
+        </div>
+
+        <div class="player-content">
+
+          <div class="video-bg">
+            <div class="video-placeholder-inner">
+              <div class="vp-icon"></div>
+              <p>VIDEO CONTENT</p>
+            </div>
+          </div>
+
+          <div class="pause-overlay">
+            <div class="pause-btn">
+              <div class="pause-btn-bars"><span></span><span></span></div>
+            </div>
+          </div>
+
+          <div class="video-progress">
+            <div class="video-progress-fill"></div>
+          </div>
+
+          <div class="right-bar">
+            <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+            <div class="right-bar-item">
+              <div class="rb-icon">♡</div>
+              <span class="rb-count">14.2w</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+              <div class="rb-icon">💬</div>
+              <span class="rb-count">3,421</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+              <div class="rb-icon">↗</div>
+              <span class="rb-count">892</span>
+            </div>
+          </div>
+
+          <div class="bottom-info">
+            <div class="creator-name">@创作者昵称<span class="follow-pill">+ 关注</span></div>
+            <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
+            <div class="video-tags">
+              <span class="video-tag">#话题标签</span>
+              <span class="video-tag">#热门话题</span>
+            </div>
+          </div>
+
+          <div class="comments-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">评论</div><div class="drawer-count">3,421 条评论</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="comments-list">
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_01</div>
+                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-time">2小时前</div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_02</div>
+                  <div class="comment-text">真的很实用，收藏了！</div>
+                  <div class="comment-text ph"></div>
+                  <div class="comment-time">4小时前</div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_03</div>
+                  <div class="comment-text ph short"></div>
+                  <div class="comment-time">昨天</div>
+                </div>
+              </div>
+            </div>
+            <div class="drawer-input">
+              <div class="input-field"><span class="input-placeholder">说点什么…</span></div>
+            </div>
+          </div>
+
+          <!-- H5 分享弹窗：显示 H5 链接 + 复制 -->
+          <div class="share-sheet">
+            <div class="share-handle"></div>
+            <div class="share-header">
+              <div>
+                <div class="share-title">分享</div>
+                <div class="share-subtitle">H5 链接</div>
+              </div>
+              <div class="share-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="share-link-block">
+              <div style="flex:1;min-width:0;">
+                <div class="share-link-label">H5 链接</div>
+                <div class="share-link-url">https://h5.example.com/video/<em>video_id_123456</em></div>
+              </div>
+              <button class="share-copy-btn" id="copy-btn" onclick="copyLink()">复制</button>
+            </div>
+          </div>
+
+        </div><!-- /player-content -->
+      </div><!-- /h5-screen -->
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 播放页结构说明（全屏）</h3>
+  <div class="spec-row">
+    <span class="spec-key">布局方式</span>
+    <span class="spec-val">全屏视频 · 信息以覆盖层叠加在视频上，与 Feed 一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序：NavBar（返回 / 视频 / 更多）&nbsp;&nbsp;→&nbsp;&nbsp;H5：浏览器地址栏（返回 / URL / 分享 / 关闭）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">播放器</span>
+    <span class="spec-val">全屏视频区 · 底部进度条（黄色）· 暂停时居中显示暂停图标</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">右侧互动栏</span>
+    <span class="spec-val">头像（+关注）/ 点赞 14.2w / 评论 3,421 / 分享 892</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">底部信息（左下角）</span>
+    <span class="spec-val">@创作者昵称 + 关注 pill · 视频标题（2 行）· 话题标签</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论抽屉</span>
+    <span class="spec-val">70% 高度底部 sheet · 点评论图标触发</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">分享弹窗</span>
+    <span class="spec-val">小程序：无弹窗（点分享直接触发系统分享）&nbsp;&nbsp;→&nbsp;&nbsp;H5：展示 H5 链接 + 复制按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">两版差异</span>
+    <span class="spec-val">仅顶部导航不同；内容区 100% 一致</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    ['mp-screen', 'h5-screen'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('state-pause', 'state-comments', 'state-share');
+      if (state !== 'play') el.classList.add('state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
+  function copyLink() {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1800);
+  }
+</script>
+
+</body>
+</html>
