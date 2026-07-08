@@ -715,6 +715,108 @@
   .state-pause .rb-music .rb-icon { animation-play-state: paused; }
   /* State: comments */
   .state-comments .comments-drawer { display: flex; }
+  /* State: share */
+  .state-share .share-sheet { display: flex; }
+
+  /* ─── Share sheet ─────────────────────────────────────────── */
+  .share-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .share-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  .share-header {
+    padding: 10px 16px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .share-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .share-subtitle {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+  }
+  .share-close {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  /* H5 link block */
+  .share-link-block {
+    margin: 14px 16px 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .share-link-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+  }
+  .share-link-url {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    word-break: break-all;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .share-link-url em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .share-copy-btn {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 12px;
+    background: var(--accent);
+    color: var(--accent-on);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .share-copy-btn.copied {
+    background: var(--success);
+    color: white;
+  }
 
   /* ─── Annotation layer ────────────────────────────────────── */
   .annotation {
@@ -798,6 +900,7 @@
   <button class="state-btn active" data-state="play" onclick="setState('play')">① 主 Feed（播放中）</button>
   <button class="state-btn" data-state="pause" onclick="setState('pause')">② 暂停</button>
   <button class="state-btn" data-state="comments" onclick="setState('comments')">③ 评论展开</button>
+  <button class="state-btn" data-state="share" onclick="setState('share')">④ 分享弹窗</button>
 </div>
 
 <!-- Device -->
@@ -878,7 +981,7 @@
             <span class="rb-count">3,421</span>
           </div>
           <!-- Share -->
-          <div class="right-bar-item">
+          <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
             <div class="rb-icon">↗</div>
             <span class="rb-count">分享</span>
           </div>
@@ -961,6 +1064,26 @@
           </div>
         </div>
 
+        <!-- Share sheet -->
+        <div class="share-sheet" id="share-sheet">
+          <div class="share-handle"></div>
+          <div class="share-header">
+            <div>
+              <div class="share-title">分享</div>
+              <div class="share-subtitle">仅限 H5 环境展示 H5 链接</div>
+            </div>
+            <div class="share-close" onclick="setState('play')">×</div>
+          </div>
+          <!-- H5 link block -->
+          <div class="share-link-block">
+            <div style="flex:1;min-width:0;">
+              <div class="share-link-label">H5 链接</div>
+              <div class="share-link-url">https://h5.example.com/feed/<em>video_id_123456</em></div>
+            </div>
+            <button class="share-copy-btn" id="copy-btn" onclick="copyLink()">复制</button>
+          </div>
+        </div>
+
       </div><!-- /mp-content -->
 
       <!-- Bottom tab bar -->
@@ -1024,14 +1147,14 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">交互状态</span>
-    <span class="spec-val">播放中 → 暂停（点按视频）→ 评论抽屉（点评论图标）</span>
+    <span class="spec-val">播放中 → 暂停（点按视频）→ 评论抽屉（点评论图标）→ 分享弹窗（点分享图标）</span>
   </div>
 </div>
 
 <script>
   function setState(state) {
     const screen = document.getElementById('mp-screen');
-    screen.classList.remove('state-pause', 'state-comments');
+    screen.classList.remove('state-pause', 'state-comments', 'state-share');
     if (state !== 'play') {
       screen.classList.add('state-' + state);
     }
@@ -1039,6 +1162,16 @@
     document.querySelectorAll('.state-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.state === state);
     });
+  }
+
+  function copyLink() {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '复制';
+      btn.classList.remove('copied');
+    }, 1800);
   }
 </script>
 
