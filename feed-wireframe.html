@@ -818,6 +818,75 @@
     color: white;
   }
 
+  /* ─── Devices row (side by side) ─────────────────────────── */
+  .devices-row {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  .diff-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent-on);
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── WeChat Browser Address Bar (H5 only) ────────────────── */
+  .h5-browser-bar {
+    height: 46px;
+    background: #1c1e26;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .h5-browser-back {
+    font-size: 22px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    line-height: 1;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .h5-address-bar {
+    flex: 1;
+    height: 30px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 5px;
+    min-width: 0;
+  }
+  .h5-address-lock { font-size: 11px; flex-shrink: 0; }
+  .h5-address-url {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.65);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .h5-address-url em { font-style: normal; color: var(--accent); }
+  .h5-browser-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .h5-action-btn {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+
   /* ─── Annotation layer ────────────────────────────────────── */
   .annotation {
     position: absolute;
@@ -892,7 +961,7 @@
 
 <div class="page-header">
   <h1>Feed 首页 — 线框图</h1>
-  <p>小程序容器 · 三态交互 · TikTok 风格</p>
+  <p>小程序 vs H5 · 四态交互 · TikTok 风格</p>
 </div>
 
 <!-- State switcher -->
@@ -903,262 +972,321 @@
   <button class="state-btn" data-state="share" onclick="setState('share')">④ 分享弹窗</button>
 </div>
 
-<!-- Device -->
-<div class="device-wrapper">
-  <div class="device-label">iPhone in WeChat Mini-Program · 375 × 780</div>
+<!-- Two devices side by side -->
+<div class="devices-row">
 
-  <div class="mp-device">
-    <div class="mp-screen" id="mp-screen">
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">小程序 · iPhone in WeChat Mini-Program</div>
 
-      <!-- Status bar -->
-      <div class="mp-status-bar">
-        <span class="mp-status-time">9:41</span>
-        <div class="mp-status-icons">
-          <div class="icon-bar">
-            <span class="bar"></span><span class="bar"></span>
-            <span class="bar"></span><span class="bar"></span>
-          </div>
-          <div class="wifi-icon"></div>
-          <div class="battery-icon"></div>
-        </div>
-      </div>
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
 
-      <!-- Mini-program nav -->
-      <div class="mp-nav">
-        <div class="mp-nav-back"></div>
-        <div class="mp-nav-title">Feed</div>
-        <div class="mp-nav-more">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-
-      <!-- Main content -->
-      <div class="mp-content">
-
-        <!-- Video background -->
-        <div class="video-bg">
-          <div class="video-placeholder-inner">
-            <div class="vp-icon"></div>
-            <p>VIDEO CONTENT</p>
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar">
+              <span class="bar"></span><span class="bar"></span>
+              <span class="bar"></span><span class="bar"></span>
+            </div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon"></div>
           </div>
         </div>
 
-        <!-- Top tabs -->
-        <div class="feed-tabs">
-          <span class="feed-tab">关注</span>
-          <span class="feed-tab active">推荐</span>
-          <span class="feed-tab">同城</span>
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="mp-nav-back"></div>
+          <div class="mp-nav-title">Feed</div>
+          <div class="mp-nav-more"><span></span><span></span><span></span></div>
         </div>
 
-        <!-- Pause overlay -->
-        <div class="pause-overlay">
-          <div class="pause-btn">
-            <div class="pause-btn-bars">
-              <span></span><span></span>
+        <div class="mp-content">
+          <div class="video-bg">
+            <div class="video-placeholder-inner">
+              <div class="vp-icon"></div>
+              <p>VIDEO CONTENT</p>
             </div>
           </div>
-        </div>
-
-        <!-- Progress bar (pause state) -->
-        <div class="video-progress">
-          <div class="video-progress-fill"></div>
-        </div>
-
-        <!-- Right interaction bar -->
-        <div class="right-bar">
-          <!-- Avatar + follow -->
-          <div class="right-bar-item rb-avatar">
-            <div class="rb-icon">👤</div>
+          <div class="feed-tabs">
+            <span class="feed-tab">关注</span>
+            <span class="feed-tab active">推荐</span>
+            <span class="feed-tab">同城</span>
           </div>
-          <!-- Like -->
-          <div class="right-bar-item">
-            <div class="rb-icon">♡</div>
-            <span class="rb-count">14.2w</span>
+          <div class="pause-overlay">
+            <div class="pause-btn"><div class="pause-btn-bars"><span></span><span></span></div></div>
           </div>
-          <!-- Comment -->
-          <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
-            <div class="rb-icon">💬</div>
-            <span class="rb-count">3,421</span>
-          </div>
-          <!-- Share -->
-          <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
-            <div class="rb-icon">↗</div>
-            <span class="rb-count">分享</span>
-          </div>
-        </div>
-
-        <!-- Bottom creator info -->
-        <div class="bottom-info">
-          <div class="creator-name">
-            @创作者昵称
-            <span class="follow-pill">+ 关注</span>
-          </div>
-          <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
-          <div class="video-tags">
-            <span class="video-tag">#话题标签</span>
-            <span class="video-tag">#热门话题</span>
-          </div>
-        </div>
-
-        <!-- Comments drawer -->
-        <div class="comments-drawer" id="comments-drawer">
-          <div class="drawer-handle"></div>
-          <div class="drawer-header">
-            <div>
-              <div class="drawer-title">评论</div>
-              <div class="drawer-count">3,421 条评论</div>
+          <div class="video-progress"><div class="video-progress-fill"></div></div>
+          <div class="right-bar">
+            <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+            <div class="right-bar-item"><div class="rb-icon">♡</div><span class="rb-count">14.2w</span></div>
+            <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+              <div class="rb-icon">💬</div><span class="rb-count">3,421</span>
             </div>
-            <div class="drawer-close" onclick="setState('play')">×</div>
+            <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+              <div class="rb-icon">↗</div><span class="rb-count">分享</span>
+            </div>
           </div>
-          <div class="comments-list">
-            <!-- Comment 1 -->
-            <div class="comment-item">
-              <div class="comment-avatar"></div>
-              <div class="comment-body">
-                <div class="comment-name">用户昵称_01</div>
-                <div class="comment-text">这个内容太好了，正是我想要的！</div>
-                <div class="comment-meta">
-                  <span class="comment-time">2小时前</span>
+          <div class="bottom-info">
+            <div class="creator-name">@创作者昵称<span class="follow-pill">+ 关注</span></div>
+            <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
+            <div class="video-tags">
+              <span class="video-tag">#话题标签</span>
+              <span class="video-tag">#热门话题</span>
+            </div>
+          </div>
+          <div class="comments-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">评论</div><div class="drawer-count">3,421 条评论</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="comments-list">
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_01</div>
+                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-meta"><span class="comment-time">2小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_02</div>
+                  <div class="comment-text">真的很实用，收藏了！</div>
+                  <div class="comment-text placeholder"></div>
+                  <div class="comment-meta"><span class="comment-time">4小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_03</div>
+                  <div class="comment-text placeholder short"></div>
+                  <div class="comment-meta"><span class="comment-time">6小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_04</div>
+                  <div class="comment-text">强烈推荐给每一个人看</div>
+                  <div class="comment-meta"><span class="comment-time">昨天</span></div>
                 </div>
               </div>
             </div>
-            <!-- Comment 2 -->
-            <div class="comment-item">
-              <div class="comment-avatar"></div>
-              <div class="comment-body">
-                <div class="comment-name">用户昵称_02</div>
-                <div class="comment-text">真的很实用，收藏了！</div>
-                <div class="comment-text placeholder"></div>
-                <div class="comment-meta">
-                  <span class="comment-time">4小时前</span>
-                </div>
-              </div>
+            <div class="drawer-input">
+              <div class="input-field"><span class="input-placeholder">说点什么…</span></div>
             </div>
-            <!-- Comment 3 -->
-            <div class="comment-item">
-              <div class="comment-avatar"></div>
-              <div class="comment-body">
-                <div class="comment-name">用户昵称_03</div>
-                <div class="comment-text placeholder short"></div>
-                <div class="comment-meta">
-                  <span class="comment-time">6小时前</span>
-                </div>
+          </div>
+          <div class="share-sheet">
+            <div class="share-handle"></div>
+            <div class="share-header">
+              <div>
+                <div class="share-title">分享</div>
+                <div class="share-subtitle">小程序内分享</div>
               </div>
+              <div class="share-close" onclick="setState('play')">×</div>
             </div>
-            <!-- Comment 4 -->
-            <div class="comment-item">
-              <div class="comment-avatar"></div>
-              <div class="comment-body">
-                <div class="comment-name">用户昵称_04</div>
-                <div class="comment-text">强烈推荐给每一个人看</div>
-                <div class="comment-meta">
-                  <span class="comment-time">昨天</span>
-                </div>
+            <div class="share-link-block">
+              <div style="flex:1;min-width:0;">
+                <div class="share-link-label">小程序路径</div>
+                <div class="share-link-url">pages/feed/index?id=<em>video_id_123456</em></div>
               </div>
             </div>
           </div>
-          <div class="drawer-input">
-            <div class="input-field">
-              <span class="input-placeholder">说点什么…</span>
-            </div>
-          </div>
+        </div><!-- /mp-content -->
+
+        <div class="mp-tabbar">
+          <div class="tab-item active"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+          <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+          <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">发布</span></div>
+          <div class="tab-item"><div class="tab-icon">✉</div><span class="tab-label">消息</span></div>
+          <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
         </div>
 
-        <!-- Share sheet -->
-        <div class="share-sheet" id="share-sheet">
-          <div class="share-handle"></div>
-          <div class="share-header">
-            <div>
-              <div class="share-title">分享</div>
-              <div class="share-subtitle">仅限 H5 环境展示 H5 链接</div>
-            </div>
-            <div class="share-close" onclick="setState('play')">×</div>
-          </div>
-          <!-- H5 link block -->
-          <div class="share-link-block">
-            <div style="flex:1;min-width:0;">
-              <div class="share-link-label">H5 链接</div>
-              <div class="share-link-url">https://h5.example.com/feed/<em>video_id_123456</em></div>
-            </div>
-            <button class="share-copy-btn" id="copy-btn" onclick="copyLink()">复制</button>
-          </div>
-        </div>
-
-      </div><!-- /mp-content -->
-
-      <!-- Bottom tab bar -->
-      <div class="mp-tabbar">
-        <div class="tab-item active">
-          <div class="tab-icon">▶</div>
-          <span class="tab-label">视频</span>
-        </div>
-        <div class="tab-item">
-          <div class="tab-icon">◻</div>
-          <span class="tab-label">图文</span>
-        </div>
-        <div class="tab-item tab-publish">
-          <div class="tab-icon">＋</div>
-          <span class="tab-label">发布</span>
-        </div>
-        <div class="tab-item">
-          <div class="tab-icon">✉</div>
-          <span class="tab-label">消息</span>
-        </div>
-        <div class="tab-item">
-          <div class="tab-icon">◉</div>
-          <span class="tab-label">我的</span>
-        </div>
-      </div>
-
-    </div><!-- /mp-screen -->
-  </div><!-- /mp-device -->
-</div>
-
-<!-- Spec panel -->
-<div class="spec-panel">
-  <h3>SPEC · 结构说明</h3>
-  <div class="spec-row">
-    <span class="spec-key">容器</span>
-    <span class="spec-val">微信小程序（非独立 App）</span>
+      </div><!-- /mp-screen -->
+    </div><!-- /mp-device -->
   </div>
+
+  <!-- ② H5 -->
+  <div class="device-wrapper">
+    <div class="device-label">H5 · iPhone in WeChat Browser</div>
+
+    <div class="mp-device">
+      <div class="mp-screen" id="h5-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar">
+              <span class="bar"></span><span class="bar"></span>
+              <span class="bar"></span><span class="bar"></span>
+            </div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- H5 浏览器地址栏（唯一差异） -->
+        <div class="h5-browser-bar">
+          <div class="h5-browser-back">‹</div>
+          <div class="h5-address-bar">
+            <span class="h5-address-lock">🔒</span>
+            <span class="h5-address-url">h5.example.com/feed/<em>video_id_123456</em></span>
+          </div>
+          <div class="h5-browser-actions">
+            <span class="h5-action-btn">↗</span>
+            <span class="h5-action-btn">×</span>
+          </div>
+        </div>
+
+        <div class="mp-content">
+          <div class="video-bg">
+            <div class="video-placeholder-inner">
+              <div class="vp-icon"></div>
+              <p>VIDEO CONTENT</p>
+            </div>
+          </div>
+          <div class="feed-tabs">
+            <span class="feed-tab">关注</span>
+            <span class="feed-tab active">推荐</span>
+            <span class="feed-tab">同城</span>
+          </div>
+          <div class="pause-overlay">
+            <div class="pause-btn"><div class="pause-btn-bars"><span></span><span></span></div></div>
+          </div>
+          <div class="video-progress"><div class="video-progress-fill"></div></div>
+          <div class="right-bar">
+            <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+            <div class="right-bar-item"><div class="rb-icon">♡</div><span class="rb-count">14.2w</span></div>
+            <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+              <div class="rb-icon">💬</div><span class="rb-count">3,421</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+              <div class="rb-icon">↗</div><span class="rb-count">分享</span>
+            </div>
+          </div>
+          <div class="bottom-info">
+            <div class="creator-name">@创作者昵称<span class="follow-pill">+ 关注</span></div>
+            <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
+            <div class="video-tags">
+              <span class="video-tag">#话题标签</span>
+              <span class="video-tag">#热门话题</span>
+            </div>
+          </div>
+          <div class="comments-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">评论</div><div class="drawer-count">3,421 条评论</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="comments-list">
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_01</div>
+                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-meta"><span class="comment-time">2小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_02</div>
+                  <div class="comment-text">真的很实用，收藏了！</div>
+                  <div class="comment-text placeholder"></div>
+                  <div class="comment-meta"><span class="comment-time">4小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_03</div>
+                  <div class="comment-text placeholder short"></div>
+                  <div class="comment-meta"><span class="comment-time">6小时前</span></div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_04</div>
+                  <div class="comment-text">强烈推荐给每一个人看</div>
+                  <div class="comment-meta"><span class="comment-time">昨天</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="drawer-input">
+              <div class="input-field"><span class="input-placeholder">说点什么…</span></div>
+            </div>
+          </div>
+          <!-- H5 分享弹窗：展示 H5 链接 + 复制 -->
+          <div class="share-sheet">
+            <div class="share-handle"></div>
+            <div class="share-header">
+              <div>
+                <div class="share-title">分享</div>
+                <div class="share-subtitle">H5 链接</div>
+              </div>
+              <div class="share-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="share-link-block">
+              <div style="flex:1;min-width:0;">
+                <div class="share-link-label">H5 链接</div>
+                <div class="share-link-url">https://h5.example.com/feed/<em>video_id_123456</em></div>
+              </div>
+              <button class="share-copy-btn" id="copy-btn" onclick="copyLink()">复制</button>
+            </div>
+          </div>
+        </div><!-- /mp-content -->
+
+        <div class="mp-tabbar">
+          <div class="tab-item active"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+          <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+          <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">发布</span></div>
+          <div class="tab-item"><div class="tab-icon">✉</div><span class="tab-label">消息</span></div>
+          <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+        </div>
+
+      </div><!-- /h5-screen -->
+    </div><!-- /mp-device -->
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Diff callout -->
+<div class="spec-panel" style="width:782px;">
+  <h3>差异说明 · 小程序 vs H5</h3>
   <div class="spec-row">
-    <span class="spec-key">导航</span>
-    <span class="spec-val">小程序 NavBar 44px · 返回/标题/更多</span>
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序：NavBar（返回 / Feed 标题 / 更多）&nbsp;&nbsp;→&nbsp;&nbsp;H5：浏览器地址栏（返回 / URL / 分享 / 关闭）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">顶 Tab</span>
-    <span class="spec-val"><span class="spec-badge">关注</span> <span class="spec-badge">推荐</span> <span class="spec-badge">同城</span></span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">视频区</span>
-    <span class="spec-val">全屏占位 · 全屏竖向上下划</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">互动栏</span>
-    <span class="spec-val">右侧固定 · 头像 / 点赞 / 评论 / 分享 / 音乐碟</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">内容信息</span>
-    <span class="spec-val">底部左侧 · 昵称 / 关注 / 标题 / 话题</span>
+    <span class="spec-val">两者相同：<span class="spec-badge">关注</span> <span class="spec-badge">推荐</span> <span class="spec-badge">同城</span></span>
   </div>
   <div class="spec-row">
     <span class="spec-key">底 Bar</span>
-    <span class="spec-val">视频 / 图文 / 发布 / 消息 / 我的 · 56px</span>
+    <span class="spec-val">两者相同：视频 / 图文 / 发布 / 消息 / 我的</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">分享弹窗</span>
+    <span class="spec-val">小程序：展示小程序路径&nbsp;&nbsp;→&nbsp;&nbsp;H5：展示 H5 链接 + 复制按钮</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">交互状态</span>
-    <span class="spec-val">播放中 → 暂停（点按视频）→ 评论抽屉（点评论图标）→ 分享弹窗（点分享图标）</span>
+    <span class="spec-val">两者相同：播放中 → 暂停 → 评论展开 → 分享弹窗</span>
   </div>
 </div>
 
 <script>
   function setState(state) {
-    const screen = document.getElementById('mp-screen');
-    screen.classList.remove('state-pause', 'state-comments', 'state-share');
-    if (state !== 'play') {
-      screen.classList.add('state-' + state);
-    }
-    // Update switcher buttons
+    ['mp-screen', 'h5-screen'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('state-pause', 'state-comments', 'state-share');
+      if (state !== 'play') el.classList.add('state-' + state);
+    });
     document.querySelectorAll('.state-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.state === state);
     });
@@ -1168,10 +1296,7 @@
     const btn = document.getElementById('copy-btn');
     btn.textContent = '已复制';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = '复制';
-      btn.classList.remove('copied');
-    }, 1800);
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1800);
   }
 </script>
 
