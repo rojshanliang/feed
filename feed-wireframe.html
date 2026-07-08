@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed 首页线框图 — 小程序</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ─── HF Design System Tokens ─────────────────────────────── */
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --warn: #f59e0b;
+    --danger: #dc2626;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    /* ─── Wireframe-specific overrides ─── */
+    --wf-block: #d1d5db;       /* placeholder fill */
+    --wf-block-dark: #9ca3af;  /* darker placeholder */
+    --wf-line: #e5e7eb;        /* divider */
+    --wf-overlay: rgba(13,17,23,0.45); /* video overlay */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    gap: 48px;
+  }
+
+  /* ─── Page Header ─────────────────────────────────────────── */
+  .page-header {
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ─── State Switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-standard);
+    white-space: nowrap;
+  }
+  .state-btn.active {
+    background: var(--accent);
+    color: var(--accent-on);
+  }
+  .state-btn:hover:not(.active) {
+    background: var(--border-soft);
+    color: var(--fg);
+  }
+
+  /* ─── Device Wrapper ──────────────────────────────────────── */
+  .device-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .device-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── Mini-program Device Frame ──────────────────────────── */
+  .mp-device {
+    width: 375px;
+    height: 780px;
+    background: var(--fg);
+    border-radius: 36px;
+    padding: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 24px 64px rgba(0,0,0,0.35),
+      0 8px 20px rgba(0,0,0,0.2);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--fg);
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status Bar (mini-program inside WeChat) ────────────── */
+  .mp-status-bar {
+    height: 44px;
+    background: var(--fg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 0 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+  .mp-status-time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .mp-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .mp-status-icons .icon-bar {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  .mp-status-icons .bar {
+    width: 3px;
+    background: #ffffff;
+    border-radius: 1px;
+  }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon {
+    width: 14px;
+    height: 10px;
+    position: relative;
+  }
+  .wifi-icon::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    background: white;
+    border-radius: 50%;
+  }
+  .battery-icon {
+    width: 22px;
+    height: 11px;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-radius: 2px;
+    position: relative;
+  }
+  .battery-icon::before {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 5px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-icon::after {
+    content: '';
+    position: absolute;
+    top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px);
+    background: white;
+    border-radius: 1px;
+  }
+
+  /* ─── Mini-program Nav Bar ────────────────────────────────── */
+  .mp-nav {
+    height: 44px;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mp-nav-back {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+  }
+  .mp-nav-back::before {
+    content: '‹';
+    color: white;
+    font-size: 18px;
+    font-weight: 300;
+    margin-top: -1px;
+  }
+  .mp-nav-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.02em;
+  }
+  .mp-nav-more {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    gap: 2px;
+  }
+  .mp-nav-more span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: white;
+    display: block;
+  }
+
+  /* ─── Content area (takes up remaining space) ─────────────── */
+  .mp-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Top Tabs ────────────────────────────────────────────── */
+  .feed-tabs {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 0 8px;
+    background: linear-gradient(to bottom, rgba(13,17,23,0.7) 0%, transparent 100%);
+  }
+  .feed-tab {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    position: relative;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+  .feed-tab.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .feed-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  /* ─── Video placeholder ───────────────────────────────────── */
+  .video-bg {
+    position: absolute;
+    inset: 0;
+    background: #1a1d23;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .video-placeholder-inner {
+    text-align: center;
+    opacity: 0.3;
+  }
+  .video-placeholder-inner .vp-icon {
+    width: 64px;
+    height: 40px;
+    border: 2px solid white;
+    border-radius: 4px;
+    margin: 0 auto 8px;
+    position: relative;
+  }
+  .video-placeholder-inner .vp-icon::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-40%, -50%);
+    border-left: 16px solid white;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+  .video-placeholder-inner p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: white;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── Pause overlay ───────────────────────────────────────── */
+  .pause-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    background: rgba(0,0,0,0.25);
+  }
+  .pause-overlay .pause-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .pause-btn-bars {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .pause-btn-bars span {
+    width: 5px;
+    height: 22px;
+    background: white;
+    border-radius: 2px;
+    display: block;
+  }
+
+  /* ─── Progress bar (shown in pause state) ─────────────────── */
+  .video-progress {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.25);
+    z-index: 25;
+    display: none;
+  }
+  .video-progress-fill {
+    height: 100%;
+    width: 38%;
+    background: var(--accent);
+    border-radius: 1px;
+    position: relative;
+  }
+  .video-progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ─── Right interaction bar ───────────────────────────────── */
+  .right-bar {
+    position: absolute;
+    right: 12px;
+    bottom: 80px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  .right-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .rb-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 20px;
+    line-height: 1;
+  }
+  /* Avatar */
+  .rb-avatar .rb-icon {
+    background: var(--wf-block-dark);
+    border: 2px solid white;
+    font-size: 18px;
+  }
+  .rb-avatar .rb-icon::after {
+    content: '+';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-on);
+    border: 1.5px solid rgba(13,17,23,0.8);
+    line-height: 14px;
+    text-align: center;
+  }
+  .rb-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }
+
+  /* ─── Bottom content info ─────────────────────────────────── */
+  .bottom-info {
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
+    right: 68px;
+    z-index: 20;
+  }
+  .creator-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .creator-name::before {
+    content: '';
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .follow-pill {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent-on);
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    flex-shrink: 0;
+  }
+  .video-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.4;
+    margin-bottom: 5px;
+    font-family: var(--font-body);
+  }
+  .video-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .video-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ─── Bottom tab bar ──────────────────────────────────────── */
+  .mp-tabbar {
+    height: 56px;
+    background: rgba(13,17,23,0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 30;
+    padding-bottom: 4px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    cursor: pointer;
+  }
+  .tab-icon {
+    font-size: 20px;
+    line-height: 1;
+    color: rgba(255,255,255,0.45);
+  }
+  .tab-item.active .tab-icon {
+    color: var(--accent);
+  }
+  .tab-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.01em;
+  }
+  .tab-item.active .tab-label {
+    color: var(--accent);
+  }
+  /* Publish button */
+  .tab-publish .tab-icon {
+    font-size: 22px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ─── Comments drawer ─────────────────────────────────────── */
+  .comments-drawer {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 70%;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .drawer-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  .drawer-header {
+    padding: 10px 16px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .drawer-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .drawer-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .drawer-close {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+  .comments-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .comment-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .comment-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    flex-shrink: 0;
+  }
+  .comment-body {
+    flex: 1;
+  }
+  .comment-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 3px;
+  }
+  .comment-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.45;
+    font-family: var(--font-body);
+  }
+  .comment-text.placeholder {
+    height: 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 6px;
+    width: 80%;
+  }
+  .comment-text.placeholder.short {
+    width: 55%;
+  }
+  .comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  .comment-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+  }
+  .drawer-input {
+    padding: 10px 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .input-field {
+    flex: 1;
+    height: 36px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+  }
+  .input-placeholder {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ─── State visibility ────────────────────────────────────── */
+  /* State: play (default) — nothing extra shown */
+  /* State: pause */
+  .state-pause .pause-overlay   { display: flex; }
+  .state-pause .video-progress  { display: block; }
+  .state-pause .rb-music        { }
+  .state-pause .rb-music .rb-icon { animation-play-state: paused; }
+  /* State: comments */
+  .state-comments .comments-drawer { display: flex; }
+
+  /* ─── Annotation layer ────────────────────────────────────── */
+  .annotation {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(13,17,23,0.85);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+  .annotation-line {
+    position: absolute;
+    background: rgba(255,210,30,0.4);
+    z-index: 49;
+    pointer-events: none;
+  }
+
+  /* ─── Legend / spec panel ─────────────────────────────────── */
+  .spec-panel {
+    width: 375px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+  }
+  .spec-panel h3 {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .spec-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .spec-badge {
+    display: inline-block;
+    background: var(--surface-warm);
+    border: 1px solid var(--accent);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Feed 首页 — 线框图</h1>
+  <p>小程序容器 · 三态交互 · TikTok 风格</p>
+</div>
+
+<!-- State switcher -->
+<div class="state-switcher" role="group" aria-label="切换状态">
+  <button class="state-btn active" data-state="play" onclick="setState('play')">① 主 Feed（播放中）</button>
+  <button class="state-btn" data-state="pause" onclick="setState('pause')">② 暂停</button>
+  <button class="state-btn" data-state="comments" onclick="setState('comments')">③ 评论展开</button>
+</div>
+
+<!-- Device -->
+<div class="device-wrapper">
+  <div class="device-label">iPhone in WeChat Mini-Program · 375 × 780</div>
+
+  <div class="mp-device">
+    <div class="mp-screen" id="mp-screen">
+
+      <!-- Status bar -->
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar">
+            <span class="bar"></span><span class="bar"></span>
+            <span class="bar"></span><span class="bar"></span>
+          </div>
+          <div class="wifi-icon"></div>
+          <div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- Mini-program nav -->
+      <div class="mp-nav">
+        <div class="mp-nav-back"></div>
+        <div class="mp-nav-title">Feed</div>
+        <div class="mp-nav-more">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="mp-content">
+
+        <!-- Video background -->
+        <div class="video-bg">
+          <div class="video-placeholder-inner">
+            <div class="vp-icon"></div>
+            <p>VIDEO CONTENT</p>
+          </div>
+        </div>
+
+        <!-- Top tabs -->
+        <div class="feed-tabs">
+          <span class="feed-tab">关注</span>
+          <span class="feed-tab active">推荐</span>
+          <span class="feed-tab">同城</span>
+        </div>
+
+        <!-- Pause overlay -->
+        <div class="pause-overlay">
+          <div class="pause-btn">
+            <div class="pause-btn-bars">
+              <span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress bar (pause state) -->
+        <div class="video-progress">
+          <div class="video-progress-fill"></div>
+        </div>
+
+        <!-- Right interaction bar -->
+        <div class="right-bar">
+          <!-- Avatar + follow -->
+          <div class="right-bar-item rb-avatar">
+            <div class="rb-icon">👤</div>
+          </div>
+          <!-- Like -->
+          <div class="right-bar-item">
+            <div class="rb-icon">♡</div>
+            <span class="rb-count">14.2w</span>
+          </div>
+          <!-- Comment -->
+          <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+            <div class="rb-icon">💬</div>
+            <span class="rb-count">3,421</span>
+          </div>
+          <!-- Share -->
+          <div class="right-bar-item">
+            <div class="rb-icon">↗</div>
+            <span class="rb-count">分享</span>
+          </div>
+        </div>
+
+        <!-- Bottom creator info -->
+        <div class="bottom-info">
+          <div class="creator-name">
+            @创作者昵称
+            <span class="follow-pill">+ 关注</span>
+          </div>
+          <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
+          <div class="video-tags">
+            <span class="video-tag">#话题标签</span>
+            <span class="video-tag">#热门话题</span>
+          </div>
+        </div>
+
+        <!-- Comments drawer -->
+        <div class="comments-drawer" id="comments-drawer">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header">
+            <div>
+              <div class="drawer-title">评论</div>
+              <div class="drawer-count">3,421 条评论</div>
+            </div>
+            <div class="drawer-close" onclick="setState('play')">×</div>
+          </div>
+          <div class="comments-list">
+            <!-- Comment 1 -->
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_01</div>
+                <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                <div class="comment-meta">
+                  <span class="comment-time">2小时前</span>
+                </div>
+              </div>
+            </div>
+            <!-- Comment 2 -->
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_02</div>
+                <div class="comment-text">真的很实用，收藏了！</div>
+                <div class="comment-text placeholder"></div>
+                <div class="comment-meta">
+                  <span class="comment-time">4小时前</span>
+                </div>
+              </div>
+            </div>
+            <!-- Comment 3 -->
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_03</div>
+                <div class="comment-text placeholder short"></div>
+                <div class="comment-meta">
+                  <span class="comment-time">6小时前</span>
+                </div>
+              </div>
+            </div>
+            <!-- Comment 4 -->
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_04</div>
+                <div class="comment-text">强烈推荐给每一个人看</div>
+                <div class="comment-meta">
+                  <span class="comment-time">昨天</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="drawer-input">
+            <div class="input-field">
+              <span class="input-placeholder">说点什么…</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /mp-content -->
+
+      <!-- Bottom tab bar -->
+      <div class="mp-tabbar">
+        <div class="tab-item active">
+          <div class="tab-icon">▶</div>
+          <span class="tab-label">视频</span>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">◻</div>
+          <span class="tab-label">图文</span>
+        </div>
+        <div class="tab-item tab-publish">
+          <div class="tab-icon">＋</div>
+          <span class="tab-label">发布</span>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">✉</div>
+          <span class="tab-label">消息</span>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">◉</div>
+          <span class="tab-label">我的</span>
+        </div>
+      </div>
+
+    </div><!-- /mp-screen -->
+  </div><!-- /mp-device -->
+</div>
+
+<!-- Spec panel -->
+<div class="spec-panel">
+  <h3>SPEC · 结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">容器</span>
+    <span class="spec-val">微信小程序（非独立 App）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">导航</span>
+    <span class="spec-val">小程序 NavBar 44px · 返回/标题/更多</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">顶 Tab</span>
+    <span class="spec-val"><span class="spec-badge">关注</span> <span class="spec-badge">推荐</span> <span class="spec-badge">同城</span></span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频区</span>
+    <span class="spec-val">全屏占位 · 全屏竖向上下划</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动栏</span>
+    <span class="spec-val">右侧固定 · 头像 / 点赞 / 评论 / 分享 / 音乐碟</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容信息</span>
+    <span class="spec-val">底部左侧 · 昵称 / 关注 / 标题 / 话题</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">底 Bar</span>
+    <span class="spec-val">视频 / 图文 / 发布 / 消息 / 我的 · 56px</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">交互状态</span>
+    <span class="spec-val">播放中 → 暂停（点按视频）→ 评论抽屉（点评论图标）</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    const screen = document.getElementById('mp-screen');
+    screen.classList.remove('state-pause', 'state-comments');
+    if (state !== 'play') {
+      screen.classList.add('state-' + state);
+    }
+    // Update switcher buttons
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+</script>
+
+</body>
+</html>
