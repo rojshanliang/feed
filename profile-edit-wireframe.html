@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人资料编辑页 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── NavBar ──────────────────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-save {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--accent-on); background: var(--accent);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+    border: none; cursor: pointer;
+  }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Cover photo area ────────────────────────────────────── */
+  .cover-area {
+    width: 100%; height: 120px;
+    background: var(--wf-block);
+    position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-edit-btn {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 6px; padding: 5px 12px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: #fff; cursor: pointer; display: flex; align-items: center; gap: 5px;
+  }
+  .cover-label {
+    position: absolute; top: 8px; left: 12px;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.05em;
+  }
+
+  /* ─── Avatar row ──────────────────────────────────────────── */
+  .avatar-row {
+    padding: 0 16px; background: #ffffff;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-top: -28px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .avatar-wrap {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--wf-block-dark);
+    border: 3px solid #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0; position: relative;
+    cursor: pointer;
+  }
+  .avatar-edit-dot {
+    position: absolute; bottom: 0; right: 0;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--fg); border: 2px solid #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #fff;
+  }
+  .avatar-hint {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    padding-bottom: 4px;
+  }
+
+  /* ─── Form fields ─────────────────────────────────────────── */
+  .form-section { padding: 16px 16px 0; display: flex; flex-direction: column; gap: 0; }
+  .field-item {
+    display: flex; align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-soft);
+    gap: 12px;
+  }
+  .field-item:last-child { border-bottom: none; }
+  .field-lbl {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--fg); width: 68px; flex-shrink: 0;
+  }
+  .field-val {
+    flex: 1; font-family: var(--font-body); font-size: 13px;
+    color: var(--fg-2); min-width: 0;
+  }
+  .field-val.placeholder { color: var(--muted); }
+  .field-val.bio { line-height: 1.5; white-space: pre-wrap; }
+  .field-arrow { font-size: 16px; color: var(--muted); font-family: var(--font-mono); flex-shrink: 0; }
+
+  /* Username uniqueness note */
+  .field-note {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    padding: 6px 0 0 80px; margin-top: -8px;
+  }
+
+  /* ─── Bottom safe area spacer ─────────────────────────────── */
+  .bottom-spacer { height: 32px; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>个人资料编辑页 — 线框图</h1>
+  <p>小程序 · 两种状态：空 / 已填写</p>
+</div>
+
+<div class="devices-row">
+
+  <!-- ① 空状态（首次填写） -->
+  <div class="device-wrapper">
+    <div class="device-label">空状态 · 首次填写</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">编辑个人资料</div>
+          <button class="nav-save">保存</button>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- 个人页头图 -->
+          <div class="cover-area">
+            <span class="cover-label">个人页头图</span>
+            <div class="cover-edit-btn">✎ 更换头图</div>
+          </div>
+
+          <!-- 头像 -->
+          <div class="avatar-row">
+            <div class="avatar-wrap">
+              👤
+              <div class="avatar-edit-dot">✎</div>
+            </div>
+            <span class="avatar-hint">点击更换头像</span>
+          </div>
+
+          <!-- 表单字段 -->
+          <div class="form-section">
+
+            <div class="field-item">
+              <span class="field-lbl">昵称</span>
+              <span class="field-val placeholder">填写你的昵称</span>
+              <span class="field-arrow">›</span>
+            </div>
+
+            <div class="field-item">
+              <span class="field-lbl">用户名</span>
+              <span class="field-val placeholder">设置唯一用户名</span>
+              <span class="field-arrow">›</span>
+            </div>
+            <div class="field-note">用户名设置后不可修改</div>
+
+            <div class="field-item">
+              <span class="field-lbl">简介</span>
+              <span class="field-val placeholder">介绍一下自己…</span>
+              <span class="field-arrow">›</span>
+            </div>
+
+          </div>
+
+          <div class="bottom-spacer"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 已填写状态 -->
+  <div class="device-wrapper">
+    <div class="device-label">已填写状态</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">编辑个人资料</div>
+          <button class="nav-save">保存</button>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- 个人页头图（已设置，深色背景模拟） -->
+          <div class="cover-area" style="background:#2a2d35;">
+            <span class="cover-label">个人页头图</span>
+            <div class="cover-edit-btn">✎ 更换头图</div>
+          </div>
+
+          <!-- 头像（已设置） -->
+          <div class="avatar-row">
+            <div class="avatar-wrap" style="background:#4a5568;">
+              😊
+              <div class="avatar-edit-dot">✎</div>
+            </div>
+            <span class="avatar-hint">点击更换头像</span>
+          </div>
+
+          <!-- 表单字段 - 已填写 -->
+          <div class="form-section">
+
+            <div class="field-item">
+              <span class="field-lbl">昵称</span>
+              <span class="field-val">用户昵称示例</span>
+              <span class="field-arrow">›</span>
+            </div>
+
+            <div class="field-item">
+              <span class="field-lbl">用户名</span>
+              <span class="field-val" style="color:var(--muted);">@username_unique</span>
+              <span class="field-arrow" style="color:var(--border);">›</span>
+            </div>
+            <div class="field-note" style="color:#dc2626;">用户名已锁定，不可修改</div>
+
+            <div class="field-item" style="align-items:flex-start; padding-top:14px;">
+              <span class="field-lbl" style="padding-top:1px;">简介</span>
+              <span class="field-val bio">这里是个人简介内容，最多展示三行，超出则截断显示省略号…</span>
+              <span class="field-arrow" style="margin-top:1px;">›</span>
+            </div>
+
+          </div>
+
+          <div class="bottom-spacer"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 个人资料编辑页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">NavBar（返回 / 编辑个人资料 / 保存按钮）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">个人页头图</span>
+    <span class="spec-val">120px 高横幅 · 点击「更换头图」触发图片选择</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">头像</span>
+    <span class="spec-val">64px 圆形 · 叠加在头图下方 · 右下角编辑点触发选择</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">昵称</span>
+    <span class="spec-val">可编辑 · 点击进入文字输入页</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">用户名</span>
+    <span class="spec-val">首次可设置 · 设置后锁定不可修改（灰色 + 锁定提示）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">简介</span>
+    <span class="spec-val">多行文本 · 点击进入文本编辑页 · 最多展示 3 行</span>
+  </div>
+</div>
+
+</body>
+</html>
