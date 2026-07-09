@@ -168,7 +168,7 @@
   .topic-stat strong { color: #ffffff; font-weight: 600; }
   .topic-stat-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.3); }
 
-  /* ─── Stats + Publish row (single row) ───────────────────── */
+  /* ─── Stats row ──────────────────────────────────────────── */
   .publish-row {
     padding: 10px 16px; background: #ffffff;
     border-bottom: 1px solid var(--border-soft);
@@ -181,13 +181,6 @@
   .publish-row .topic-stat { color: var(--fg-2); font-family: var(--font-mono); font-size: 11px; }
   .publish-row .topic-stat strong { color: var(--fg); }
   .publish-row .topic-stat-sep { background: var(--border); }
-  .publish-btn {
-    height: 34px; padding: 0 18px;
-    background: var(--accent); color: var(--accent-on);
-    border-radius: var(--radius-pill); border: none;
-    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
-    cursor: pointer; flex-shrink: 0;
-  }
 
   /* ─── Content tabs ────────────────────────────────────────── */
   .content-tabs {
@@ -287,7 +280,6 @@
               <span class="topic-stat-sep"></span>
               <span class="topic-stat"><strong>3,421</strong> 参与</span>
             </div>
-            <button class="publish-btn">＋ 发布内容</button>
           </div>
 
           <!-- Content tabs -->
@@ -352,7 +344,6 @@
               <span class="topic-stat-sep"></span>
               <span class="topic-stat"><strong>3,421</strong> 参与</span>
             </div>
-            <button class="publish-btn">＋ 发布内容</button>
           </div>
 
           <!-- Content tabs -->
@@ -385,10 +376,6 @@
   <div class="spec-row">
     <span class="spec-key">话题 Banner</span>
     <span class="spec-val">封面图 · 话题名称 · 数据（内容数 + 参与数）</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">发布入口</span>
-    <span class="spec-val">输入框占位 + 黄色「＋ 发布」按钮 — 点击跳转发布流程</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">内容 Tab</span>

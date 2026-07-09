@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>内容发布页 — 线框图</title>
+<title>内容发布页 — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -379,7 +379,7 @@
 
 <div class="page-header">
   <h1>内容发布页 — 线框图</h1>
-  <p>小程序 vs H5 · 三态：相册授权 / 未上传 / 上传中 / 已上传 · 每行 2-3 屏 · 仅竖版视频</p>
+  <p>小程序 · 相册授权 / 未上传 / 上传中 / 已上传</p>
 </div>
 
 <!-- ════════════ 行 1：小程序 ════════════ -->
@@ -640,206 +640,8 @@
 
 </div><!-- /devices-row 小程序 完成态 -->
 
-<!-- ════════════ 行 2：H5 ════════════ -->
-<div class="row-label">H5 浏览器 — 过程态</div>
-
-<div class="devices-row">
-
-  <!-- H5 · 未上传 -->
-  <div class="device-wrapper">
-    <div class="device-label">① 未上传</div>
-    <div class="mp-device">
-      <div class="mp-screen">
-        <div class="h5-status-bar">
-          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
-          <div class="mp-status-icons">
-            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
-            <div class="wifi-icon"></div>
-            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
-          </div>
-        </div>
-        <div class="h5-browser-bar">
-          <div class="h5-back">‹</div>
-          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
-          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
-        </div>
-        <div class="page-scroll">
-          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
-          <div class="upload-wrap">
-            <div class="upload-portrait empty" onclick="this.closest('.mp-device').querySelector('.album-auth-overlay').classList.add('visible')" style="cursor:pointer">
-              <div class="u-icon">＋</div>
-              <div class="u-text"><strong>选择竖版视频</strong>从相册选取</div>
-              <span class="u-format">MP4 · MOV（仅 iOS）</span>
-            </div>
-          </div>
-          <div class="form-section">
-            <div class="field-group">
-              <div class="field-lbl">视频标题</div>
-              <div class="title-input">添加标题，让更多人看到你的内容…</div>
-              <div class="field-hint">0 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text">搜索或选择话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bottom-bar">
-          <button class="pub-btn inactive" disabled>上传视频后可发布</button>
-        </div>
-      </div>
-    </div>
-  <!-- 相册授权弹层 -->
-  <div class="album-auth-overlay" onclick="this.classList.remove('visible')">
-    <div class="album-auth-sheet" onclick="event.stopPropagation()">
-      <div class="album-auth-icon">📷</div>
-      <div class="album-auth-title">需要访问您的相册</div>
-      <div class="album-auth-desc">
-        上传视频需要访问您的<strong>相册权限</strong><br>仅用于选取您想发布的视频内容
-      </div>
-      <div class="album-auth-actions">
-        <button class="album-auth-allow" onclick="this.closest('.album-auth-overlay').classList.remove('visible')">允许访问相册</button>
-        <button class="album-auth-deny" onclick="this.closest('.album-auth-overlay').classList.remove('visible')">暂不允许</button>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <!-- H5 · 上传中 -->
-  <div class="device-wrapper">
-    <div class="device-label">② 上传中</div>
-    <div class="mp-device">
-      <div class="mp-screen">
-        <div class="h5-status-bar">
-          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
-          <div class="mp-status-icons">
-            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
-            <div class="wifi-icon"></div>
-            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
-          </div>
-        </div>
-        <div class="h5-browser-bar">
-          <div class="h5-back">‹</div>
-          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
-          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
-        </div>
-        <div class="page-scroll">
-          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
-          <div class="upload-wrap">
-            <div class="upload-portrait uploading">
-              <div class="uploading-thumb-bg"></div>
-              <div class="uploading-overlay">
-                <div class="uploading-spinner"></div>
-                <div class="uploading-pct">68%</div>
-                <div class="uploading-label">视频上传中…</div>
-              </div>
-              <div class="upload-progress-bar">
-                <div class="upload-progress-fill"></div>
-              </div>
-            </div>
-          </div>
-          <div class="form-section">
-            <div class="field-group">
-              <div class="field-lbl">视频标题</div>
-              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
-              <div class="field-hint filled">18 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text filled">继续添加话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
-              <div class="topic-chips">
-                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bottom-bar">
-          <button class="pub-btn uploading-btn" disabled>视频上传中，请稍候…</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /devices-row H5 过程态 -->
-
-<!-- ════════════ H5 浏览器 完成态 ════════════ -->
-<div class="row-label">H5 浏览器 — 完成态</div>
-
-<div class="devices-row">
-
-  <!-- H5 · 已上传 -->
-  <div class="device-wrapper">
-    <div class="device-label">③ 已上传（可发布）</div>
-    <div class="mp-device">
-      <div class="mp-screen">
-        <div class="h5-status-bar">
-          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
-          <div class="mp-status-icons">
-            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
-            <div class="wifi-icon"></div>
-            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
-          </div>
-        </div>
-        <div class="h5-browser-bar">
-          <div class="h5-back">‹</div>
-          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/publish</span></div>
-          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
-        </div>
-        <div class="page-scroll">
-          <div class="section-label">上传视频 <span class="section-note">仅支持竖版</span></div>
-          <div class="upload-wrap">
-            <div class="upload-portrait done">
-              <div class="done-thumb-bg">▶</div>
-              <div class="done-duration">00:42</div>
-              <div class="done-replace">重新选择</div>
-            </div>
-          </div>
-          <div class="form-section">
-            <div class="field-group">
-              <div class="field-lbl">视频标题</div>
-              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
-              <div class="field-hint filled">18 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text filled">继续添加话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
-              <div class="topic-chips">
-                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
-                <div class="topic-chip">#热门话题<span class="chip-x">×</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bottom-bar">
-          <button class="pub-btn">发布</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-</div><!-- /devices-row H5 完成态 -->
-
 <!-- Spec -->
-<div class="spec-panel" style="width:1630px;">
+<div class="spec-panel" style="width:782px;">
   <h3>SPEC · 内容发布页结构说明</h3>
   <div class="spec-row">
     <span class="spec-key">顶部导航</span>
@@ -863,10 +665,9 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">两版差异</span>
-    <span class="spec-val">小程序发布按钮在 NavBar 右侧 · H5 发布按钮在底部全宽操作栏；内容区三态完全一致</span>
+    <span class="spec-val">小程序发布按钮在 NavBar 右侧 · NavBar 右侧发布按钮；底部全宽操作栏（H5 版）</span>
   </div>
 </div>
-
 
 <script>
   function copyLink() {
