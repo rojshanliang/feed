@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人页 / 创作者页 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-pill: 9999px;
+    --motion-fast: 120ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 600; color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 13px; color: var(--muted); margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  /* ─── Device wrapper ──────────────────────────────────────── */
+  .device-wrapper {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .device-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px;
+    background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 24px 64px rgba(0,0,0,0.35),
+      0 8px 20px rgba(0,0,0,0.2);
+    position: relative; flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%;
+    background: #ffffff;
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; background: white; border-radius: 50%;
+  }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before {
+    content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0;
+  }
+  .battery-icon::after {
+    content: ''; position: absolute; top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px;
+  }
+
+  /* ─── Nav bar ─────────────────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .mp-nav-back {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+    padding-bottom: 1px;
+  }
+  .mp-nav-title {
+    flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+  .mp-nav-share {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--fg); cursor: pointer;
+  }
+
+  /* ─── Scrollable profile content ─────────────────────────── */
+  .profile-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Cover + avatar header ───────────────────────────────── */
+  .profile-cover {
+    width: 100%; height: 120px;
+    background: var(--wf-block);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+  .profile-cover-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.05em;
+  }
+  .profile-avatar-wrap {
+    position: absolute;
+    bottom: -30px; left: 16px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    border: 3px solid #ffffff;
+    z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  /* ─── Profile info section ────────────────────────────────── */
+  .profile-info {
+    padding: 36px 16px 0;
+    background: #ffffff;
+  }
+  .profile-name {
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); margin-bottom: 2px;
+  }
+  .profile-handle {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .profile-bio {
+    font-size: 13px; color: var(--fg-2); line-height: 1.5;
+    margin-bottom: 14px; font-family: var(--font-body);
+  }
+
+  /* ─── Stats row ───────────────────────────────────────────── */
+  .stats-row {
+    display: flex;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+  .stat-item {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0;
+    border-right: 1px solid var(--border-soft);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+    color: var(--fg); line-height: 1;
+  }
+  .stat-lbl {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-top: 3px; letter-spacing: 0.02em;
+  }
+
+  /* ─── Action buttons ──────────────────────────────────────── */
+  .profile-actions {
+    padding: 14px 0 0;
+    display: flex; gap: 8px;
+  }
+  .btn-primary {
+    flex: 1; height: 36px;
+    background: var(--fg); color: #fff;
+    border-radius: var(--radius-md); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 5px;
+  }
+  .btn-outline {
+    flex: 1; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 5px;
+  }
+  .btn-follow {
+    flex: 1; height: 36px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-md); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .btn-icon {
+    width: 36px; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ─── Content section ─────────────────────────────────────── */
+  .content-section {
+    background: #ffffff;
+    padding: 14px 16px 0;
+    flex: 1;
+  }
+  .content-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .content-title {
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.04em;
+  }
+  .content-count {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  }
+  /* 3-column video grid */
+  .video-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .video-thumb {
+    aspect-ratio: 9/16;
+    background: var(--wf-block);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .video-thumb::after {
+    content: '▶';
+    font-size: 16px; color: rgba(255,255,255,0.5);
+  }
+  .video-thumb:nth-child(3n+2) { background: #c8ccd2; }
+  .video-thumb:nth-child(3n+3) { background: #b8bcc4; }
+
+  /* ─── Divider between profile-info and content ────────────── */
+  .section-gap {
+    height: 8px; background: var(--border-soft); flex-shrink: 0;
+  }
+
+  /* ─── H5 browser address bar ─────────────────────────────── */
+  .h5-browser-bar {
+    height: 46px; background: #1c1e26;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .h5-browser-back {
+    font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.45);
+    line-height: 1; width: 20px; text-align: center; flex-shrink: 0;
+  }
+  .h5-address-bar {
+    flex: 1; height: 28px; background: rgba(0,0,0,0.07);
+    border-radius: 14px; display: flex; align-items: center;
+    padding: 0 10px; gap: 4px; min-width: 0;
+  }
+  .h5-address-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-address-url {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.55);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .h5-browser-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-action-btn { font-size: 14px; color: rgba(0,0,0,0.4); font-family: var(--font-mono); }
+
+  /* H5 screen has white status bar area */
+  .h5-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; z-index: 10;
+    border-bottom: none;
+  }
+  .h5-status-bar .mp-status-time { color: var(--fg); }
+  .h5-status-bar .mp-status-icons .bar { background: var(--fg); }
+  .h5-status-bar .wifi-icon::before { background: var(--fg); }
+  .h5-status-bar .battery-icon { border-color: rgba(13,17,23,0.7); }
+  .h5-status-bar .battery-icon::before { background: rgba(13,17,23,0.7); }
+  .h5-status-bar .battery-icon::after { background: var(--fg); }
+
+  /* Override H5 browser bar for light theme */
+  .h5-browser-bar.light {
+    background: #f2f2f7;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .h5-browser-bar.light .h5-browser-back { color: rgba(0,0,0,0.5); }
+  .h5-browser-bar.light .h5-address-bar { background: #ffffff; border: 1px solid var(--border); }
+  .h5-browser-bar.light .h5-address-url { color: var(--muted); }
+  .h5-browser-bar.light .h5-action-btn { color: var(--muted); }
+
+  /* ─── Section heading ─────────────────────────────────────── */
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 600; color: var(--fg);
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-heading::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ─── Diff badge ──────────────────────────────────────────── */
+  .diff-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--accent-on); background: var(--accent);
+    padding: 2px 8px; border-radius: 3px; letter-spacing: 0.02em;
+  }
+  .diff-tag.secondary {
+    background: var(--fg); color: #fff;
+  }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px 18px;
+  }
+  .spec-panel h3 {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em;
+  }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge {
+    display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent);
+    color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    padding: 1px 7px; border-radius: 3px; margin-right: 3px;
+  }
+  .spec-badge.dark {
+    background: var(--fg); border-color: var(--fg); color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>个人页 / 创作者页 — 线框图</h1>
+  <p>小程序 · 个人页 vs 创作者页 · 并排对比</p>
+</div>
+
+<div class="devices-row">
+
+  <!-- 个人页 · 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">个人页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">我的</div>
+          <div style="display:flex;gap:6px;">
+            <div class="mp-nav-share">↗</div>
+            <div class="mp-nav-share">⚙</div>
+          </div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">个人页头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">用户昵称</div>
+            <div class="profile-handle">@username_unique</div>
+            <div class="profile-bio">这里是个人简介，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">128</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">3,421</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">56</span><span class="stat-lbl">内容</span></div>
+            </div>
+            <div class="profile-actions"><button class="btn-outline">✏ 编辑个人资料</button></div>
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+          <div class="content-section">
+            <div class="content-header"><span class="content-title">全部内容</span><span class="content-count">共 56 条</span></div>
+            <div class="video-grid">
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 创作者页 · 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">创作者页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">创作者</div>
+          <div class="mp-nav-share">↗</div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">创作者头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">创作者昵称</div>
+            <div class="profile-handle">@creator_handle</div>
+            <div class="profile-bio">创作者简介文字，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">256</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">8.6w</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">120w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">203</span><span class="stat-lbl">内容</span></div>
+            </div>
+            <div class="profile-actions">
+              <button class="btn-follow">+ 关注</button>
+
+              <div class="btn-icon">↗</div>
+            </div>
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+          <div class="content-section">
+            <div class="content-header"><span class="content-title">全部内容</span><span class="content-count">共 203 条</span></div>
+            <div class="video-grid">
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec panel -->
+<div class="spec-panel" style="width:782px;">
+  <h3>差异说明 · 个人页 vs 创作者页（小程序）</h3>
+  <div class="spec-row">
+    <span class="spec-key">页面标题</span>
+    <span class="spec-val">个人页：「我的」&nbsp;&nbsp;→&nbsp;&nbsp;创作者页：「创作者」</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">右上角操作</span>
+    <span class="spec-val">个人页：分享↗ + 设置⚙&nbsp;&nbsp;→&nbsp;&nbsp;创作者页：仅分享↗</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">数据四格</span>
+    <span class="spec-val">两者相同：<span class="spec-badge">关注量</span><span class="spec-badge">粉丝量</span><span class="spec-badge">获赞量</span><span class="spec-badge">内容总量</span></span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">操作按钮</span>
+    <span class="spec-val">个人页：编辑个人资料&nbsp;&nbsp;→&nbsp;&nbsp;创作者页：关注（黄色）+ 分享图标</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">设置入口</span>
+    <span class="spec-val">头像/昵称/头图/用户名/简介 — 仅限个人页 ⚙ 触达</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容列表</span>
+    <span class="spec-val">两者相同：3 列视频缩略图网格</span>
+  </div>
+</div>
+
+</body>
+</html>
