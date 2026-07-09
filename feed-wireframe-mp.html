@@ -909,6 +909,29 @@
     color: white;
   }
 
+  /* ─── Share platform panel ────────────────────────────────── */
+  .share-platforms {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    padding: 20px 16px 24px;
+  }
+  .share-platform-item {
+    display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer;
+  }
+  .share-platform-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .share-platform-icon.whatsapp  { background: #25D366; }
+  .share-platform-icon.instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+  .share-platform-icon.tiktok    { background: #010101; border: 1px solid rgba(255,255,255,0.15); }
+  .share-platform-label {
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6);
+  }
+
   /* ─── Devices row (side by side) ─────────────────────────── */
   .devices-row {
     display: flex;
@@ -1177,15 +1200,22 @@
             <div class="share-handle"></div>
             <div class="share-header">
               <div>
-                <div class="share-title">分享</div>
-                <div class="share-subtitle">小程序内分享</div>
+                <div class="share-title">分享到</div>
               </div>
               <div class="share-close" onclick="setState('play')">×</div>
             </div>
-            <div class="share-link-block">
-              <div style="flex:1;min-width:0;">
-                <div class="share-link-label">小程序路径</div>
-                <div class="share-link-url">pages/feed/index?id=<em>video_id_123456</em></div>
+            <div class="share-platforms">
+              <div class="share-platform-item">
+                <div class="share-platform-icon whatsapp">💬</div>
+                <span class="share-platform-label">WhatsApp</span>
+              </div>
+              <div class="share-platform-item">
+                <div class="share-platform-icon instagram">📸</div>
+                <span class="share-platform-label">Instagram</span>
+              </div>
+              <div class="share-platform-item">
+                <div class="share-platform-icon tiktok">♪</div>
+                <span class="share-platform-label">TikTok</span>
               </div>
             </div>
           </div>
