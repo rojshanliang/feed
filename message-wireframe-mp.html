@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消息页 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── H5 light status bar ─────────────────────────────────── */
+  .h5-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .h5-status-bar .mp-status-time { color: var(--fg); }
+  .h5-status-bar .mp-status-icons .bar { background: var(--fg); }
+  .h5-status-bar .wifi-icon::before { background: var(--fg); }
+  .h5-status-bar .battery-icon { border-color: rgba(13,17,23,0.7); }
+  .h5-status-bar .battery-icon::after { background: var(--fg); }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-spacer { width: 28px; }
+
+  /* ─── H5 browser bar ──────────────────────────────────────── */
+  .h5-browser-bar {
+    height: 46px; background: #f2f2f7;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .h5-back { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.45); line-height: 1; width: 20px; text-align: center; flex-shrink: 0; }
+  .h5-addr { flex: 1; height: 28px; background: #ffffff; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; padding: 0 10px; gap: 4px; min-width: 0; }
+  .h5-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-url { font-family: var(--font-mono); font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h5-acts { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-act { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Section label ───────────────────────────────────────── */
+  .section-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 12px 16px 8px;
+  }
+
+  /* ─── Recent contacts strip ───────────────────────────────── */
+  .recent-contacts {
+    padding: 4px 16px 14px;
+    display: flex; gap: 16px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .recent-contacts::-webkit-scrollbar { display: none; }
+  .contact-item {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    flex-shrink: 0; cursor: pointer;
+  }
+  .contact-avatar {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; position: relative;
+  }
+  .contact-avatar.unread::after {
+    content: '';
+    position: absolute; top: 1px; right: 1px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #dc2626; border: 2px solid #ffffff;
+  }
+  .contact-name {
+    font-family: var(--font-mono); font-size: 10px; color: var(--fg-2);
+    text-align: center; max-width: 52px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* ─── Message list ────────────────────────────────────────── */
+  .message-list { flex: 1; display: flex; flex-direction: column; }
+  .message-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    cursor: pointer; position: relative;
+  }
+  .message-item:active { background: var(--border-soft); }
+  .msg-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--wf-block-dark);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 3px;
+  }
+  .msg-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .msg-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); flex-shrink: 0; }
+  .msg-preview {
+    font-size: 12px; color: var(--muted); line-height: 1.4;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    font-family: var(--font-body);
+  }
+  .msg-preview.unread { color: var(--fg-2); font-weight: 500; }
+  .unread-badge {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #dc2626; color: #ffffff;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ─── Empty state placeholder ─────────────────────────────── */
+  .list-footer {
+    padding: 20px 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; color: rgba(0,0,0,0.25);
+  }
+
+  /* ─── Full empty state (no messages at all) ───────────────── */
+  .empty-state {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; padding: 32px 24px;
+  }
+  .empty-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: var(--wf-block-dark);
+  }
+  .empty-title {
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    color: var(--fg); text-align: center;
+  }
+  .empty-desc {
+    font-family: var(--font-body); font-size: 13px; color: var(--muted);
+    text-align: center; line-height: 1.5; max-width: 220px;
+  }
+
+  /* ─── Bottom tab bar ─────────────────────────────────────── */
+  .mp-tabbar {
+    height: 56px;
+    background: rgba(13,17,23,0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; padding-bottom: 4px;
+  }
+  .tab-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer;
+  }
+  .tab-icon { font-size: 20px; line-height: 1; color: rgba(255,255,255,0.45); }
+  .tab-item.active .tab-icon { color: var(--accent); }
+  .tab-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.01em; }
+  .tab-item.active .tab-label { color: var(--accent); }
+  /* Publish button special shape */
+  .tab-publish .tab-icon {
+    font-size: 22px; color: rgba(255,255,255,0.7);
+  }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>消息页 — 线框图</h1>
+  <p>小程序 · 最近联系 + 消息列表 · 三种状态</p>
+</div>
+
+<div class="devices-row">
+
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">消息页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-spacer"></div>
+          <div class="nav-title">消息</div>
+          <div class="nav-spacer"></div>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- 最近联系 -->
+          <div class="recent-contacts">
+            <div class="contact-item">
+              <div class="contact-avatar unread">👤</div>
+              <span class="contact-name">创作者A</span>
+            </div>
+            <div class="contact-item">
+              <div class="contact-avatar">👤</div>
+              <span class="contact-name">用户B</span>
+            </div>
+            <div class="contact-item">
+              <div class="contact-avatar unread">👤</div>
+              <span class="contact-name">创作者C</span>
+            </div>
+            <div class="contact-item">
+              <div class="contact-avatar">👤</div>
+              <span class="contact-name">用户D</span>
+            </div>
+            <div class="contact-item">
+              <div class="contact-avatar">👤</div>
+              <span class="contact-name">创作者E</span>
+            </div>
+            <div class="contact-item">
+              <div class="contact-avatar">👤</div>
+              <span class="contact-name">用户F</span>
+            </div>
+          </div>
+
+          <!-- 消息列表 -->
+          <div class="section-label">消息列表</div>
+          <div class="message-list">
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">创作者A</span>
+                  <span class="msg-time">刚刚</span>
+                </div>
+                <div class="msg-preview unread">你好！我看了你的视频，很喜欢～</div>
+              </div>
+              <div class="unread-badge">3</div>
+            </div>
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">创作者C</span>
+                  <span class="msg-time">10分钟</span>
+                </div>
+                <div class="msg-preview unread">感谢关注，期待你的下一条内容！</div>
+              </div>
+              <div class="unread-badge">1</div>
+            </div>
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">用户B</span>
+                  <span class="msg-time">1小时</span>
+                </div>
+                <div class="msg-preview">好的，下次见！</div>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">用户D</span>
+                  <span class="msg-time">昨天</span>
+                </div>
+                <div class="msg-preview">这个话题真的太有意思了</div>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">创作者E</span>
+                  <span class="msg-time">昨天</span>
+                </div>
+                <div class="msg-preview">期待你的新视频上线！</div>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="msg-avatar">👤</div>
+              <div class="msg-body">
+                <div class="msg-header">
+                  <span class="msg-name">用户F</span>
+                  <span class="msg-time">3天前</span>
+                </div>
+                <div class="msg-preview">你好，请问可以合作吗</div>
+              </div>
+            </div>
+
+            <div class="list-footer">— 没有更多消息 —</div>
+          </div>
+
+        </div><!-- /page-scroll -->
+
+        <!-- Bottom tab bar -->
+        <div class="mp-tabbar">
+          <div class="tab-item">
+            <div class="tab-icon">▶</div>
+            <span class="tab-label">视频</span>
+          </div>
+          <div class="tab-item">
+            <div class="tab-icon">◻</div>
+            <span class="tab-label">图文</span>
+          </div>
+          <div class="tab-item tab-publish">
+            <div class="tab-icon">＋</div>
+            <span class="tab-label">发布</span>
+          </div>
+          <div class="tab-item active">
+            <div class="tab-icon">✉</div>
+            <span class="tab-label">消息</span>
+          </div>
+          <div class="tab-item">
+            <div class="tab-icon">◉</div>
+            <span class="tab-label">我的</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 空状态（无任何消息） -->
+  <div class="device-wrapper">
+    <div class="device-label">消息页 · 空状态（无消息）</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-spacer"></div>
+          <div class="nav-title">消息</div>
+          <div class="nav-spacer"></div>
+        </div>
+
+        <div class="page-scroll">
+          <!-- 没有最近联系，没有消息列表，直接空状态 -->
+          <div class="empty-state">
+            <div class="empty-icon">✉</div>
+            <div class="empty-title">暂无消息</div>
+            <div class="empty-desc">当有人给你发消息时，会在这里显示</div>
+          </div>
+        </div>
+
+        <!-- Bottom tab bar -->
+        <div class="mp-tabbar">
+          <div class="tab-item">
+            <div class="tab-icon">▶</div>
+            <span class="tab-label">视频</span>
+          </div>
+          <div class="tab-item">
+            <div class="tab-icon">◻</div>
+            <span class="tab-label">图文</span>
+          </div>
+          <div class="tab-item tab-publish">
+            <div class="tab-icon">＋</div>
+            <span class="tab-label">发布</span>
+          </div>
+          <div class="tab-item active">
+            <div class="tab-icon">✉</div>
+            <span class="tab-label">消息</span>
+          </div>
+          <div class="tab-item">
+            <div class="tab-icon">◉</div>
+            <span class="tab-label">我的</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:375px;">
+  <h3>SPEC · 消息页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序：NavBar（消息）&nbsp;&nbsp;→&nbsp;&nbsp;H5：浏览器地址栏（返回 / URL / 分享 / 关闭）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">最近联系</span>
+    <span class="spec-val">横向滚动头像条 · 头像 50px · 红点表示未读 · 显示昵称（截断）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">消息列表</span>
+    <span class="spec-val">头像 46px · 名称 + 最后消息预览（单行截断）· 时间戳 · 未读红色角标</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">未读状态</span>
+    <span class="spec-val">头像右上角红点（最近联系）· 右侧角标数字（消息列表）· 预览文字加重</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">两版差异</span>
+    <span class="spec-val">小程序容器，NavBar 顶部导航</span>
+  </div>
+</div>
+
+</body>
+</html>
