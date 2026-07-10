@@ -717,9 +717,6 @@
   .state-comments .comments-drawer { display: flex; }
   /* State: share */
   .state-share .share-sheet { display: flex; }
-  /* State: auth */
-  .state-auth .auth-sheet { display: flex; }
-  .state-auth .video-bg { filter: brightness(0.45); }
   /* State: location (mini-program only) */
   .state-location .location-sheet { display: flex; }
   .state-location .video-bg { filter: brightness(0.45); }
@@ -768,45 +765,6 @@
     border-radius: 23px; border: none;
     font-family: var(--font-mono); font-size: 14px; font-weight: 600;
     cursor: pointer;
-  }
-
-  /* ─── Auth sheet ──────────────────────────────────────────── */
-  .auth-sheet {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    background: rgba(20,22,28,0.98);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px 20px 0 0;
-    z-index: 50; display: none; flex-direction: column;
-    align-items: center; padding: 12px 24px 24px;
-    backdrop-filter: blur(16px);
-  }
-  .auth-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-bottom: 20px; flex-shrink: 0; }
-  .auth-app-icon {
-    width: 56px; height: 56px; border-radius: 14px;
-    background: var(--wf-block-dark); border: 1px solid rgba(255,255,255,0.12);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; margin-bottom: 10px;
-  }
-  .auth-app-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px; }
-  .auth-desc { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.55); text-align: center; line-height: 1.5; margin-bottom: 6px; }
-  .auth-scope {
-    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;
-  }
-  .auth-scope-item {
-    display: flex; align-items: center; gap: 4px;
-    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4);
-  }
-  .auth-scope-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.25); flex-shrink: 0; }
-  .auth-btn {
-    width: 100%; height: 46px;
-    background: var(--accent); color: var(--accent-on);
-    border-radius: 23px; border: none;
-    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
-    cursor: pointer; margin-bottom: 12px;
-  }
-  .auth-cancel {
-    font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.35);
-    cursor: pointer; padding: 4px 0;
   }
 
   /* ─── Share sheet ─────────────────────────────────────────── */
@@ -1069,13 +1027,93 @@
     padding: 1px 7px;
     border-radius: 3px;
   }
+
+  /* ─── Onboarding overlay ──────────────────────────────────── */
+  .ob-overlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: #ffffff; display: none; flex-direction: column;
+  }
+  .state-ob-gender .ob-overlay,
+  .state-ob-age .ob-overlay,
+  .state-ob-tags .ob-overlay { display: flex; }
+
+  .ob-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .ob-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .ob-status-icons { display: flex; align-items: center; gap: 5px; }
+  .ob-icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .ob-bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .ob-bar:nth-child(1) { height: 4px; }
+  .ob-bar:nth-child(2) { height: 6px; }
+  .ob-bar:nth-child(3) { height: 8px; }
+  .ob-bar:nth-child(4) { height: 10px; }
+  .ob-wifi { width: 14px; height: 10px; position: relative; }
+  .ob-wifi::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .ob-battery { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.6); border-radius: 2px; position: relative; }
+  .ob-battery::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.6); border-radius: 0 1px 1px 0; }
+  .ob-battery::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  .ob-topbar { height: 40px; display: flex; align-items: center; justify-content: flex-end; padding: 0 20px; flex-shrink: 0; }
+  .ob-skip { font-family: var(--font-mono); font-size: 12px; color: var(--muted); cursor: pointer; }
+  .ob-content { flex: 1; overflow-y: auto; padding: 24px 24px 16px; display: flex; flex-direction: column; }
+
+  .ob-dots { display: flex; gap: 8px; margin-bottom: 28px; }
+  .ob-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--border); }
+  .state-ob-gender .ob-dot:nth-child(1) { background: var(--accent); }
+  .state-ob-age .ob-dot:nth-child(1) { background: var(--fg-2); }
+  .state-ob-age .ob-dot:nth-child(2) { background: var(--accent); }
+  .state-ob-tags .ob-dot:nth-child(1), .state-ob-tags .ob-dot:nth-child(2) { background: var(--fg-2); }
+  .state-ob-tags .ob-dot:nth-child(3) { background: var(--accent); }
+
+  .ob-step { display: none; flex-direction: column; flex: 1; }
+  .state-ob-gender .ob-step[data-step="gender"],
+  .state-ob-age .ob-step[data-step="age"],
+  .state-ob-tags .ob-step[data-step="tags"] { display: flex; }
+
+  .ob-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--fg); line-height: 1.25; margin-bottom: 8px; }
+  .ob-subtitle { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 24px; }
+
+  .gender-cards { display: flex; flex-direction: column; gap: 12px; }
+  .gender-card { border: 2px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .gender-card.selected { border-color: var(--fg); background: var(--border-soft); }
+  .gender-card-icon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+  .gender-card-label { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .gender-card-sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+  .gender-radio { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .gender-card.selected .gender-radio { background: var(--accent); border-color: var(--accent); }
+  .gender-card.selected .gender-radio::after { content: '✓'; font-size: 11px; font-weight: 700; color: var(--accent-on); }
+
+  .age-options { display: flex; flex-direction: column; gap: 10px; }
+  .age-option { border: 2px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .age-option.selected { border-color: var(--fg); background: var(--border-soft); }
+  .age-option-label { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .age-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .age-option.selected .age-radio { background: var(--accent); border-color: var(--accent); }
+  .age-option.selected .age-radio::after { content: '✓'; font-size: 11px; font-weight: 700; color: var(--accent-on); }
+
+  .ob-tag-hint { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .ob-tag-hint em { font-style: normal; font-weight: 600; color: var(--accent-on); background: var(--accent); padding: 1px 6px; border-radius: 3px; }
+  .tags-grid { display: flex; flex-wrap: wrap; gap: 9px; }
+  .tag-pill { display: flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 9999px; border: 1.5px solid var(--border); background: #fff; cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--fg); }
+  .tag-pill.selected { background: var(--fg); border-color: var(--fg); color: #fff; }
+  .tag-pill-emoji { font-size: 15px; line-height: 1; }
+  .tag-pill.selected .tag-pill-emoji { display: none; }
+  .tag-pill-check { display: none; font-size: 11px; font-weight: 700; }
+  .tag-pill.selected .tag-pill-check { display: inline; }
+
+  .ob-footer { padding: 12px 24px 20px; flex-shrink: 0; border-top: 1px solid var(--border-soft); }
+  .ob-next-btn { width: 100%; height: 48px; background: var(--fg); color: #fff; border: none; border-radius: 24px; font-family: var(--font-display); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .state-ob-tags .ob-next-btn { background: var(--accent); color: var(--accent-on); }
 </style>
 </head>
 <body>
 
 <div class="page-header">
   <h1>Feed 首页 — 线框图</h1>
-  <p>小程序 · 六态交互 · TikTok 风格</p>
+  <p>小程序 · 五态交互 · TikTok 风格</p>
 </div>
 
 <!-- State switcher -->
@@ -1084,8 +1122,10 @@
   <button class="state-btn" data-state="pause" onclick="setState('pause')">② 暂停</button>
   <button class="state-btn" data-state="comments" onclick="setState('comments')">③ 评论展开</button>
   <button class="state-btn" data-state="share" onclick="setState('share')">④ 分享弹窗</button>
-  <button class="state-btn" data-state="auth" onclick="setState('auth')">⑤ 未登录授权</button>
-  <button class="state-btn" data-state="location" onclick="setState('location')">⑥ 同城定位失败</button>
+  <button class="state-btn" data-state="location" onclick="setState('location')">⑤ 同城定位失败</button>
+  <button class="state-btn" data-state="ob-gender" onclick="setState('ob-gender')">⑥ 新手引导①性别</button>
+  <button class="state-btn" data-state="ob-age" onclick="setState('ob-age')">⑦ 新手引导②年龄</button>
+  <button class="state-btn" data-state="ob-tags" onclick="setState('ob-tags')">⑧ 新手引导③兴趣</button>
 </div>
 
 <!-- Two devices side by side -->
@@ -1220,20 +1260,6 @@
             </div>
           </div>
 
-          <!-- 未登录授权弹窗 -->
-          <div class="auth-sheet">
-            <div class="auth-handle"></div>
-            <div class="auth-app-icon">📱</div>
-            <div class="auth-app-name">宿主 App 名称</div>
-            <div class="auth-desc">授权后即可使用 Feed 内容功能<br>仅获取以下权限</div>
-            <div class="auth-scope">
-              <div class="auth-scope-item"><span class="auth-scope-dot"></span>获取昵称与头像</div>
-              <div class="auth-scope-item"><span class="auth-scope-dot"></span>登录状态授权</div>
-            </div>
-            <button class="auth-btn" onclick="setState('play')">授权并继续</button>
-            <span class="auth-cancel" onclick="setState('play')">取消</span>
-          </div>
-
           <!-- 同城定位失败 — 选择所属地区（仅小程序） -->
           <div class="location-sheet">
             <div class="loc-handle"></div>
@@ -1254,6 +1280,119 @@
             </div>
             <button class="loc-confirm" onclick="setState('play')">确认</button>
           </div>
+
+          <!-- 新手引导覆盖层 -->
+          <div class="ob-overlay">
+            <!-- 状态栏 -->
+            <div class="ob-status-bar">
+              <span class="ob-status-time">9:41</span>
+              <div class="ob-status-icons">
+                <div class="ob-icon-bar"><span class="ob-bar"></span><span class="ob-bar"></span><span class="ob-bar"></span><span class="ob-bar"></span></div>
+                <div class="ob-wifi"></div>
+                <div class="ob-battery"></div>
+              </div>
+            </div>
+            <!-- 跳过 -->
+            <div class="ob-topbar">
+              <span class="ob-skip" onclick="setState('play')">跳过</span>
+            </div>
+            <!-- 内容 -->
+            <div class="ob-content">
+              <!-- 进度条 -->
+              <div class="ob-dots">
+                <div class="ob-dot"></div>
+                <div class="ob-dot"></div>
+                <div class="ob-dot"></div>
+              </div>
+
+              <!-- 步骤①：性别 -->
+              <div class="ob-step" data-step="gender">
+                <div class="ob-title">你的性别是？</div>
+                <div class="ob-subtitle">帮助我们推荐更贴合你的内容</div>
+                <div class="gender-cards">
+                  <div class="gender-card selected">
+                    <span class="gender-card-icon">👨</span>
+                    <div><div class="gender-card-label">男性</div><div class="gender-card-sub">Male</div></div>
+                    <div class="gender-radio"></div>
+                  </div>
+                  <div class="gender-card">
+                    <span class="gender-card-icon">👩</span>
+                    <div><div class="gender-card-label">女性</div><div class="gender-card-sub">Female</div></div>
+                    <div class="gender-radio"></div>
+                  </div>
+                  <div class="gender-card">
+                    <span class="gender-card-icon">🙂</span>
+                    <div><div class="gender-card-label">不便透露</div><div class="gender-card-sub">Prefer not to say</div></div>
+                    <div class="gender-radio"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 步骤②：年龄 -->
+              <div class="ob-step" data-step="age">
+                <div class="ob-title">你的年龄段？</div>
+                <div class="ob-subtitle">了解你的生活阶段，帮助推荐更合适的内容</div>
+                <div class="age-options">
+                  <div class="age-option"><span class="age-option-label">18 岁以下</span><div class="age-radio"></div></div>
+                  <div class="age-option selected"><span class="age-option-label">18 — 24 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">25 — 30 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">31 — 40 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">40 岁以上</span><div class="age-radio"></div></div>
+                </div>
+              </div>
+
+              <!-- 步骤③：兴趣标签 -->
+              <div class="ob-step" data-step="tags">
+                <div class="ob-title">选择你的兴趣</div>
+                <div class="ob-subtitle">选择 3 个或更多，获取个性化内容推荐</div>
+                <div class="ob-tag-hint">已选 <em>3</em> 个 · 至少选 3 个</div>
+                <div class="tags-grid">
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎬</span><span class="tag-pill-check">✓</span>剧情</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">⭐</span><span class="tag-pill-check">✓</span>明星</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎪</span><span class="tag-pill-check">✓</span>综艺</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎥</span><span class="tag-pill-check">✓</span>电影</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">📺</span><span class="tag-pill-check">✓</span>电视剧</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎵</span><span class="tag-pill-check">✓</span>音乐</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🌙</span><span class="tag-pill-check">✓</span>二次元</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎮</span><span class="tag-pill-check">✓</span>游戏</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📰</span><span class="tag-pill-check">✓</span>社会时政</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">❤️</span><span class="tag-pill-check">✓</span>公益</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📷</span><span class="tag-pill-check">✓</span>随拍</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💃</span><span class="tag-pill-check">✓</span>舞蹈</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🐾</span><span class="tag-pill-check">✓</span>动物</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🌾</span><span class="tag-pill-check">✓</span>三农</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🚀</span><span class="tag-pill-check">✓</span>科技</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📊</span><span class="tag-pill-check">✓</span>财经</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">👶</span><span class="tag-pill-check">✓</span>母婴</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎠</span><span class="tag-pill-check">✓</span>亲子</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏠</span><span class="tag-pill-check">✓</span>生活家居</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📖</span><span class="tag-pill-check">✓</span>法律</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💊</span><span class="tag-pill-check">✓</span>医疗健康</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🔬</span><span class="tag-pill-check">✓</span>科普</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💛</span><span class="tag-pill-check">✓</span>情感</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📚</span><span class="tag-pill-check">✓</span>传统文化</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🤝</span><span class="tag-pill-check">✓</span>职场</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎓</span><span class="tag-pill-check">✓</span>教育校园</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📸</span><span class="tag-pill-check">✓</span>摄影摄像</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🍖</span><span class="tag-pill-check">✓</span>美食</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏖️</span><span class="tag-pill-check">✓</span>旅行</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">👜</span><span class="tag-pill-check">✓</span>时尚</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎨</span><span class="tag-pill-check">✓</span>艺术</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏀</span><span class="tag-pill-check">✓</span>体育</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🍹</span><span class="tag-pill-check">✓</span>休闲娱乐</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🚗</span><span class="tag-pill-check">✓</span>汽车</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📒</span><span class="tag-pill-check">✓</span>生活记录</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🌍</span><span class="tag-pill-check">✓</span>人文社科</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💕</span><span class="tag-pill-check">✓</span>颜值</div>
+                </div>
+              </div>
+
+            </div><!-- /ob-content -->
+            <!-- 底部按钮 -->
+            <div class="ob-footer">
+              <button class="ob-next-btn" onclick="obNext()">下一步</button>
+            </div>
+          </div><!-- /ob-overlay -->
 
         </div><!-- /mp-content -->
 
@@ -1298,15 +1437,31 @@
 </div>
 
 <script>
+  const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
+
   function setState(state) {
-    ['mp-screen'].forEach(id => {
-      const el = document.getElementById(id);
-      el.classList.remove('state-pause', 'state-comments', 'state-share', 'state-auth', 'state-location');
-      if (state !== 'play') el.classList.add('state-' + state);
-    });
+    const el = document.getElementById('mp-screen');
+    el.classList.remove('state-pause', 'state-comments', 'state-share', 'state-location',
+                        'state-ob-gender', 'state-ob-age', 'state-ob-tags');
+    if (state !== 'play') el.classList.add('state-' + state);
     document.querySelectorAll('.state-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.state === state);
     });
+    // update next-btn label
+    const nextBtn = el.querySelector('.ob-next-btn');
+    if (nextBtn) nextBtn.textContent = state === 'ob-tags' ? '完成' : '下一步';
+  }
+
+  function obNext() {
+    const el = document.getElementById('mp-screen');
+    const cur = OB_STATES.find(s => el.classList.contains('state-' + s));
+    if (!cur) return;
+    const idx = OB_STATES.indexOf(cur);
+    if (idx < OB_STATES.length - 1) {
+      setState(OB_STATES[idx + 1]);
+    } else {
+      setState('play'); // 完成 → 进入 Feed
+    }
   }
 
   function copyLink() {
