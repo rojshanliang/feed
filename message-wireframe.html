@@ -45,6 +45,64 @@
 
   /* ─── Devices row ─────────────────────────────────────────── */
   .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+
+  /* ─── Row label ───────────────────────────────────────────── */
+  .row-label {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+    letter-spacing: 0.02em; display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 830px;
+  }
+  .row-label::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  /* ─── Chat detail page ────────────────────────────────────── */
+  .chat-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .chat-nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .chat-nav-info { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .chat-nav-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .chat-nav-more { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .chat-nav-more span { width: 3px; height: 3px; border-radius: 50%; background: var(--fg); display: block; }
+
+  .chat-messages { flex: 1; overflow-y: auto; padding: 12px 12px 8px; display: flex; flex-direction: column; gap: 12px; background: var(--border-soft); }
+
+  /* msg bubble — received (left) */
+  .msg-received { display: flex; align-items: flex-end; gap: 8px; }
+  .msg-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .bubble-received {
+    max-width: 65%; background: #ffffff; border-radius: 12px 12px 12px 2px;
+    padding: 9px 12px; font-family: var(--font-body); font-size: 13px; color: var(--fg);
+    line-height: 1.45; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  /* msg bubble — sent (right) */
+  .msg-sent { display: flex; align-items: flex-end; justify-content: flex-end; }
+  .bubble-sent {
+    max-width: 65%; background: var(--accent); border-radius: 12px 12px 2px 12px;
+    padding: 9px 12px; font-family: var(--font-body); font-size: 13px; color: var(--accent-on);
+    line-height: 1.45;
+  }
+
+  /* timestamp */
+  .msg-time { text-align: center; font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); }
+
+  /* chat input bar */
+  .chat-input-bar {
+    height: 56px; background: #ffffff; border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; padding: 0 12px; gap: 10px; flex-shrink: 0;
+  }
+  .chat-input-field {
+    flex: 1; height: 36px; background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: 18px; display: flex; align-items: center; padding: 0 14px;
+    font-family: var(--font-body); font-size: 12px; color: var(--muted);
+  }
+  .chat-send-btn {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--accent-on);
+    border: none; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
   .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -257,8 +315,11 @@
 
 <div class="page-header">
   <h1>消息页 — 线框图</h1>
-  <p>小程序 vs H5 · 最近联系 + 消息列表</p>
+  <p>小程序 vs H5 · 消息列表 + 聊天详情</p>
 </div>
+
+<!-- 行 1：消息列表页 -->
+<div class="row-label">消息列表页</div>
 
 <div class="devices-row">
 
@@ -388,11 +449,6 @@
           </div>
 
         </div><!-- /page-scroll -->
-
-        <!-- Bottom tab bar -->
-        <div class="mp-tabbar">
-          <div class="tab-item">
-            <div class="tab-icon">▶</div>
             <span class="tab-label">视频</span>
           </div>
           <div class="tab-item">
@@ -550,11 +606,6 @@
           </div>
 
         </div><!-- /page-scroll -->
-
-        <!-- Bottom tab bar -->
-        <div class="mp-tabbar">
-          <div class="tab-item">
-            <div class="tab-icon">▶</div>
             <span class="tab-label">视频</span>
           </div>
           <div class="tab-item">
@@ -608,11 +659,6 @@
             <div class="empty-desc">当有人给你发消息时，会在这里显示</div>
           </div>
         </div>
-
-        <!-- Bottom tab bar -->
-        <div class="mp-tabbar">
-          <div class="tab-item">
-            <div class="tab-icon">▶</div>
             <span class="tab-label">视频</span>
           </div>
           <div class="tab-item">
@@ -637,7 +683,112 @@
     </div>
   </div>
 
-</div><!-- /devices-row -->
+</div><!-- /devices-row 消息列表 -->
+
+<!-- 行 2：聊天详情页 -->
+<div class="row-label">聊天详情页（点击消息进入）</div>
+
+<div class="devices-row">
+
+  <!-- 聊天详情 · 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">聊天详情 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="chat-nav">
+          <div class="chat-nav-back">‹</div>
+          <div class="chat-nav-info"><div class="chat-nav-name">创作者A</div></div>
+          <div class="chat-nav-more"><span></span><span></span><span></span></div>
+        </div>
+        <div class="chat-messages">
+          <div class="msg-time">10:24</div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">你好！我看了你的视频，很喜欢～</div>
+          </div>
+          <div class="msg-sent"><div class="bubble-sent">谢谢你的支持！</div></div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">请问这个是怎么拍的？</div>
+          </div>
+          <div class="msg-time">10:28</div>
+          <div class="msg-sent"><div class="bubble-sent">用手机拍的，主要靠光线好 😊</div></div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">好的，谢谢！期待你的下一条内容</div>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <div class="chat-input-field">发送消息…</div>
+          <div class="chat-send-btn">↑</div>
+        </div>
+<span class="tab-label">视频</span></div>
+          <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+          <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">发布</span></div>
+          <div class="tab-item active"><div class="tab-icon">✉</div><span class="tab-label">消息</span></div>
+          <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 聊天详情 · H5 浏览器 -->
+  <div class="device-wrapper">
+    <div class="device-label">聊天详情 · H5 浏览器</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="h5-status-bar">
+          <span class="mp-status-time" style="color:var(--fg)">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span><span class="bar" style="background:var(--fg)"></span></div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon" style="border-color:rgba(13,17,23,0.7)"></div>
+          </div>
+        </div>
+        <div class="h5-browser-bar">
+          <div class="h5-back">‹</div>
+          <div class="h5-addr"><span class="h5-lock">🔒</span><span class="h5-url">h5.example.com/chat/user_id</span></div>
+          <div class="h5-acts"><span class="h5-act">↗</span><span class="h5-act">×</span></div>
+        </div>
+        <div class="chat-nav">
+          <div class="chat-nav-back">‹</div>
+          <div class="chat-nav-info"><div class="chat-nav-name">创作者A</div></div>
+          <div class="chat-nav-more"><span></span><span></span><span></span></div>
+        </div>
+        <div class="chat-messages">
+          <div class="msg-time">10:24</div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">你好！我看了你的视频，很喜欢～</div>
+          </div>
+          <div class="msg-sent"><div class="bubble-sent">谢谢你的支持！</div></div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">请问这个是怎么拍的？</div>
+          </div>
+          <div class="msg-time">10:28</div>
+          <div class="msg-sent"><div class="bubble-sent">用手机拍的，主要靠光线好 😊</div></div>
+          <div class="msg-received">
+            <div class="msg-avatar">👤</div>
+            <div class="bubble-received">好的，谢谢！期待你的下一条内容</div>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <div class="chat-input-field">发送消息…</div>
+          <div class="chat-send-btn">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row 聊天详情 -->
 
 <!-- Spec -->
 <div class="spec-panel" style="width:782px;">
