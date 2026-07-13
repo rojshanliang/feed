@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容发布页 · 图文发布 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Row label ───────────────────────────────────────────── */
+  .row-label {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+    letter-spacing: 0.02em; display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 830px;
+  }
+  .row-label::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-publish-btn {
+    height: 28px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ─── 内容类型 Tab：视频 / 图文 ─────────────────────────────── */
+  .type-tabs {
+    display: flex; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
+  }
+  .type-tab {
+    flex: 1; padding: 11px 0; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); position: relative; cursor: pointer;
+  }
+  .type-tab.active { color: var(--fg); font-weight: 600; }
+  .type-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Section label ───────────────────────────────────────── */
+  .section-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 14px 16px 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .section-note { font-weight: 400; color: rgba(0,0,0,0.35); font-size: 10px; letter-spacing: 0.01em; }
+
+  /* ─── 图文 · 图片多选宫格 ──────────────────────────────────── */
+  .image-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 0 16px 14px;
+  }
+  .image-slot {
+    aspect-ratio: 1/1; border-radius: var(--radius-md);
+    position: relative; overflow: hidden;
+  }
+  .image-slot.add {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer;
+  }
+  .image-slot.add .u-icon { font-size: 22px; color: var(--muted); line-height: 1; }
+  .image-slot.add .u-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .image-slot.filled { background: var(--wf-block); }
+  .image-slot.filled::after { content: '图'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); }
+  .image-slot.filled.cover::before {
+    content: '封面'; position: absolute; bottom: 4px; left: 4px; z-index: 2;
+    font-family: var(--font-mono); font-size: 8px; font-weight: 600; color: #fff;
+    background: rgba(13,17,23,0.6); padding: 1px 5px; border-radius: 3px;
+  }
+  .image-slot-remove {
+    position: absolute; top: 3px; right: 3px; z-index: 2;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(13,17,23,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1;
+  }
+
+  /* 图片上传中态 */
+  .image-slot.uploading {
+    background: repeating-linear-gradient(135deg, #1e2128 0px, #1e2128 8px, #22252e 8px, #22252e 16px);
+  }
+  .image-slot.uploading .upload-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .image-slot.uploading .upload-spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .image-slot.uploading .upload-pct {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #ffffff;
+  }
+  .image-slot.uploading .upload-progress-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: rgba(255,255,255,0.2); z-index: 2;
+  }
+  .image-slot.uploading .upload-progress-fill { height: 100%; background: var(--accent); }
+
+  /* ─── Form fields ─────────────────────────────────────────── */
+  .form-section { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-lbl { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg); letter-spacing: 0.02em; }
+  .field-lbl .optional { font-weight: 400; color: var(--muted); text-transform: none; letter-spacing: 0; }
+  .title-input {
+    width: 100%; min-height: 44px;
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 9px 12px;
+    font-family: var(--font-body); font-size: 13px; color: var(--muted);
+    line-height: 1.5;
+  }
+  .title-input.filled { color: var(--fg); }
+  .body-input {
+    width: 100%; min-height: 90px;
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 10px 12px;
+    font-family: var(--font-body); font-size: 13px; color: var(--muted);
+    line-height: 1.6;
+  }
+  .body-input.filled { color: var(--fg); }
+  .field-hint { font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); text-align: right; }
+  .field-hint.filled { color: var(--fg); }
+  .topic-picker {
+    background: var(--border-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 9px 12px;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  }
+  .topic-picker-left { display: flex; align-items: center; gap: 8px; }
+  .topic-picker-icon { font-size: 15px; line-height: 1; }
+  .topic-picker-text { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+  .topic-picker-text.filled { color: var(--fg); }
+  .topic-picker-arrow { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+  .topic-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .topic-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    color: #2563eb; background: #dbeafe;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+  }
+  .topic-chip .chip-x { color: rgba(37,99,235,0.5); font-size: 11px; line-height: 1; cursor: pointer; }
+
+  /* ─── Bottom bar ──────────────────────────────────────────── */
+  .bottom-bar {
+    height: 64px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .pub-btn {
+    flex: 1; height: 44px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .pub-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 782px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>内容发布页 · 图文发布 — 线框图</h1>
+  <p>小程序 · 内容类型 Tab（视频 / 图文）· 仅展示图文发布态</p>
+</div>
+
+<!-- ════════════ 内容类型 Tab · 图文（新增能力） ════════════ -->
+<div class="row-label">内容类型 Tab · 图文（新增能力）</div>
+
+<div class="devices-row">
+
+  <!-- 图文 · 未填写 -->
+  <div class="device-wrapper">
+    <div class="device-label">① 图文未填写</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn inactive" disabled>发布</button>
+        </div>
+
+        <!-- 内容类型 Tab -->
+        <div class="type-tabs">
+          <div class="type-tab">视频</div>
+          <div class="type-tab active">图文</div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="section-label">上传图片 <span class="section-note">最多 9 张 · 0/9</span></div>
+          <div class="image-grid">
+            <div class="image-slot add">
+              <div class="u-icon">＋</div>
+              <div class="u-count">添加图片</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">标题</div>
+              <div class="title-input">添加标题，让更多人看到你的内容…</div>
+              <div class="field-hint">0 / 30</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">正文</div>
+              <div class="body-input">分享这一刻的想法…</div>
+              <div class="field-hint">0 / 1000</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left"><span class="topic-picker-icon">#</span><span class="topic-picker-text">搜索或选择话题</span></div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn inactive" disabled>上传图片后可发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图文 · 已填写（可发布） -->
+  <div class="device-wrapper">
+    <div class="device-label">② 图文已填写（可发布）</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn">发布</button>
+        </div>
+
+        <!-- 内容类型 Tab -->
+        <div class="type-tabs">
+          <div class="type-tab">视频</div>
+          <div class="type-tab active">图文</div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="section-label">上传图片 <span class="section-note">最多 9 张 · 4/9</span></div>
+          <div class="image-grid">
+            <div class="image-slot filled cover">
+              <div class="image-slot-remove">×</div>
+            </div>
+            <div class="image-slot filled">
+              <div class="image-slot-remove">×</div>
+            </div>
+            <div class="image-slot filled">
+              <div class="image-slot-remove">×</div>
+            </div>
+            <div class="image-slot filled">
+              <div class="image-slot-remove">×</div>
+            </div>
+            <div class="image-slot add">
+              <div class="u-icon">＋</div>
+              <div class="u-count">5/9</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">标题</div>
+              <div class="title-input filled">今天路过的一家小店，很喜欢这种感觉</div>
+              <div class="field-hint filled">17 / 30</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">正文</div>
+              <div class="body-input filled">午后阳光正好，随手拍了几张照片记录下来。这家店的装修风格很有意思，木质的桌椅搭配暖黄的灯光，坐在里面很舒服，推荐大家有空来打卡～</div>
+              <div class="field-hint filled">78 / 1000</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left"><span class="topic-picker-icon">#</span><span class="topic-picker-text filled">继续添加话题</span></div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#生活记录<span class="chip-x">×</span></div>
+                <div class="topic-chip">#探店<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn">发布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图文 · 图片上传中 -->
+  <div class="device-wrapper">
+    <div class="device-label">③ 图片上传中</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">发布内容</div>
+          <button class="nav-publish-btn inactive" disabled>发布</button>
+        </div>
+
+        <!-- 内容类型 Tab -->
+        <div class="type-tabs">
+          <div class="type-tab">视频</div>
+          <div class="type-tab active">图文</div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="section-label">上传图片 <span class="section-note">最多 9 张 · 2 张上传中</span></div>
+          <div class="image-grid">
+            <div class="image-slot filled cover">
+              <div class="image-slot-remove">×</div>
+            </div>
+            <div class="image-slot uploading">
+              <div class="upload-overlay">
+                <div class="upload-spinner"></div>
+                <div class="upload-pct">72%</div>
+              </div>
+              <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:72%;"></div></div>
+            </div>
+            <div class="image-slot uploading">
+              <div class="upload-overlay">
+                <div class="upload-spinner"></div>
+                <div class="upload-pct">35%</div>
+              </div>
+              <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:35%;"></div></div>
+            </div>
+            <div class="image-slot add">
+              <div class="u-icon">＋</div>
+              <div class="u-count">3/9</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-group">
+              <div class="field-lbl">标题</div>
+              <div class="title-input filled">今天路过的一家小店，很喜欢这种感觉</div>
+              <div class="field-hint filled">17 / 30</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">正文</div>
+              <div class="body-input filled">午后阳光正好，随手拍了几张照片记录下来。这家店的装修风格很有意思，木质的桌椅搭配暖黄的灯光，坐在里面很舒服，推荐大家有空来打卡～</div>
+              <div class="field-hint filled">78 / 1000</div>
+            </div>
+            <div class="field-group">
+              <div class="field-lbl">添加话题</div>
+              <div class="topic-picker">
+                <div class="topic-picker-left"><span class="topic-picker-icon">#</span><span class="topic-picker-text filled">继续添加话题</span></div>
+                <span class="topic-picker-arrow">›</span>
+              </div>
+              <div class="topic-chips">
+                <div class="topic-chip">#生活记录<span class="chip-x">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="pub-btn inactive" disabled>图片上传中，请稍候…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row 图文 Tab -->
+
+<!-- Spec -->
+<div class="spec-panel">
+  <h3>SPEC · 图文发布结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">内容类型 Tab</span>
+    <span class="spec-val"><span class="spec-badge">视频</span><span class="spec-badge dark">图文</span> — 位于 NavBar 下方，切换后表单结构随之变化</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片</span>
+    <span class="spec-val">3 列宫格 · 最多 9 张 · 第 1 张自动标记「封面」· 每张右上角可删除</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">标题</span>
+    <span class="spec-val">单行文本 · 最多 30 字 · 与视频 Tab 的标题字段结构一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">正文</span>
+    <span class="spec-val">多行文本域 · 最多 1000 字 · 图文 Tab 特有，视频 Tab 无此字段</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">话题</span>
+    <span class="spec-val">与视频 Tab 一致：搜索或选择话题 · Chip 展示已选话题，可单个删除</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布条件</span>
+    <span class="spec-val">至少上传 1 张图片才可点击发布 · 标题/正文/话题均为选填</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片上传中</span>
+    <span class="spec-val">单张宫格内旋转加载圈 + 独立百分比 + 底部进度条 · 已上传完成的图片正常展示 · 发布按钮禁用直至全部上传完成</span>
+  </div>
+</div>
+
+</body>
+</html>
