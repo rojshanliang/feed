@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图文首页 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: var(--bg);
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.7); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  /* ─── Top tabs (顶Tab: 关注/推荐/同城) ────────────────────── */
+  .top-tabs {
+    display: flex; align-items: center; justify-content: center;
+    gap: 24px; padding: 10px 0 10px;
+    background: #ffffff; flex-shrink: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .top-tab {
+    font-family: var(--font-display); font-size: 14px; font-weight: 500;
+    color: var(--muted); position: relative; cursor: pointer;
+  }
+  .top-tab.active { color: var(--fg); font-weight: 600; }
+  .top-tab.active::after {
+    content: ''; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+  /* 默认态：推荐高亮 */
+  #tab-recommend.active { color: var(--fg); font-weight: 600; }
+  #tab-recommend.active::after {
+    content: ''; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+  /* 同城定位失败态：同城高亮 */
+  .state-location #tab-location { color: var(--fg); font-weight: 600; }
+  .state-location #tab-location::after {
+    content: ''; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Waterfall grid (信息展示 · 内容展示 + 创作者展示) ───── */
+  .waterfall-scroll { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg); }
+  .waterfall-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; padding: 8px;
+  }
+  .wf-col { display: flex; flex-direction: column; gap: 8px; }
+
+  .post-card {
+    background: #ffffff; border-radius: var(--radius-md);
+    overflow: hidden; border: 1px solid var(--border-soft);
+    cursor: pointer;
+  }
+  .post-cover {
+    width: 100%; background: var(--wf-block);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .post-cover.h1 { height: 160px; }
+  .post-cover.h2 { height: 210px; }
+  .post-cover.h3 { height: 130px; }
+  .post-cover.h4 { height: 190px; }
+  .post-cover::after { content: '图'; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .post-cover:nth-of-type(1) {}
+  .post-body { padding: 8px 10px 10px; }
+  .post-title {
+    font-size: 13px; color: var(--fg); line-height: 1.4;
+    font-family: var(--font-body); font-weight: 500;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; margin-bottom: 6px;
+  }
+  .post-topic {
+    font-family: var(--font-mono); font-size: 10px; color: #2563eb;
+    background: #eff6ff; padding: 1px 6px; border-radius: 3px;
+    display: inline-block; margin-bottom: 8px;
+  }
+  /* 无标题图文卡片：标题字段为空时，用正文文字顶替展示在同一位置（非标题样式，字数通常更多） */
+  .post-card.no-title .post-title { font-weight: 400; color: var(--fg-2); }
+  .post-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .post-creator { display: flex; align-items: center; gap: 5px; min-width: 0; }
+  .post-avatar {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .post-creator-name {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .post-likes {
+    display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+  }
+  .post-likes .heart { font-size: 11px; color: var(--muted); }
+  .post-likes .heart.liked { color: #dc2626; }
+  .post-likes span.num { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+  /* ─── 同城定位失败 · 选择所属地区（弹层） ─────────────────── */
+  .location-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(20,22,28,0.98);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px 20px 0 0;
+    z-index: 50; display: none; flex-direction: column;
+    padding: 12px 20px 24px;
+    backdrop-filter: blur(16px);
+  }
+  .state-location .location-sheet { display: flex; }
+  .state-location .waterfall-scroll { filter: brightness(0.5); }
+  .loc-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0; }
+  .loc-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; text-align: center; margin-bottom: 6px; }
+  .loc-hint { font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 18px; line-height: 1.5; }
+  .loc-hint .loc-reason { display: block; color: rgba(255,255,255,0.25); font-size: 11px; margin-top: 3px; font-family: var(--font-mono); }
+  .loc-selectors { display: flex; gap: 10px; margin-bottom: 20px; }
+  .loc-select-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .loc-select-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.04em; }
+  .loc-select {
+    height: 42px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-md);
+    padding: 0 12px;
+    font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.75);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .loc-select .arrow { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .loc-confirm {
+    width: 100%; height: 46px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: 23px; border: none;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── Bottom tab bar (底Bar) ──────────────────────────────── */
+  .mp-tabbar {
+    height: 56px; background: rgba(13,17,23,0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; padding-bottom: 4px;
+  }
+  .tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; }
+  .tab-icon { font-size: 20px; line-height: 1; color: rgba(255,255,255,0.45); }
+  .tab-item.active .tab-icon { color: var(--accent); }
+  .tab-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.01em; }
+  .tab-item.active .tab-label { color: var(--accent); }
+  .tab-publish .tab-icon { font-size: 22px; color: rgba(255,255,255,0.7); }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>图文首页 — 线框图（小程序）</h1>
+  <p>小程序 · 顶Tab（关注/推荐/同城）· 双列瀑布流</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="default" onclick="setState('default')">① 默认（推荐）</button>
+  <button class="state-btn" data-state="location" onclick="setState('location')">② 同城定位失败</button>
+</div>
+
+<div class="devices-row">
+
+  <div class="device-wrapper">
+    <div class="device-label">图文首页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- 顶Tab -->
+        <div class="top-tabs">
+          <span class="top-tab">关注</span>
+          <span class="top-tab active" id="tab-recommend">推荐</span>
+          <span class="top-tab" id="tab-location" onclick="setState('location')">同城</span>
+        </div>
+
+        <!-- 双列瀑布流 -->
+        <div class="waterfall-scroll">
+          <div class="waterfall-grid">
+
+            <!-- 左列 -->
+            <div class="wf-col">
+              <div class="post-card">
+                <div class="post-cover h2"></div>
+                <div class="post-body">
+                  <div class="post-title">图文标题文字展示区域，最多展示两行内容，超出截断…</div>
+                  <span class="post-topic">#话题标签</span>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称A</span></div>
+                    <div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="post-card no-title">
+                <div class="post-cover h3"></div>
+                <div class="post-body">
+                  <div class="post-title">这条内容没有填写标题，所以直接把正文的前几句话展示出来占据标题位置，文字量会明显比标题长一些…</div>
+                  <span class="post-topic">#热门话题</span>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称B</span></div>
+                    <div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="post-card">
+                <div class="post-cover h1"></div>
+                <div class="post-body">
+                  <div class="post-title">图文标题文字展示区域，最多展示两行内容…</div>
+                  <span class="post-topic">#生活记录</span>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称C</span></div>
+                    <div class="post-likes"><span class="heart">♡</span><span class="num">89</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右列 -->
+            <div class="wf-col">
+              <div class="post-card">
+                <div class="post-cover h3"></div>
+                <div class="post-body">
+                  <div class="post-title">图文内容标题展示，右列第一条</div>
+                  <span class="post-topic">#美食</span>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称D</span></div>
+                    <div class="post-likes"><span class="heart liked">❤</span><span class="num">5,204</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="post-card no-title">
+                <div class="post-cover h4"></div>
+                <div class="post-body">
+                  <div class="post-title">这一条也没有标题也没有话题标签，同样用正文内容顶替展示，超出三行的部分会被截断…</div>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称E</span></div>
+                    <div class="post-likes"><span class="heart">♡</span><span class="num">1,033</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="post-card">
+                <div class="post-cover h2"></div>
+                <div class="post-body">
+                  <div class="post-title">右列第三条图文标题，稍短一些</div>
+                  <span class="post-topic">#穿搭</span>
+                  <div class="post-footer">
+                    <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称F</span></div>
+                    <div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- /waterfall-scroll -->
+
+        <!-- 同城定位失败 — 选择所属地区（仅小程序） -->
+        <div class="location-sheet">
+          <div class="loc-handle"></div>
+          <div class="loc-title">无法获取您的位置</div>
+          <div class="loc-hint">
+            请手动选择所属地区，以查看同城内容
+            <span class="loc-reason">GPS 或 IP 定位失败，请检查权限设置</span>
+          </div>
+          <div class="loc-selectors">
+            <div class="loc-select-wrap">
+              <span class="loc-select-label">国家 / 地区</span>
+              <div class="loc-select"><span>中国</span><span class="arrow">›</span></div>
+            </div>
+            <div class="loc-select-wrap">
+              <span class="loc-select-label">省市 / 地区</span>
+              <div class="loc-select"><span>请选择</span><span class="arrow">›</span></div>
+            </div>
+          </div>
+          <button class="loc-confirm" onclick="setState('default')">确认</button>
+        </div>
+
+        <!-- 底Bar：视频/图文/内容发布/广场/我的 -->
+        <div class="mp-tabbar">
+          <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+          <div class="tab-item active"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+          <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+          <div class="tab-item"><div class="tab-icon">▦</div><span class="tab-label">广场</span></div>
+          <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<div class="spec-panel">
+  <h3>SPEC · 图文首页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶 Tab</span>
+    <span class="spec-val"><span class="spec-badge">关注</span><span class="spec-badge">推荐</span><span class="spec-badge">同城</span> — 与视频 Feed 一致，默认「推荐」</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">底 Bar</span>
+    <span class="spec-val">视频 / <span class="spec-badge dark">图文（当前）</span> / 内容发布 / 广场 / 我的</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容布局</span>
+    <span class="spec-val">双列瀑布流卡片 · 头图高度不等（错落排布）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容展示</span>
+    <span class="spec-val">头图 · 标题（最多 2 行，可为空）· 话题标签（可为空）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">无标题兼容</span>
+    <span class="spec-val">标题字段为空时，用正文文字顶替展示在标题位（非加粗），最多 2 行，超出截断</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">创作者展示</span>
+    <span class="spec-val">头像 18px + 昵称（截断）· 位于卡片底部左侧</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动数据</span>
+    <span class="spec-val">点赞量 — 卡片底部右侧，红心为已点赞态</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">点击行为</span>
+    <span class="spec-val">卡片点击进入图文详情页（本图未展示）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">同城定位失败</span>
+    <span class="spec-val">点击「同城」Tab 若 GPS/IP 定位失败，弹出选择所属地区弹层（与视频 Feed 一致）</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    const el = document.getElementById('mp-screen');
+    el.classList.toggle('state-location', state === 'location');
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+</script>
+
+</body>
+</html>
