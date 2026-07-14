@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>话题页 · 图文卡片 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-more { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .nav-more span { width: 3px; height: 3px; border-radius: 50%; background: var(--fg); display: block; }
+
+  /* ─── Scrollable content ──────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── Topic hero banner ───────────────────────────────────── */
+  .topic-hero {
+    width: 100%; height: 140px; position: relative; flex-shrink: 0;
+    background: linear-gradient(135deg, #2a2d35 0%, #1a1d23 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 14px 16px;
+  }
+  .topic-hero-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.2); letter-spacing: 0.05em;
+  }
+  .topic-tag-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--accent);
+    letter-spacing: 0.05em; margin-bottom: 4px;
+    position: relative; z-index: 2;
+  }
+  .topic-name {
+    font-family: var(--font-display); font-size: 20px; font-weight: 600;
+    color: #ffffff; position: relative; z-index: 2; margin-bottom: 6px;
+  }
+  .topic-stats { display: flex; align-items: center; gap: 8px; position: relative; z-index: 2; }
+  .topic-stat { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.65); }
+  .topic-stat strong { color: #ffffff; font-weight: 600; }
+  .topic-stat-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+
+  /* ─── Stats row ──────────────────────────────────────────── */
+  .publish-row {
+    padding: 10px 16px; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .publish-row .topic-stats { position: static; flex: 1; }
+  .publish-row .topic-stat { color: var(--fg-2); font-family: var(--font-mono); font-size: 11px; }
+  .publish-row .topic-stat strong { color: var(--fg); }
+  .publish-row .topic-stat-sep { background: var(--border); }
+
+  /* ─── Content tabs (推荐 / 最新) ────────────────────────────── */
+  .content-tabs {
+    display: flex; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
+  }
+  .content-tab {
+    flex: 1; padding: 10px 0; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); position: relative; cursor: pointer;
+  }
+  .content-tab.active { color: var(--fg); font-weight: 600; }
+  .content-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Mixed waterfall grid (视频缩略图 + 图文卡片混排) ────── */
+  .content-scroll { flex: 1; background: var(--bg); }
+  .waterfall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
+  .wf-col { display: flex; flex-direction: column; gap: 8px; }
+
+  /* 视频卡片（竖版缩略图 + 简单信息条） */
+  .video-card { background: #ffffff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); }
+  .video-thumb {
+    width: 100%; aspect-ratio: 9/16; background: var(--wf-block);
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .video-thumb::after { content: '▶'; font-size: 18px; color: rgba(255,255,255,0.55); }
+  .video-info { padding: 7px 9px 9px; display: flex; align-items: center; gap: 3px; }
+  .video-info .heart { font-size: 10px; color: var(--muted); }
+  .video-info .num { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+  /* 图文卡片：头图 + 标题（兼容无标题）+ 创作者展示（昵称/头像/点赞量） */
+  .post-card { background: #ffffff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); }
+  .post-cover { width: 100%; background: var(--wf-block); position: relative; display: flex; align-items: center; justify-content: center; }
+  .post-cover.h1 { height: 150px; }
+  .post-cover.h2 { height: 200px; }
+  .post-cover.h3 { height: 125px; }
+  .post-cover::after { content: '图'; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .post-type-tag {
+    position: absolute; top: 6px; left: 6px; z-index: 2;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: #fff;
+    background: rgba(13,17,23,0.55); padding: 2px 6px; border-radius: 3px;
+  }
+  .post-body { padding: 8px 10px 10px; }
+  .post-title {
+    font-size: 13px; color: var(--fg); line-height: 1.4;
+    font-family: var(--font-body); font-weight: 500;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  /* 兼容无标题：不渲染标题行，头图下方直接衔接创作者信息 */
+  .post-card.no-title .post-title { display: none; }
+  .post-card.no-title .post-body { padding-top: 8px; }
+
+  .post-footer { display: flex; align-items: center; justify-content: space-between; }
+  .post-creator { display: flex; align-items: center; gap: 5px; min-width: 0; }
+  .post-avatar {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;
+  }
+  .post-creator-name {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .post-likes { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+  .post-likes .heart { font-size: 11px; color: var(--muted); }
+  .post-likes .heart.liked { color: #dc2626; }
+  .post-likes span.num { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>话题页 · 图文卡片 — 线框图（小程序）</h1>
+  <p>小程序 · 内容区新增图文卡片 · 双列瀑布流混排</p>
+</div>
+
+<div class="devices-row">
+
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">话题页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">#话题页</div>
+          <div class="nav-more"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="page-scroll">
+
+          <!-- Topic hero -->
+          <div class="topic-hero">
+            <div class="topic-hero-bg">TOPIC COVER IMAGE</div>
+            <div class="topic-tag-label"># 话题</div>
+            <div class="topic-name">话题名称标题</div>
+          </div>
+
+          <!-- Stats -->
+          <div class="publish-row">
+            <div class="topic-stats">
+              <span class="topic-stat"><strong>12.6w</strong> 内容</span>
+              <span class="topic-stat-sep"></span>
+              <span class="topic-stat"><strong>3,421</strong> 参与</span>
+            </div>
+          </div>
+
+          <!-- 内容 Tab：推荐 / 最新 -->
+          <div class="content-tabs">
+            <div class="content-tab active">推荐</div>
+            <div class="content-tab">最新</div>
+          </div>
+
+          <!-- 视频 + 图文混排双列瀑布流 -->
+          <div class="content-scroll">
+            <div class="waterfall-grid">
+
+              <!-- 左列 -->
+              <div class="wf-col">
+                <div class="video-card">
+                  <div class="video-thumb"></div>
+                  <div class="video-info"><span class="heart liked">❤</span><span class="num">8,204</span></div>
+                </div>
+                <div class="post-card">
+                  <div class="post-cover h2"><span class="post-type-tag">图文</span></div>
+                  <div class="post-body">
+                    <div class="post-title">图文卡片标题文字展示区域，最多展示两行内容…</div>
+                    <div class="post-footer">
+                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称A</span></div>
+                      <div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="post-card no-title">
+                  <div class="post-cover h3"><span class="post-type-tag">图文</span></div>
+                  <div class="post-body">
+                    <div class="post-footer">
+                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称B</span></div>
+                      <div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 右列 -->
+              <div class="wf-col">
+                <div class="post-card">
+                  <div class="post-cover h3"><span class="post-type-tag">图文</span></div>
+                  <div class="post-body">
+                    <div class="post-title">右列第一条图文标题，较短</div>
+                    <div class="post-footer">
+                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称C</span></div>
+                      <div class="post-likes"><span class="heart">♡</span><span class="num">89</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="video-card">
+                  <div class="video-thumb"></div>
+                  <div class="video-info"><span class="heart">♡</span><span class="num">1,530</span></div>
+                </div>
+                <div class="post-card">
+                  <div class="post-cover h1"><span class="post-type-tag">图文</span></div>
+                  <div class="post-body">
+                    <div class="post-title">这一条图文标题稍长一些，展示两行截断效果…</div>
+                    <div class="post-footer">
+                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称D</span></div>
+                      <div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div><!-- /content-scroll -->
+
+        </div><!-- /page-scroll -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<div class="spec-panel">
+  <h3>SPEC · 话题页图文卡片结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">内容 Tab</span>
+    <span class="spec-val"><span class="spec-badge dark">推荐</span><span class="spec-badge">最新</span> — 与原话题页一致，不新增分类筛选</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容布局</span>
+    <span class="spec-val">双列瀑布流 · 视频卡片与图文卡片直接混排（原 3 列视频网格改为此布局）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图文卡片 · 头图</span>
+    <span class="spec-val">头图高度错落 · 左上角「图文」类型角标区分内容类型</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图文卡片 · 标题</span>
+    <span class="spec-val">最多 2 行，超出截断 · 兼容无标题：不占位，头图下方直接衔接创作者信息</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图文卡片 · 创作者展示</span>
+    <span class="spec-val">头像 18px + 昵称（左）· 图文点赞量（右，红心为已点赞态）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频卡片</span>
+    <span class="spec-val">竖版缩略图 + 底部点赞量条，与图文卡片保持同一栅格节奏</span>
+  </div>
+</div>
+
+</body>
+</html>

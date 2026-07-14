@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图文内容页 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher ────────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.7); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  /* ─── NavBar (floats over image) ───────────────────────────── */
+  .mp-nav {
+    height: 44px; position: absolute; top: 44px; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px;
+  }
+  .mp-nav-back, .mp-nav-more {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(13,17,23,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: #fff; cursor: pointer;
+  }
+
+  /* ─── Scroll content ────────────────────────────────────────── */
+  .detail-scroll { flex: 1; overflow-y: auto; }
+
+  /* ─── 内容呈现 · 图片 ─────────────────────────────────────── */
+  .content-image {
+    width: 100%; aspect-ratio: 3/4; background: var(--wf-block);
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .content-image::after { content: '图片'; font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .image-dots {
+    position: absolute; bottom: 12px; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .image-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+  .image-dot.active { background: #ffffff; width: 14px; border-radius: 3px; }
+  .image-count {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(13,17,23,0.5); color: #fff;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+  }
+
+  /* ─── 创作者展示 ─────────────────────────────────────────── */
+  .creator-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 0;
+  }
+  .creator-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+  }
+  .creator-info { flex: 1; min-width: 0; cursor: pointer; }
+  .creator-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
+  .creator-fans { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .follow-btn {
+    height: 32px; padding: 0 16px; flex-shrink: 0;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .follow-btn.followed {
+    background: transparent; color: var(--muted); border: 1.5px solid var(--border);
+  }
+
+  /* ─── 内容呈现 · 标题/正文/话题 ─────────────────────────── */
+  .content-body { padding: 14px 16px 0; }
+  .content-title {
+    font-family: var(--font-display); font-size: 17px; font-weight: 600;
+    color: var(--fg); line-height: 1.4; margin-bottom: 10px;
+  }
+  .content-text {
+    font-size: 14px; color: var(--fg-2); line-height: 1.65;
+    font-family: var(--font-body); margin-bottom: 12px;
+  }
+  .content-topics { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .content-topic {
+    font-family: var(--font-mono); font-size: 12px; color: #2563eb;
+    background: #eff6ff; padding: 3px 10px; border-radius: var(--radius-pill);
+  }
+  .content-time {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    padding: 0 16px 14px; border-bottom: 1px solid var(--border-soft);
+  }
+
+  /* ─── 数据展示：点赞量/评论量/分享量（正文下方小计） ───── */
+  .stat-summary {
+    display: flex; gap: 16px; padding: 12px 16px;
+    border-bottom: 8px solid var(--border-soft);
+  }
+  .stat-summary-item {
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  .stat-summary-num { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .stat-summary-lbl { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  /* ─── Comments placeholder section ─────────────────────────── */
+  .comments-section { padding: 14px 16px 24px; }
+  .comments-heading {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.03em; margin-bottom: 12px;
+  }
+  .comment-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .comment-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; }
+  .comment-body { flex: 1; }
+  .comment-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+  .comment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; font-family: var(--font-body); }
+  .comment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── 互动行为：底部交互条（点赞/评论/分享） ───────────── */
+  .interaction-bar {
+    height: 56px; border-top: 1px solid var(--border-soft); background: #ffffff;
+    display: flex; align-items: center; padding: 0 14px; gap: 10px; flex-shrink: 0;
+  }
+  .comment-input {
+    flex: 1; height: 36px; background: var(--border-soft); border-radius: var(--radius-pill);
+    display: flex; align-items: center; padding: 0 14px;
+    font-family: var(--font-body); font-size: 12px; color: var(--muted);
+    cursor: pointer;
+  }
+  .interaction-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; flex-shrink: 0; min-width: 40px;
+  }
+  .interaction-icon { font-size: 21px; line-height: 1; color: var(--fg-2); }
+  .interaction-icon.liked { color: #dc2626; }
+  .interaction-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>图文内容页 — 线框图（小程序）</h1>
+  <p>小程序 · 内容呈现 · 互动行为 · 关系行为 · 创作者展示</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="default" onclick="setState('default')">① 默认（未关注/未点赞）</button>
+  <button class="state-btn" data-state="engaged" onclick="setState('engaged')">② 已关注/已点赞</button>
+</div>
+
+<div class="devices-row">
+
+  <div class="device-wrapper">
+    <div class="device-label">图文内容页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- NavBar 悬浮在图片上 -->
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-more">⋯</div>
+        </div>
+
+        <div class="detail-scroll">
+
+          <!-- 内容呈现 · 图片 -->
+          <div class="content-image">
+            <span class="image-count">1 / 6</span>
+            <div class="image-dots">
+              <span class="image-dot active"></span>
+              <span class="image-dot"></span>
+              <span class="image-dot"></span>
+              <span class="image-dot"></span>
+              <span class="image-dot"></span>
+              <span class="image-dot"></span>
+            </div>
+          </div>
+
+          <!-- 创作者展示 -->
+          <div class="creator-row">
+            <div class="creator-avatar">👤</div>
+            <div class="creator-info">
+              <div class="creator-name">创作者昵称</div>
+              <div class="creator-fans" id="fans-count">8.6w 粉丝</div>
+            </div>
+            <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">+ 关注</button>
+          </div>
+
+          <!-- 内容呈现 · 标题/正文/话题 -->
+          <div class="content-body">
+            <div class="content-title">图文内容标题文字展示区域，最多展示两行内容</div>
+            <div class="content-text">这里是图文内容的正文文字展示区域，用于呈现创作者撰写的详细内容，支持较长篇幅的文字描述，最多可展示若干行，具体行数不做限制，超出部分保持完整展示…</div>
+            <div class="content-topics">
+              <span class="content-topic">#话题标签</span>
+              <span class="content-topic">#热门话题</span>
+            </div>
+          </div>
+          <div class="content-time">2026-07-10 · 发布于同城</div>
+
+          <!-- 数据展示：点赞量/评论量/分享量 -->
+          <div class="stat-summary">
+            <div class="stat-summary-item"><span class="stat-summary-num" id="like-num">1.2w</span><span class="stat-summary-lbl">点赞</span></div>
+            <div class="stat-summary-item"><span class="stat-summary-num">342</span><span class="stat-summary-lbl">评论</span></div>
+            <div class="stat-summary-item"><span class="stat-summary-num">89</span><span class="stat-summary-lbl">分享</span></div>
+          </div>
+
+          <!-- 评论列表（互动行为 · 评论 的承载区） -->
+          <div class="comments-section">
+            <div class="comments-heading">全部评论 342</div>
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_01</div>
+                <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                <div class="comment-time">2小时前</div>
+              </div>
+            </div>
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-name">用户昵称_02</div>
+                <div class="comment-text">真的很实用，收藏了！</div>
+                <div class="comment-time">4小时前</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /detail-scroll -->
+
+        <!-- 互动行为：点赞 / 评论 / 分享 -->
+        <div class="interaction-bar">
+          <div class="comment-input">说点什么…</div>
+          <div class="interaction-item" onclick="toggleLike()">
+            <div class="interaction-icon" id="like-icon">♡</div>
+            <span class="interaction-count" id="like-count">1.2w</span>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">💬</div>
+            <span class="interaction-count">342</span>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">↗</div>
+            <span class="interaction-count">89</span>
+          </div>
+        </div>
+
+      </div><!-- /mp-screen -->
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<div class="spec-panel">
+  <h3>SPEC · 图文内容页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">内容呈现</span>
+    <span class="spec-val">图片（多图带指示点）· 标题 · 正文 · 话题标签</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">数据展示</span>
+    <span class="spec-val"><span class="spec-badge">点赞量</span><span class="spec-badge">评论量</span><span class="spec-badge">分享量</span> — 正文下方小计 + 底部交互条同步展示</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动行为</span>
+    <span class="spec-val">点赞（点击变红）· 评论（输入框唤起评论区）· 分享</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">关系行为</span>
+    <span class="spec-val">关注 — 创作者信息行右侧按钮，点击后变为「已关注」态</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">创作者展示</span>
+    <span class="spec-val">头像 40px · 昵称 · 粉丝量 — 位于图片下方独立一行</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">导航</span>
+    <span class="spec-val">NavBar 悬浮在首图上（半透明圆形按钮）· 返回 / 更多</span>
+  </div>
+</div>
+
+<script>
+  let liked = false;
+  let followed = false;
+  const BASE_LIKES = 12000;
+
+  function formatCount(n) {
+    return n >= 10000 ? (n / 10000).toFixed(1).replace(/\.0$/, '') + 'w' : String(n);
+  }
+
+  function toggleLike() {
+    liked = !liked;
+    const icon = document.getElementById('like-icon');
+    const count = document.getElementById('like-count');
+    const summaryNum = document.getElementById('like-num');
+    const display = formatCount(liked ? BASE_LIKES + 1 : BASE_LIKES);
+    icon.textContent = liked ? '❤' : '♡';
+    icon.classList.toggle('liked', liked);
+    count.textContent = display;
+    summaryNum.textContent = display;
+  }
+
+  function toggleFollow() {
+    followed = !followed;
+    const btn = document.getElementById('follow-btn');
+    btn.textContent = followed ? '已关注' : '+ 关注';
+    btn.classList.toggle('followed', followed);
+  }
+
+  function setState(state) {
+    if (state === 'engaged') {
+      if (!liked) toggleLike();
+      if (!followed) toggleFollow();
+    } else {
+      if (liked) toggleLike();
+      if (followed) toggleFollow();
+    }
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+</script>
+
+</body>
+</html>

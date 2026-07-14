@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H5 图文分享页 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Device ──────────────────────────────────────────────── */
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+
+  /* ─── Status bar (light) ────────────────────────────────────── */
+  .status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .status-icons { display: flex; align-items: center; gap: 5px; }
+  .status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .status-icons .bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .status-icons .bar:nth-child(1) { height: 4px; }
+  .status-icons .bar:nth-child(2) { height: 6px; }
+  .status-icons .bar:nth-child(3) { height: 8px; }
+  .status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.7); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  /* ─── H5 browser bar (light) ───────────────────────────────── */
+  .browser-bar {
+    height: 46px; background: #f2f2f7;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .h5-back { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.45); line-height: 1; width: 20px; text-align: center; flex-shrink: 0; }
+  .h5-addr { flex: 1; height: 28px; background: #ffffff; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; padding: 0 10px; gap: 4px; min-width: 0; }
+  .h5-lock { font-size: 10px; flex-shrink: 0; }
+  .h5-url { font-family: var(--font-mono); font-size: 10px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h5-url em { font-style: normal; color: var(--accent-on); background: var(--accent); padding: 0 3px; border-radius: 2px; font-size: 9px; }
+  .h5-acts { display: flex; gap: 8px; flex-shrink: 0; }
+  .h5-act { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
+
+  /* ─── Scrollable content ──────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+
+  /* ─── 内容展示 · 头图 ─────────────────────────────────────── */
+  .content-image {
+    width: 100%; aspect-ratio: 4/3; background: var(--wf-block);
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .content-image::after { content: '头图'; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .image-dots {
+    position: absolute; bottom: 10px; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .image-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+  .image-dot.active { background: #ffffff; width: 14px; border-radius: 3px; }
+  .image-count {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(13,17,23,0.5); color: #fff;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+  }
+
+  /* ─── 创作者展示 ─────────────────────────────────────────── */
+  .creator-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 0;
+  }
+  .creator-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .creator-info { flex: 1; min-width: 0; }
+  .creator-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+
+  /* ─── 内容展示 · 标题/话题/点赞量 ───────────────────────── */
+  .content-body { padding: 12px 16px 0; }
+  .content-title {
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); line-height: 1.4; margin-bottom: 10px;
+  }
+  .content-topics { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .content-topic {
+    font-family: var(--font-mono); font-size: 12px; color: #2563eb;
+    background: #eff6ff; padding: 3px 10px; border-radius: var(--radius-pill);
+  }
+
+  /* ─── 数据展示：点赞量 ───────────────────────────────────── */
+  .like-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 16px; border-top: 1px solid var(--border-soft);
+    border-bottom: 8px solid var(--border-soft);
+  }
+  .like-row .heart { font-size: 15px; color: var(--muted); }
+  .like-row .heart.liked { color: #dc2626; }
+  .like-row .num { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .like-row .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  /* ─── 评论展示 ───────────────────────────────────────────── */
+  .comments-section { padding: 14px 16px 24px; }
+  .comments-heading {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.03em; margin-bottom: 12px;
+  }
+  .comment-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; }
+  .comment-body { flex: 1; }
+  .comment-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+  .comment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; font-family: var(--font-body); }
+  .comment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── 打开小程序 Banner（底部固定，跨页统一约定） ───────── */
+  .open-app-banner {
+    flex-shrink: 0; height: 56px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; border-top: 1px solid var(--border-soft);
+  }
+  .open-app-left { display: flex; align-items: center; gap: 8px; }
+  .open-app-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--wf-block-dark); flex-shrink: 0; }
+  .open-app-text { font-family: var(--font-body); font-size: 12px; color: var(--fg-2); }
+  .open-app-btn {
+    height: 32px; padding: 0 16px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>H5 图文分享页 — 线框图</h1>
+  <p>H5 · 图文分享链接 · 微信浏览器打开</p>
+</div>
+
+<div class="device-wrapper">
+  <div class="device-label">H5 图文分享页 · 微信浏览器</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <!-- 状态栏 -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 浏览器地址栏 -->
+      <div class="browser-bar">
+        <div class="h5-back">‹</div>
+        <div class="h5-addr">
+          <span class="h5-lock">🔒</span>
+          <span class="h5-url">h5.example.com/imagetext/<em>post_id</em></span>
+        </div>
+        <div class="h5-acts">
+          <span class="h5-act">↗</span>
+          <span class="h5-act">×</span>
+        </div>
+      </div>
+
+      <div class="page-scroll">
+
+        <!-- 内容展示 · 头图 -->
+        <div class="content-image">
+          <span class="image-count">1 / 4</span>
+          <div class="image-dots">
+            <span class="image-dot active"></span>
+            <span class="image-dot"></span>
+            <span class="image-dot"></span>
+            <span class="image-dot"></span>
+          </div>
+        </div>
+
+        <!-- 创作者展示 -->
+        <div class="creator-row">
+          <div class="creator-avatar">👤</div>
+          <div class="creator-info">
+            <div class="creator-name">创作者昵称</div>
+          </div>
+        </div>
+
+        <!-- 内容展示 · 标题/话题 -->
+        <div class="content-body">
+          <div class="content-title">图文内容标题文字展示区域，最多展示两行内容</div>
+          <div class="content-topics">
+            <span class="content-topic">#话题标签</span>
+            <span class="content-topic">#热门话题</span>
+          </div>
+        </div>
+
+        <!-- 数据展示：点赞量 -->
+        <div class="like-row">
+          <span class="heart liked">❤</span>
+          <span class="num">1.2w</span>
+          <span class="lbl">人点赞</span>
+        </div>
+
+        <!-- 评论展示 -->
+        <div class="comments-section">
+          <div class="comments-heading">全部评论 342</div>
+          <div class="comment-item">
+            <div class="comment-avatar"></div>
+            <div class="comment-body">
+              <div class="comment-name">用户昵称_01</div>
+              <div class="comment-text">这个内容太好了，正是我想要的！</div>
+              <div class="comment-time">2小时前</div>
+            </div>
+          </div>
+          <div class="comment-item">
+            <div class="comment-avatar"></div>
+            <div class="comment-body">
+              <div class="comment-name">用户昵称_02</div>
+              <div class="comment-text">真的很实用，收藏了！</div>
+              <div class="comment-time">4小时前</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page-scroll -->
+
+      <!-- 打开小程序 Banner（底部固定） -->
+      <div class="open-app-banner">
+        <div class="open-app-left">
+          <div class="open-app-icon"></div>
+          <span class="open-app-text">在小程序内查看完整内容</span>
+        </div>
+        <button class="open-app-btn">打开小程序</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Spec -->
+<div class="spec-panel">
+  <h3>SPEC · H5 图文分享页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">容器</span>
+    <span class="spec-val">H5 · 微信内置浏览器 · 浅色可滚动文章式页面</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容展示 · 头图</span>
+    <span class="spec-val">多图轮播（页码 + 指示点）· 与小程序内容页图片区一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">内容展示 · 标题/话题</span>
+    <span class="spec-val">标题（最多 2 行）· 话题标签 — 位于头图下方独立区块</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">数据展示 · 点赞量</span>
+    <span class="spec-val">仅展示点赞量（无评论量/分享量数字），红心 + 数字 + 「人点赞」</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">创作者展示</span>
+    <span class="spec-val">头像 + 昵称 — 位于头图下方独立一行，H5 端不展示关注按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论展示</span>
+    <span class="spec-val">评论列表（头像 + 昵称 + 内容 + 时间）· 仅展示，无法在 H5 内发表评论</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">打开小程序</span>
+    <span class="spec-val">底部固定 Banner · 引导回小程序内查看完整内容（沿用视频分享页约定）</span>
+  </div>
+</div>
+
+</body>
+</html>
