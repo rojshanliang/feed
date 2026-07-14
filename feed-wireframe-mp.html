@@ -678,6 +678,23 @@
     color: rgba(255,255,255,0.45);
     cursor: pointer;
   }
+  .comment-votes {
+    display: flex; align-items: center; gap: 10px;
+    margin-left: auto;
+  }
+  .comment-vote {
+    display: flex; align-items: center; gap: 3px;
+    cursor: pointer;
+  }
+  .comment-vote .vote-icon {
+    font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1;
+  }
+  .comment-vote .vote-icon.liked { color: #ff4d6d; }
+  .comment-vote .vote-icon.disliked { color: rgba(255,255,255,0.7); }
+  .comment-vote .vote-count {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4);
+    min-width: 10px;
+  }
   .replies-list {
     margin-top: 12px;
     padding-left: 14px;
@@ -1229,14 +1246,26 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_01</div>
                   <div class="comment-text">这个内容太好了，正是我想要的！</div>
-                  <div class="comment-meta"><span class="comment-time">2小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">2小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like liked">❤</span><span class="vote-count">128</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
                   <div class="replies-list">
                     <div class="reply-item">
                       <div class="reply-avatar"></div>
                       <div class="reply-body">
                         <div class="reply-name">用户昵称_05</div>
                         <div class="reply-text">同感，太真实了</div>
-                        <div class="reply-meta"><span class="reply-time">1小时前</span><span class="comment-reply-btn">回复</span></div>
+                        <div class="reply-meta">
+                          <span class="reply-time">1小时前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">6</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="reply-item">
@@ -1244,7 +1273,13 @@
                       <div class="reply-body">
                         <div class="reply-name">用户昵称_06</div>
                         <div class="reply-text">哈哈哈哈是的</div>
-                        <div class="reply-meta"><span class="reply-time">50分钟前</span><span class="comment-reply-btn">回复</span></div>
+                        <div class="reply-meta">
+                          <span class="reply-time">50分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">2</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="reply-item">
@@ -1252,7 +1287,13 @@
                       <div class="reply-body">
                         <div class="reply-name">用户昵称_07</div>
                         <div class="reply-text">已经关注了创作者</div>
-                        <div class="reply-meta"><span class="reply-time">30分钟前</span><span class="comment-reply-btn">回复</span></div>
+                        <div class="reply-meta">
+                          <span class="reply-time">30分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">0</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="reply-item more">
@@ -1260,7 +1301,13 @@
                       <div class="reply-body">
                         <div class="reply-name">用户昵称_08</div>
                         <div class="reply-text">路过点个赞</div>
-                        <div class="reply-meta"><span class="reply-time">20分钟前</span><span class="comment-reply-btn">回复</span></div>
+                        <div class="reply-meta">
+                          <span class="reply-time">20分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">1</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="reply-item more">
@@ -1268,7 +1315,13 @@
                       <div class="reply-body">
                         <div class="reply-name">用户昵称_09</div>
                         <div class="reply-text">学到了，感谢分享</div>
-                        <div class="reply-meta"><span class="reply-time">5分钟前</span><span class="comment-reply-btn">回复</span></div>
+                        <div class="reply-meta">
+                          <span class="reply-time">5分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">0</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1281,7 +1334,13 @@
                   <div class="comment-name">用户昵称_02</div>
                   <div class="comment-text">真的很实用，收藏了！</div>
                   <div class="comment-text placeholder"></div>
-                  <div class="comment-meta"><span class="comment-time">4小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">4小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">14</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="comment-item">
@@ -1289,7 +1348,13 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_03</div>
                   <div class="comment-text placeholder short"></div>
-                  <div class="comment-meta"><span class="comment-time">6小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">6小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">3</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="comment-item">
@@ -1297,7 +1362,13 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_04</div>
                   <div class="comment-text">强烈推荐给每一个人看</div>
-                  <div class="comment-meta"><span class="comment-time">昨天</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">昨天</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">42</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1539,6 +1610,39 @@
     const name = commentBody.querySelector('.comment-name').textContent;
     const input = commentBody.closest('.comments-drawer').querySelector('.input-placeholder');
     input.textContent = '回复 @' + name + '…';
+  }
+
+  function toggleLike(voteEl) {
+    const meta = voteEl.closest('.comment-meta, .reply-meta');
+    const likeIcon = voteEl.querySelector('.vote-icon.like');
+    const countEl = voteEl.querySelector('.vote-count');
+    const dislikeIcon = meta.querySelector('.vote-icon.dislike');
+    let count = parseInt(countEl.textContent, 10) || 0;
+
+    const wasLiked = likeIcon.classList.contains('liked');
+    if (wasLiked) {
+      likeIcon.classList.remove('liked');
+      countEl.textContent = Math.max(0, count - 1);
+    } else {
+      likeIcon.classList.add('liked');
+      countEl.textContent = count + 1;
+      if (dislikeIcon.classList.contains('disliked')) dislikeIcon.classList.remove('disliked');
+    }
+  }
+
+  function toggleDislike(voteEl) {
+    const meta = voteEl.closest('.comment-meta, .reply-meta');
+    const dislikeIcon = voteEl.querySelector('.vote-icon.dislike');
+    const likeIcon = meta.querySelector('.vote-icon.like');
+    const likeCountEl = meta.querySelector('.vote-count');
+
+    const wasDisliked = dislikeIcon.classList.contains('disliked');
+    dislikeIcon.classList.toggle('disliked', !wasDisliked);
+    if (!wasDisliked && likeIcon.classList.contains('liked')) {
+      likeIcon.classList.remove('liked');
+      let count = parseInt(likeCountEl.textContent, 10) || 0;
+      likeCountEl.textContent = Math.max(0, count - 1);
+    }
   }
 
   function copyFeedLink() {
