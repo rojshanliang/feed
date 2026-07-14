@@ -501,32 +501,21 @@
     flex-shrink: 0;
     display: inline-block;
   }
-  .follow-pill {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--accent-on);
-    background: var(--accent);
-    padding: 2px 8px;
-    border-radius: var(--radius-pill);
-    flex-shrink: 0;
-  }
-  .video-title {
+  .video-title-line {
     font-size: 13px;
     color: rgba(255,255,255,0.9);
     line-height: 1.4;
-    margin-bottom: 5px;
     font-family: var(--font-body);
-  }
-  .video-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .video-tag {
     font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    color: var(--accent);
+    margin-left: 6px;
   }
 
   /* ─── Bottom tab bar ──────────────────────────────────────── */
@@ -681,6 +670,36 @@
     font-family: var(--font-mono);
     font-size: 10px;
     color: rgba(255,255,255,0.3);
+  }
+  .comment-reply-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+  }
+  .replies-list {
+    margin-top: 12px;
+    padding-left: 14px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .reply-item.more { display: none; }
+  .replies-list.expanded .reply-item.more { display: flex; }
+  .reply-item { display: flex; gap: 8px; align-items: flex-start; }
+  .reply-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--wf-block-dark); flex-shrink: 0;
+  }
+  .reply-body { flex: 1; }
+  .reply-name { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+  .reply-text { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4; font-family: var(--font-body); }
+  .reply-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+  .reply-time { font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.3); }
+  .expand-replies-btn {
+    margin-top: 12px; padding-left: 14px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    color: var(--accent); cursor: pointer;
   }
   .drawer-input {
     padding: 10px 14px;
@@ -867,28 +886,39 @@
     color: white;
   }
 
-  /* ─── Share platform panel ────────────────────────────────── */
-  .share-platforms {
-    display: flex;
-    gap: 24px;
-    justify-content: center;
+  /* ─── Share copy-link panel ───────────────────────────────── */
+  .share-copy-panel {
     padding: 20px 16px 24px;
   }
-  .share-platform-item {
-    display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer;
+  .share-copy-row {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
   }
-  .share-platform-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
+  .share-copy-url {
+    flex: 1; min-width: 0;
+    font-family: var(--font-mono); font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .share-platform-icon.whatsapp  { background: #25D366; }
-  .share-platform-icon.instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
-  .share-platform-icon.tiktok    { background: #010101; border: 1px solid rgba(255,255,255,0.15); }
-  .share-platform-label {
-    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6);
+  .share-copy-btn-main {
+    flex-shrink: 0; height: 32px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-sm); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
   }
+  .share-copy-btn-main.copied { background: var(--success); color: white; }
+  .share-copy-toast {
+    position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: rgba(13,17,23,0.9); color: #fff;
+    font-family: var(--font-mono); font-size: 12px;
+    padding: 8px 16px; border-radius: var(--radius-pill);
+    display: none; z-index: 60; white-space: nowrap;
+  }
+  .share-copy-toast.visible { display: block; }
 
   /* ─── Devices row (side by side) ─────────────────────────── */
   .devices-row {
@@ -1184,12 +1214,8 @@
             </div>
           </div>
           <div class="bottom-info">
-            <div class="creator-name">@创作者昵称<span class="follow-pill">+ 关注</span></div>
-            <div class="video-title">视频标题文字展示区域，最多展示两行内容，超出截断…</div>
-            <div class="video-tags">
-              <span class="video-tag">#话题标签</span>
-              <span class="video-tag">#热门话题</span>
-            </div>
+            <div class="creator-name">@创作者昵称</div>
+            <div class="video-title-line">视频标题文字展示区域，最多展示两行内容<span class="video-tag">#话题标签</span><span class="video-tag">#热门话题</span></div>
           </div>
           <div class="comments-drawer">
             <div class="drawer-handle"></div>
@@ -1203,7 +1229,50 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_01</div>
                   <div class="comment-text">这个内容太好了，正是我想要的！</div>
-                  <div class="comment-meta"><span class="comment-time">2小时前</span></div>
+                  <div class="comment-meta"><span class="comment-time">2小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
+                  <div class="replies-list">
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_05</div>
+                        <div class="reply-text">同感，太真实了</div>
+                        <div class="reply-meta"><span class="reply-time">1小时前</span><span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_06</div>
+                        <div class="reply-text">哈哈哈哈是的</div>
+                        <div class="reply-meta"><span class="reply-time">50分钟前</span><span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_07</div>
+                        <div class="reply-text">已经关注了创作者</div>
+                        <div class="reply-meta"><span class="reply-time">30分钟前</span><span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                    <div class="reply-item more">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_08</div>
+                        <div class="reply-text">路过点个赞</div>
+                        <div class="reply-meta"><span class="reply-time">20分钟前</span><span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                    <div class="reply-item more">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_09</div>
+                        <div class="reply-text">学到了，感谢分享</div>
+                        <div class="reply-meta"><span class="reply-time">5分钟前</span><span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expand-replies-btn" onclick="expandReplies(this)">展开 2 条回复</div>
                 </div>
               </div>
               <div class="comment-item">
@@ -1212,7 +1281,7 @@
                   <div class="comment-name">用户昵称_02</div>
                   <div class="comment-text">真的很实用，收藏了！</div>
                   <div class="comment-text placeholder"></div>
-                  <div class="comment-meta"><span class="comment-time">4小时前</span></div>
+                  <div class="comment-meta"><span class="comment-time">4小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
                 </div>
               </div>
               <div class="comment-item">
@@ -1220,7 +1289,7 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_03</div>
                   <div class="comment-text placeholder short"></div>
-                  <div class="comment-meta"><span class="comment-time">6小时前</span></div>
+                  <div class="comment-meta"><span class="comment-time">6小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
                 </div>
               </div>
               <div class="comment-item">
@@ -1228,7 +1297,7 @@
                 <div class="comment-body">
                   <div class="comment-name">用户昵称_04</div>
                   <div class="comment-text">强烈推荐给每一个人看</div>
-                  <div class="comment-meta"><span class="comment-time">昨天</span></div>
+                  <div class="comment-meta"><span class="comment-time">昨天</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span></div>
                 </div>
               </div>
             </div>
@@ -1244,21 +1313,14 @@
               </div>
               <div class="share-close" onclick="setState('play')">×</div>
             </div>
-            <div class="share-platforms">
-              <div class="share-platform-item">
-                <div class="share-platform-icon whatsapp">💬</div>
-                <span class="share-platform-label">WhatsApp</span>
-              </div>
-              <div class="share-platform-item">
-                <div class="share-platform-icon instagram">📸</div>
-                <span class="share-platform-label">Instagram</span>
-              </div>
-              <div class="share-platform-item">
-                <div class="share-platform-icon tiktok">♪</div>
-                <span class="share-platform-label">TikTok</span>
+            <div class="share-copy-panel">
+              <div class="share-copy-row">
+                <span class="share-copy-url">h5.example.com/share/<em>video_id_123456</em></span>
+                <button class="share-copy-btn-main" id="feed-copy-btn" onclick="copyFeedLink()">复制链接</button>
               </div>
             </div>
           </div>
+          <div class="share-copy-toast" id="feed-copy-toast">链接已复制</div>
 
           <!-- 同城定位失败 — 选择所属地区（仅小程序） -->
           <div class="location-sheet">
@@ -1318,11 +1380,6 @@
                   <div class="gender-card">
                     <span class="gender-card-icon">👩</span>
                     <div><div class="gender-card-label">女性</div><div class="gender-card-sub">Female</div></div>
-                    <div class="gender-radio"></div>
-                  </div>
-                  <div class="gender-card">
-                    <span class="gender-card-icon">🙂</span>
-                    <div><div class="gender-card-label">不便透露</div><div class="gender-card-sub">Prefer not to say</div></div>
                     <div class="gender-radio"></div>
                   </div>
                 </div>
@@ -1469,6 +1526,32 @@
     btn.textContent = '已复制';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1800);
+  }
+
+  function expandReplies(btn) {
+    const list = btn.previousElementSibling;
+    list.classList.add('expanded');
+    btn.style.display = 'none';
+  }
+
+  function toggleReplies(btn) {
+    const commentBody = btn.closest('.comment-body');
+    const name = commentBody.querySelector('.comment-name').textContent;
+    const input = commentBody.closest('.comments-drawer').querySelector('.input-placeholder');
+    input.textContent = '回复 @' + name + '…';
+  }
+
+  function copyFeedLink() {
+    const btn = document.getElementById('feed-copy-btn');
+    const toast = document.getElementById('feed-copy-toast');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    toast.classList.add('visible');
+    setTimeout(() => {
+      btn.textContent = '复制链接';
+      btn.classList.remove('copied');
+      toast.classList.remove('visible');
+    }, 1800);
   }
 </script>
 

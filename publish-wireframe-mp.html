@@ -267,24 +267,15 @@
   .title-input.filled { color: var(--fg); }
   .field-hint { font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); text-align: right; }
   .field-hint.filled { color: var(--fg); }
-  .topic-picker {
-    background: var(--border-soft); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 9px 12px;
-    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  /* 话题以 #识别 方式内联在标题文字中，不再单独占字段 */
+  .title-input .inline-topic {
+    color: #2563eb; font-weight: 600;
   }
-  .topic-picker-left { display: flex; align-items: center; gap: 8px; }
-  .topic-picker-icon { font-size: 15px; line-height: 1; }
-  .topic-picker-text { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
-  .topic-picker-text.filled { color: var(--fg); }
-  .topic-picker-arrow { font-size: 14px; color: var(--muted); font-family: var(--font-mono); }
-  .topic-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-  .topic-chip {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
-    color: #2563eb; background: #dbeafe;
-    padding: 2px 8px; border-radius: var(--radius-pill);
+  .title-hint-inline {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.35);
+    margin-top: -2px;
   }
-  .topic-chip .chip-x { color: rgba(37,99,235,0.5); font-size: 11px; line-height: 1; cursor: pointer; }
+  .title-hint-inline em { font-style: normal; color: #2563eb; }
 
   /* ─── Bottom bar ──────────────────────────────────────────── */
   .bottom-bar {
@@ -418,16 +409,7 @@
               <div class="field-lbl">视频标题</div>
               <div class="title-input">添加标题，让更多人看到你的内容…</div>
               <div class="field-hint">0 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text">搜索或选择话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
+              <div class="title-hint-inline">输入 <em>#</em> 添加话题，跟随文字内联展示</div>
             </div>
           </div>
         </div>
@@ -483,13 +465,7 @@
             <div class="field-group">
               <div class="field-lbl">视频标题</div>
               <div class="title-input">添加标题，让更多人看到你的内容…</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left"><span class="topic-picker-icon">#</span><span class="topic-picker-text">搜索或选择话题</span></div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
+              <div class="title-hint-inline">输入 <em>#</em> 添加话题，跟随文字内联展示</div>
             </div>
           </div>
         </div>
@@ -550,21 +526,9 @@
           <div class="form-section">
             <div class="field-group">
               <div class="field-lbl">视频标题</div>
-              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="title-input filled">这是一个非常精彩的视频<span class="inline-topic">#话题标签</span>标题示例</div>
               <div class="field-hint filled">18 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text filled">继续添加话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
-              <div class="topic-chips">
-                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
-              </div>
+              <div class="title-hint-inline">输入 <em>#</em> 添加话题，跟随文字内联展示</div>
             </div>
           </div>
         </div>
@@ -611,22 +575,9 @@
           <div class="form-section">
             <div class="field-group">
               <div class="field-lbl">视频标题</div>
-              <div class="title-input filled">这是一个非常精彩的视频内容标题示例</div>
+              <div class="title-input filled">这是一个非常精彩的视频<span class="inline-topic">#话题标签</span><span class="inline-topic">#热门话题</span>内容标题示例</div>
               <div class="field-hint filled">18 / 50</div>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">添加话题</div>
-              <div class="topic-picker">
-                <div class="topic-picker-left">
-                  <span class="topic-picker-icon">#</span>
-                  <span class="topic-picker-text filled">继续添加话题</span>
-                </div>
-                <span class="topic-picker-arrow">›</span>
-              </div>
-              <div class="topic-chips">
-                <div class="topic-chip">#话题标签<span class="chip-x">×</span></div>
-                <div class="topic-chip">#热门话题<span class="chip-x">×</span></div>
-              </div>
+              <div class="title-hint-inline">输入 <em>#</em> 添加话题，跟随文字内联展示</div>
             </div>
           </div>
         </div>
@@ -661,7 +612,11 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">③ 已上传</span>
-    <span class="spec-val">竖版缩略图 + 时长角标 + 重新选择 · 标题已填写 · 话题 Chip · 发布按钮黄色激活</span>
+    <span class="spec-val">竖版缩略图 + 时长角标 + 重新选择 · 标题已填写 · 话题内联展示 · 发布按钮黄色激活</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">话题添加方式</span>
+    <span class="spec-val">无独立话题字段 · 在标题编辑器中键入 <span class="spec-badge">#</span> 直接识别生成话题，内联跟随文字展示</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">两版差异</span>
