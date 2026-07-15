@@ -345,11 +345,6 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     overflow: hidden; margin-bottom: 6px;
   }
-  .post-topic {
-    font-family: var(--font-mono); font-size: 10px; color: #2563eb;
-    background: #eff6ff; padding: 1px 6px; border-radius: 3px;
-    display: inline-block; margin-bottom: 8px;
-  }
   .post-footer {
     display: flex; align-items: center; justify-content: flex-end;
   }
@@ -459,7 +454,6 @@
                     <div class="post-cover h2"></div>
                     <div class="post-body">
                       <div class="post-title">图文标题文字展示区域，最多展示两行内容…</div>
-                      <span class="post-topic">#话题标签</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div></div>
                     </div>
                   </div>
@@ -467,7 +461,6 @@
                     <div class="post-cover h3"></div>
                     <div class="post-body">
                       <div class="post-title">另一条图文标题，单行较短</div>
-                      <span class="post-topic">#生活记录</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart">♡</span><span class="num">89</span></div></div>
                     </div>
                   </div>
@@ -477,7 +470,6 @@
                     <div class="post-cover h3"></div>
                     <div class="post-body">
                       <div class="post-title">图文内容标题展示，右列第一条</div>
-                      <span class="post-topic">#美食</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div></div>
                     </div>
                   </div>
@@ -485,7 +477,6 @@
                     <div class="post-cover h1"></div>
                     <div class="post-body">
                       <div class="post-title">右列第二条图文标题，稍长一些的展示效果…</div>
-                      <span class="post-topic">#旅行</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div></div>
                     </div>
                   </div>
@@ -567,7 +558,6 @@
                     <div class="post-cover h1"></div>
                     <div class="post-body">
                       <div class="post-title">创作者图文标题文字展示区域，最多展示两行…</div>
-                      <span class="post-topic">#创作分享</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart liked">❤</span><span class="num">5,204</span></div></div>
                     </div>
                   </div>
@@ -575,7 +565,6 @@
                     <div class="post-cover h3"></div>
                     <div class="post-body">
                       <div class="post-title">幕后花絮，单行标题</div>
-                      <span class="post-topic">#幕后</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart">♡</span><span class="num">612</span></div></div>
                     </div>
                   </div>
@@ -585,7 +574,6 @@
                     <div class="post-cover h3"></div>
                     <div class="post-body">
                       <div class="post-title">右列第一条创作者图文</div>
-                      <span class="post-topic">#穿搭</span>
                       <div class="post-footer"><div class="post-likes"><span class="heart">♡</span><span class="num">1,033</span></div></div>
                     </div>
                   </div>
@@ -621,7 +609,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">图文面板</span>
-    <span class="spec-val">双列瀑布流卡片 · 头图错落高度 + 标题（最多 2 行）+ 话题标签 + 点赞量</span>
+    <span class="spec-val">双列瀑布流卡片 · 头图错落高度 + 标题（最多 2 行，可为空）+ 点赞量 — 不展示话题标签</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">图文卡片差异</span>
