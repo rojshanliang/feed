@@ -97,6 +97,28 @@
   .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0; }
   .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
 
+  /* ─── NavBar（小程序导航栏，与视频 Feed 首页一致：返回 + 标题 + 更多胶囊） ── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .mp-nav-back {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+  }
+  .mp-nav-title {
+    flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+  .mp-nav-more {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  .mp-nav-more span { width: 3px; height: 3px; border-radius: 50%; background: var(--fg); display: block; }
+
   /* ─── Top tabs (顶Tab: 关注/推荐/同城) ────────────────────── */
   .top-tabs {
     display: flex; align-items: center; justify-content: center;
@@ -155,12 +177,7 @@
     font-size: 13px; color: var(--fg); line-height: 1.4;
     font-family: var(--font-body); font-weight: 500;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden; margin-bottom: 6px;
-  }
-  .post-topic {
-    font-family: var(--font-mono); font-size: 10px; color: #2563eb;
-    background: #eff6ff; padding: 1px 6px; border-radius: 3px;
-    display: inline-block; margin-bottom: 8px;
+    overflow: hidden; margin-bottom: 8px;
   }
   /* 无标题图文卡片：标题字段为空时，用正文文字顶替展示在同一位置（非标题样式，字数通常更多） */
   .post-card.no-title .post-title { font-weight: 400; color: var(--fg-2); }
@@ -274,6 +291,13 @@
           </div>
         </div>
 
+        <!-- 小程序 NavBar -->
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">图文</div>
+          <div class="mp-nav-more"><span></span><span></span><span></span></div>
+        </div>
+
         <!-- 顶Tab -->
         <div class="top-tabs">
           <span class="top-tab">关注</span>
@@ -291,7 +315,6 @@
                 <div class="post-cover h2"></div>
                 <div class="post-body">
                   <div class="post-title">图文标题文字展示区域，最多展示两行内容，超出截断…</div>
-                  <span class="post-topic">#话题标签</span>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称A</span></div>
                     <div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div>
@@ -302,7 +325,6 @@
                 <div class="post-cover h3"></div>
                 <div class="post-body">
                   <div class="post-title">这条内容没有填写标题，所以直接把正文的前几句话展示出来占据标题位置，文字量会明显比标题长一些…</div>
-                  <span class="post-topic">#热门话题</span>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称B</span></div>
                     <div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div>
@@ -313,7 +335,6 @@
                 <div class="post-cover h1"></div>
                 <div class="post-body">
                   <div class="post-title">图文标题文字展示区域，最多展示两行内容…</div>
-                  <span class="post-topic">#生活记录</span>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称C</span></div>
                     <div class="post-likes"><span class="heart">♡</span><span class="num">89</span></div>
@@ -328,7 +349,6 @@
                 <div class="post-cover h3"></div>
                 <div class="post-body">
                   <div class="post-title">图文内容标题展示，右列第一条</div>
-                  <span class="post-topic">#美食</span>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称D</span></div>
                     <div class="post-likes"><span class="heart liked">❤</span><span class="num">5,204</span></div>
@@ -338,7 +358,7 @@
               <div class="post-card no-title">
                 <div class="post-cover h4"></div>
                 <div class="post-body">
-                  <div class="post-title">这一条也没有标题也没有话题标签，同样用正文内容顶替展示，超出三行的部分会被截断…</div>
+                  <div class="post-title">这一条也没有填写标题，同样用正文内容顶替展示，超出两行的部分会被截断…</div>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">创作者昵称E</span></div>
                     <div class="post-likes"><span class="heart">♡</span><span class="num">1,033</span></div>
@@ -349,7 +369,6 @@
                 <div class="post-cover h2"></div>
                 <div class="post-body">
                   <div class="post-title">右列第三条图文标题，稍短一些</div>
-                  <span class="post-topic">#穿搭</span>
                   <div class="post-footer">
                     <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称F</span></div>
                     <div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div>
@@ -400,6 +419,10 @@
 <div class="spec-panel">
   <h3>SPEC · 图文首页结构说明</h3>
   <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">NavBar（返回 / 图文 / 更多）— 与视频 Feed 首页一致的小程序导航栏</span>
+  </div>
+  <div class="spec-row">
     <span class="spec-key">顶 Tab</span>
     <span class="spec-val"><span class="spec-badge">关注</span><span class="spec-badge">推荐</span><span class="spec-badge">同城</span> — 与视频 Feed 一致，默认「推荐」</span>
   </div>
@@ -413,7 +436,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">内容展示</span>
-    <span class="spec-val">头图 · 标题（最多 2 行，可为空）· 话题标签（可为空）</span>
+    <span class="spec-val">头图 · 标题（最多 2 行，可为空）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">无标题兼容</span>
