@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "profile-reward-wireframe-mp.html",
+  "entry": "profile-reward-wireframe-mp.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-20T04:32:09.947Z",
+  "updatedAt": "2026-07-20T04:32:09.947Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

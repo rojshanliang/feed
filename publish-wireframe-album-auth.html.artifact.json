@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "publish-wireframe-album-auth.html",
+  "entry": "publish-wireframe-album-auth.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-09T14:29:45.697Z",
+  "updatedAt": "2026-07-09T14:29:45.697Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

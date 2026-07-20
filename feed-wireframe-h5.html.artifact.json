@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "feed-wireframe-h5.html",
+  "entry": "feed-wireframe-h5.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-08T11:23:06.373Z",
+  "updatedAt": "2026-07-08T11:23:06.373Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

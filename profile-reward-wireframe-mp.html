@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人页 / 创作者页 — 打赏额度模块线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-pill: 9999px;
+    --motion-fast: 120ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 600; color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 13px; color: var(--muted); margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  /* ─── Device wrapper ──────────────────────────────────────── */
+  .device-wrapper {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .device-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px;
+    background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 24px 64px rgba(0,0,0,0.35),
+      0 8px 20px rgba(0,0,0,0.2);
+    position: relative; flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%;
+    background: #ffffff;
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; background: white; border-radius: 50%;
+  }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before {
+    content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0;
+  }
+  .battery-icon::after {
+    content: ''; position: absolute; top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px;
+  }
+
+  /* ─── Nav bar ─────────────────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .mp-nav-back {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+    padding-bottom: 1px;
+  }
+  .mp-nav-title {
+    flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+  .mp-nav-share {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--fg); cursor: pointer;
+  }
+
+  /* ─── Scrollable profile content ─────────────────────────── */
+  .profile-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Cover + avatar header ───────────────────────────────── */
+  .profile-cover {
+    width: 100%; height: 120px;
+    background: var(--wf-block);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+  .profile-cover-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.05em;
+  }
+  .profile-avatar-wrap {
+    position: absolute;
+    bottom: -30px; left: 16px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    border: 3px solid #ffffff;
+    z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  /* ─── Profile info section ────────────────────────────────── */
+  .profile-info {
+    padding: 36px 16px 0;
+    background: #ffffff;
+  }
+  .profile-name {
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); margin-bottom: 2px;
+  }
+  .profile-handle {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .profile-bio {
+    font-size: 13px; color: var(--fg-2); line-height: 1.5;
+    margin-bottom: 14px; font-family: var(--font-body);
+  }
+
+  /* ─── Stats row ───────────────────────────────────────────── */
+  .stats-row {
+    display: flex;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+  .stat-item {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0;
+    border-right: 1px solid var(--border-soft);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+    color: var(--fg); line-height: 1;
+  }
+  .stat-lbl {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-top: 3px; letter-spacing: 0.02em;
+  }
+
+  /* ─── 打赏额度卡：七日/总打赏额度 ─────────────────────────── */
+  .reward-card {
+    margin: 14px 0 0;
+    padding: 12px 0;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center;
+  }
+  .reward-stat {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    border-right: 1px solid var(--border-soft);
+  }
+  .reward-stat:last-child { border-right: none; }
+  .reward-stat-lbl {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 0.02em; margin-bottom: 3px;
+  }
+  .reward-stat-num {
+    display: flex; align-items: baseline; gap: 3px; line-height: 1;
+  }
+  .reward-stat-num .cur {
+    font-family: var(--font-body); font-size: 12px; font-weight: 600;
+    color: var(--muted);
+  }
+  .reward-stat-num .amt {
+    font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+    color: var(--fg);
+  }
+
+  /* ─── Action buttons ──────────────────────────────────────── */
+  .profile-actions {
+    padding: 14px 0 0;
+    display: flex; gap: 8px;
+  }
+  .btn-outline {
+    flex: 1; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 5px;
+  }
+  .btn-follow {
+    flex: 1; height: 36px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-md); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .btn-icon {
+    width: 36px; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ─── Divider between profile-info and content ────────────── */
+  .section-gap {
+    height: 8px; background: var(--border-soft); flex-shrink: 0;
+  }
+
+  /* ─── Content Tab (视频 / 图文) ────────────────────────────── */
+  .content-tabs {
+    display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .content-tab {
+    flex: 1; text-align: center; padding: 11px 0;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative;
+  }
+  .content-tab.active { color: var(--fg); font-weight: 600; }
+  .content-tab.active::after {
+    content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Content panels ──────────────────────────────────────── */
+  .content-panel { display: none; background: #ffffff; flex: 1; }
+  .content-panel.active { display: block; }
+
+  .content-section { padding: 14px 16px 16px; }
+  .content-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .content-title {
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.04em;
+  }
+  .content-count {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  }
+
+  /* 3-column video grid */
+  .video-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .video-thumb {
+    aspect-ratio: 9/16;
+    background: var(--wf-block);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .video-thumb::after {
+    content: '▶';
+    font-size: 16px; color: rgba(255,255,255,0.5);
+  }
+  .video-thumb:nth-child(3n+2) { background: #c8ccd2; }
+  .video-thumb:nth-child(3n+3) { background: #b8bcc4; }
+
+  /* ─── 广场 Tab：图文 / 视频 / 纯文字动态流（朋友圈式） ────── */
+  .moment-list { display: flex; flex-direction: column; }
+  .moment-item {
+    padding: 14px 16px; border-bottom: 1px solid var(--border-soft);
+  }
+  .moment-item:last-child { border-bottom: none; }
+  .moment-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .moment-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .moment-meta { flex: 1; min-width: 0; }
+  .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .moment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .moment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; margin-bottom: 10px; }
+
+  .moment-images {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; width: 216px; margin-bottom: 10px;
+  }
+  .moment-image {
+    aspect-ratio: 1/1; background: var(--wf-block); border-radius: 4px;
+  }
+
+  .moment-video {
+    width: 150px; aspect-ratio: 9/16; background: var(--wf-block);
+    border-radius: 6px; position: relative; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .moment-video::after { content: '▶'; font-size: 16px; color: rgba(255,255,255,0.55); }
+  .moment-video-dur {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(13,17,23,0.55); color: #fff;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+    padding: 1px 6px; border-radius: var(--radius-pill);
+  }
+
+  /* ─── 已点赞 / 已打赏用户列表：内容下方常驻展示，与「···」互动菜单分离 ─── */
+  .moment-social {
+    background: var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    margin-bottom: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .moment-social-row {
+    display: flex; align-items: baseline; gap: 5px;
+    font-size: 12px; line-height: 1.5;
+  }
+  .moment-social-row .ic { font-size: 11px; flex-shrink: 0; }
+  .moment-social-row.liked-row .ic { color: #dc2626; }
+  .moment-social-row.reward-row .ic { font-family: var(--font-mono); font-weight: 700; color: var(--accent-hover); }
+  .moment-social-names {
+    font-family: var(--font-body); color: #576b95;
+  }
+  .moment-social-row.reward-row .moment-social-names { color: var(--fg-2); }
+  .moment-social-row.reward-row .amt { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  /* 评论预览：若该动态有评论，紧接在点赞/打赏行下方，同一信息条内，用分隔线区隔 */
+  .moment-comments {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-top: 5px; margin-top: 1px;
+    border-top: 1px solid rgba(13,17,23,0.08);
+  }
+  .moment-comment-row {
+    font-size: 12px; line-height: 1.5; color: var(--fg-2);
+  }
+  .moment-comment-row .cmt-name {
+    font-family: var(--font-body); font-weight: 600; color: #576b95; margin-right: 2px;
+  }
+  .moment-comment-more {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px;
+  }
+
+  /* ─── 底部操作栏：默认只露出「···」，点击后展开互动菜单 ──── */
+  .moment-footer { display: flex; align-items: center; justify-content: flex-end; }
+  .moment-more-wrap { position: relative; }
+  .moment-more {
+    width: 26px; height: 18px; border-radius: var(--radius-pill);
+    background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer;
+  }
+  .moment-more .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+  .moment-popover {
+    position: absolute; bottom: 24px; right: 0;
+    background: rgba(13,17,23,0.94);
+    border-radius: var(--radius-sm);
+    padding: 2px 0;
+    min-width: 108px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+    display: none; z-index: 20;
+  }
+  .moment-popover.open { display: block; }
+  .moment-popover::after {
+    content: ''; position: absolute; bottom: -4px; right: 15px;
+    width: 8px; height: 8px; background: rgba(13,17,23,0.94); transform: rotate(45deg);
+  }
+  .moment-popover-item {
+    display: flex; align-items: center; gap: 7px; padding: 8px 12px;
+    font-family: var(--font-body); font-size: 12px; font-weight: 500; color: #fff;
+    cursor: pointer; white-space: nowrap;
+  }
+  .moment-popover-item + .moment-popover-item { border-top: 1px solid rgba(255,255,255,0.12); }
+  .moment-popover-item .ic { font-size: 13px; width: 14px; text-align: center; }
+  .moment-popover-item.like-item.liked { color: #ff6b6b; }
+  .moment-popover-item.reward-item .ic { font-family: var(--font-mono); font-weight: 700; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px 18px;
+  }
+  .spec-panel h3 {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em;
+  }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge {
+    display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent);
+    color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    padding: 1px 7px; border-radius: 3px; margin-right: 3px;
+  }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>个人页 / 创作者页 — 打赏额度模块线框图</h1>
+  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 新增广场 Tab（朋友圈式动态流）</p>
+</div>
+
+<div class="devices-row">
+
+  <!-- 个人页 · 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">个人页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">我的</div>
+          <div style="display:flex;gap:6px;">
+            <div class="mp-nav-share">↗</div>
+            <div class="mp-nav-share">✉</div>
+            <div class="mp-nav-share">⚙</div>
+          </div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">个人页头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">用户昵称</div>
+            <div class="profile-handle">@username_unique</div>
+            <div class="profile-bio">这里是个人简介，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">128</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">3,421</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">56</span><span class="stat-lbl">内容</span></div>
+            </div>
+
+            <!-- 打赏额度卡（新增） -->
+            <div class="reward-card">
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">七日打赏额度</span>
+                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">86.00</span></span>
+              </div>
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">总打赏额度</span>
+                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">1,024.00</span></span>
+              </div>
+            </div>
+
+            <div class="profile-actions"><button class="btn-outline">✏ 编辑个人资料</button></div>
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+
+          <!-- 内容 Tab -->
+          <div class="content-tabs">
+            <div class="content-tab active" data-target="profile-video" onclick="setContentTab(this, 'profile')">视频</div>
+            <div class="content-tab" data-target="profile-imagetext" onclick="setContentTab(this, 'profile')">图文</div>
+            <div class="content-tab" data-target="profile-square" onclick="setContentTab(this, 'profile')">广场</div>
+          </div>
+
+          <!-- 视频面板 -->
+          <div class="content-panel active" id="profile-video">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">视频内容</span><span class="content-count">共 34 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+                <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 图文面板 -->
+          <div class="content-panel" id="profile-imagetext">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">图文内容</span><span class="content-count">共 22 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb" style="aspect-ratio:1/1;"></div><div class="video-thumb" style="aspect-ratio:1/1;"></div><div class="video-thumb" style="aspect-ratio:1/1;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 广场面板：朋友圈式动态流（图文 / 视频 / 纯文字，含点赞·评论·打赏） -->
+          <div class="content-panel" id="profile-square">
+            <div class="moment-list">
+
+              <!-- 纯文字动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">用户昵称</div>
+                    <div class="moment-time">2 小时前</div>
+                  </div>
+                </div>
+                <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情，纯文字动态最多展示五行超出折叠…</div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 32 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿强打赏 <span class="amt">¥5.00</span>，小美打赏 <span class="amt">¥2.00</span></span></div>
+                  <div class="moment-comments">
+                    <div class="moment-comment-row"><span class="cmt-name">阿强：</span>写得真好，感觉写的就是我</div>
+                    <div class="moment-comment-row"><span class="cmt-name">小美：</span>今天也要加油鸭～</div>
+                    <div class="moment-comment-more">查看全部 5 条评论</div>
+                  </div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item liked"><span class="ic">❤</span><span class="lbl">已赞 32</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 5</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 图片+文字动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">用户昵称</div>
+                    <div class="moment-time">昨天 21:04</div>
+                  </div>
+                </div>
+                <div class="moment-text">周末拍的一组图，分享给大家</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                </div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 156 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">Lucy打赏 <span class="amt">¥10.00</span> 等 3 人打赏</span></div>
+                  <div class="moment-comments">
+                    <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这张构图绝了</div>
+                    <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>求出图参数！</div>
+                    <div class="moment-comment-more">查看全部 18 条评论</div>
+                  </div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 156</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 18</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 视频动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">用户昵称</div>
+                    <div class="moment-time">3 天前</div>
+                  </div>
+                </div>
+                <div class="moment-text">随手拍的一个小视频</div>
+                <div class="moment-video"><span class="moment-video-dur">00:32</span></div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 89 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿伟打赏 <span class="amt">¥3.00</span></span></div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 89</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 创作者页 · 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">创作者页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">创作者</div>
+          <div class="mp-nav-share">↗</div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">创作者头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">创作者昵称</div>
+            <div class="profile-handle">@creator_handle</div>
+            <div class="profile-bio">创作者简介文字，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">256</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">8.6w</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">120w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">203</span><span class="stat-lbl">内容</span></div>
+            </div>
+
+            <!-- 打赏额度卡（新增） -->
+            <div class="reward-card">
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">七日打赏额度</span>
+                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">3,280.00</span></span>
+              </div>
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">总打赏额度</span>
+                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">86,450.00</span></span>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="btn-follow">+ 关注</button>
+              <div class="btn-icon">↗</div>
+            </div>
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+
+          <!-- 内容 Tab -->
+          <div class="content-tabs">
+            <div class="content-tab active" data-target="creator-video" onclick="setContentTab(this, 'creator')">视频</div>
+            <div class="content-tab" data-target="creator-imagetext" onclick="setContentTab(this, 'creator')">图文</div>
+            <div class="content-tab" data-target="creator-square" onclick="setContentTab(this, 'creator')">广场</div>
+          </div>
+
+          <!-- 视频面板 -->
+          <div class="content-panel active" id="creator-video">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">视频内容</span><span class="content-count">共 148 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+                <div class="video-thumb"></div><div class="video-thumb"></div><div class="video-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 图文面板 -->
+          <div class="content-panel" id="creator-imagetext">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">图文内容</span><span class="content-count">共 55 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb" style="aspect-ratio:1/1;"></div><div class="video-thumb" style="aspect-ratio:1/1;"></div><div class="video-thumb" style="aspect-ratio:1/1;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 广场面板：朋友圈式动态流（图文 / 视频 / 纯文字，含点赞·评论·打赏） -->
+          <div class="content-panel" id="creator-square">
+            <div class="moment-list">
+
+              <!-- 纯文字动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">创作者昵称</div>
+                    <div class="moment-time">1 小时前</div>
+                  </div>
+                </div>
+                <div class="moment-text">感谢大家一路支持，新一期内容正在准备中，敬请期待，纯文字动态最多展示五行超出折叠…</div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 1.8w 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿强打赏 <span class="amt">¥66.00</span> 等 214 人打赏</span></div>
+                  <div class="moment-comments">
+                    <div class="moment-comment-row"><span class="cmt-name">小美：</span>等了好久，冲了！</div>
+                    <div class="moment-comment-row"><span class="cmt-name">阿强：</span>什么时候上线呀老师</div>
+                    <div class="moment-comment-more">查看全部 246 条评论</div>
+                  </div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item liked"><span class="ic">❤</span><span class="lbl">已赞 1.8w</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 246</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 图片+文字动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">创作者昵称</div>
+                    <div class="moment-time">昨天 18:22</div>
+                  </div>
+                </div>
+                <div class="moment-text">幕后花絮分享给大家</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                </div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 3.2w 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">Lucy打赏 <span class="amt">¥128.00</span> 等 380 人打赏</span></div>
+                  <div class="moment-comments">
+                    <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>幕后原来是这样拍的</div>
+                    <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>辛苦啦，效果绝了</div>
+                    <div class="moment-comment-more">查看全部 512 条评论</div>
+                  </div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 3.2w</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 512</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 视频动态 -->
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">创作者昵称</div>
+                    <div class="moment-time">4 天前</div>
+                  </div>
+                </div>
+                <div class="moment-text">拍摄花絮小片段</div>
+                <div class="moment-video"><span class="moment-video-dur">00:47</span></div>
+                <div class="moment-social">
+                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 9,420 人点赞</span></div>
+                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿伟打赏 <span class="amt">¥88.00</span> 等 96 人打赏</span></div>
+                  <div class="moment-comments">
+                    <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这个镜头也太稳了吧</div>
+                    <div class="moment-comment-more">查看全部 203 条评论</div>
+                  </div>
+                </div>
+                <div class="moment-footer">
+                  <div class="moment-more-wrap">
+                    <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="moment-popover">
+                      <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 9,420</span></div>
+                      <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 203</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec panel -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 打赏额度模块结构说明（个人页 / 创作者页）</h3>
+  <div class="spec-row">
+    <span class="spec-key">打赏额度卡</span>
+    <span class="spec-val">位于数据四格（关注/粉丝/获赞/内容）下方、操作按钮上方 · 独立卡片，1px 描边 + 6px 圆角</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">数据展示</span>
+    <span class="spec-val"><span class="spec-badge">七日打赏额度</span><span class="spec-badge">总打赏额度</span> 两项并列，金额用等宽数字（IBM Plex Mono），¥ 符号用正文字体、弱化于金额</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">不重复展示</span>
+    <span class="spec-val">页面本身已展示头像与昵称，打赏卡内不再重复出现创作者信息</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">适用范围</span>
+    <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，数值随粉丝量级同比放大</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">与原页面差异</span>
+    <span class="spec-val">在 profile-content-tab-wireframe-mp.html 基础上新增本模块，其余结构保持一致</span>
+  </div>
+</div>
+
+<!-- Spec panel · 广场 Tab -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 广场 Tab 结构说明（个人页 / 创作者页）</h3>
+  <div class="spec-row">
+    <span class="spec-key">Tab 位置</span>
+    <span class="spec-val">内容 Tab 由「视频 / 图文」扩展为「视频 / 图文 / 广场」三个 Tab，广场为第三项</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">动态形式</span>
+    <span class="spec-val"><span class="spec-badge">纯文字</span><span class="spec-badge">图片+文字</span><span class="spec-badge">视频+文字</span> 类朋友圈动态流，单列时间倒序排列</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片动态</span>
+    <span class="spec-val">3 列图片九宫格布局（本例展示 6 图），单张图片 1:1 裁切</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频动态</span>
+    <span class="spec-val">竖版视频缩略图（9:16）+ 右下角时长标签，点击进入播放</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">已互动用户展示</span>
+    <span class="spec-val">内容下方常驻一块浅灰底信息条，分两行展示「已点赞用户」和「已打赏用户（含金额）」，点赞行超出人数用「等 N 人点赞」收尾</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论展示（有条件）</span>
+    <span class="spec-val">若该动态有评论，在已互动用户信息条内加一条分隔线，展示 1-2 条评论预览（昵称+内容）+「查看全部 N 条评论」；无评论则不展示该区块，点击「···」→评论仍可发表首条评论</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动入口</span>
+    <span class="spec-val">已互动用户展示条下方默认仅展示「···」更多按钮，不直接铺开点赞/评论/打赏数字</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动能力</span>
+    <span class="spec-val">点击「···」展开悬浮菜单，菜单内含 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">打赏</span> 三项操作；点击菜单外区域自动收起</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">适用范围</span>
+    <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，创作者页动态互动量级更高</span>
+  </div>
+</div>
+
+<script>
+  function setContentTab(el, scope) {
+    const container = el.closest('.profile-scroll');
+    container.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    container.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+    container.querySelector('#' + el.dataset.target).classList.add('active');
+  }
+
+  function toggleMomentMenu(el) {
+    const popover = el.nextElementSibling;
+    const isOpen = popover.classList.contains('open');
+    document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    if (!isOpen) popover.classList.add('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.moment-more-wrap')) {
+      document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    }
+  });
+</script>
+
+</body>
+</html>

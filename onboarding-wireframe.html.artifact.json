@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "onboarding-wireframe.html",
+  "entry": "onboarding-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-10T06:39:55.953Z",
+  "updatedAt": "2026-07-10T06:39:55.953Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

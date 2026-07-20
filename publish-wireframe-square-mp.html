@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容发布页 · 广场发布 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher（切换 纯文字/图文/视频/上传中 状态，避免平铺） ── */
+  .state-switcher {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Device ──────────────────────────────────────────────── */
+  .device-wrapper { display: none; flex-direction: column; align-items: center; gap: 12px; }
+  .device-wrapper.active { display: flex; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-publish-btn {
+    height: 28px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── 正文输入：像朋友圈一样，大段文字输入在最上面 ─────────── */
+  .square-text-wrap { padding: 16px 16px 4px; }
+  .square-textarea {
+    width: 100%; min-height: 96px;
+    font-family: var(--font-body); font-size: 15px; color: var(--muted);
+    line-height: 1.6; border: none;
+  }
+  .square-textarea.filled { color: var(--fg); }
+  .square-textarea .inline-topic { color: #2563eb; font-weight: 600; }
+  .square-textarea .caret {
+    display: inline-block; width: 1px; height: 15px; background: var(--fg);
+    margin-left: 1px; vertical-align: middle;
+    animation: caret-blink 1s step-end infinite;
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+  .square-char-count { font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); text-align: right; padding: 0 16px 6px; }
+  .square-char-count.filled { color: var(--fg); }
+
+  /* ─── 文字工具行：发表情按钮，紧贴正文输入框右下方 ──────────── */
+  .text-toolbar { display: flex; justify-content: flex-end; padding: 0 16px 6px; }
+  .text-emoji-btn {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+  }
+  .text-emoji-btn.active { background: var(--border-soft); }
+
+  /* ─── 表情面板：点击表情按钮后，在正文下方展开 ─────────────── */
+  .emoji-panel {
+    background: #f0f1f3; margin: 0 16px 14px; border-radius: var(--radius-md);
+    display: grid; grid-template-columns: repeat(8, 1fr);
+    align-content: flex-start; gap: 4px;
+    padding: 12px 8px;
+  }
+  .emoji-panel .emoji-item {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border-radius: 4px; cursor: pointer;
+  }
+
+  /* ─── 媒体动作行：图片 / 视频，二选一（与朋友圈一致，不能同时发） ── */
+  .media-actions { display: flex; gap: 10px; padding: 4px 16px 14px; }
+  .media-action-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: var(--radius-pill);
+    border: 1px solid var(--border); background: #ffffff;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg-2);
+    cursor: pointer;
+  }
+  .media-action-btn .ic { font-size: 14px; }
+  .media-action-btn.active { border-color: var(--accent); background: var(--surface-warm); color: var(--fg); }
+  .media-action-btn.disabled { color: var(--border); border-color: var(--border-soft); cursor: not-allowed; }
+
+  /* ─── 图文 · 图片多选宫格 ──────────────────────────────────── */
+  .image-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 0 16px 14px;
+  }
+  .image-slot {
+    aspect-ratio: 1/1; border-radius: var(--radius-md);
+    position: relative; overflow: hidden;
+  }
+  .image-slot.add {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer;
+  }
+  .image-slot.add .u-icon { font-size: 22px; color: var(--muted); line-height: 1; }
+  .image-slot.add .u-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .image-slot.filled { background: var(--wf-block); }
+  .image-slot.filled::after { content: '图'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); }
+  .image-slot-remove {
+    position: absolute; top: 3px; right: 3px; z-index: 2;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(13,17,23,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1;
+  }
+  .image-slot.uploading {
+    background: repeating-linear-gradient(135deg, #1e2128 0px, #1e2128 8px, #22252e 8px, #22252e 16px);
+  }
+  .image-slot.uploading .upload-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .image-slot.uploading .upload-spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .image-slot.uploading .upload-pct { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #ffffff; }
+  .image-slot.uploading .upload-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.2); z-index: 2; }
+  .image-slot.uploading .upload-progress-fill { height: 100%; background: var(--accent); }
+
+  /* ─── 视频 · 竖版单条上传 ──────────────────────────────────── */
+  .video-wrap { padding: 0 16px 14px; display: flex; justify-content: flex-start; }
+  .video-portrait {
+    width: 130px; aspect-ratio: 9/16;
+    border-radius: var(--radius-md); position: relative; overflow: hidden;
+  }
+  .video-portrait.empty {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+  .video-portrait.empty .u-icon { font-size: 20px; color: var(--muted); }
+  .video-portrait.empty .u-text { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-align: center; }
+  .video-portrait.uploading { background: #1a1d23; display: flex; align-items: center; justify-content: center; }
+  .video-portrait .uploading-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  .video-portrait .uploading-spinner {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  .video-portrait .uploading-pct { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #ffffff; }
+  .video-portrait .upload-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.2); }
+  .video-portrait .upload-progress-fill { height: 100%; background: var(--accent); }
+  .video-portrait.done { background: #1a1d23; }
+  .video-portrait.done .done-thumb-bg {
+    position: absolute; inset: 0; background: linear-gradient(135deg, #2a2d35 0%, #1a1d23 100%);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; color: rgba(255,255,255,0.3);
+  }
+  .video-portrait .done-duration {
+    position: absolute; bottom: 6px; right: 6px;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    color: #ffffff; background: rgba(0,0,0,0.6); padding: 2px 5px; border-radius: 3px;
+  }
+  .video-portrait .video-remove {
+    position: absolute; top: 4px; right: 4px; z-index: 2;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(13,17,23,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1;
+  }
+
+  /* ─── 可见范围（仿朋友圈：谁可以看） ────────────────────────── */
+  .visibility-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-top: 1px solid var(--border-soft);
+    margin-top: 4px;
+  }
+  .visibility-lbl { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--fg); }
+  .visibility-lbl .ic { font-size: 13px; }
+  .visibility-val { display: flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .visibility-val .arrow { font-size: 12px; color: var(--border); }
+
+  /* ─── Bottom bar ──────────────────────────────────────────── */
+  .bottom-bar {
+    height: 64px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .pub-btn {
+    flex: 1; height: 44px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .pub-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .pub-btn.uploading-btn { background: var(--border-soft); color: var(--muted); cursor: not-allowed; font-size: 12px; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>内容发布页 · 广场发布 — 线框图</h1>
+  <p>小程序 · 内容类型新增「广场」· 像朋友圈一样发文字 / 图文 / 视频 · 纯文字 / 图文 / 视频 / 图片上传中 / 视频上传中 / 表情面板 六态</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="text" onclick="setState('text')">① 纯文字态</button>
+  <button class="state-btn" data-state="image" onclick="setState('image')">② 图文态</button>
+  <button class="state-btn" data-state="video" onclick="setState('video')">③ 视频态</button>
+  <button class="state-btn" data-state="image-uploading" onclick="setState('image-uploading')">④ 图片上传中</button>
+  <button class="state-btn" data-state="video-uploading" onclick="setState('video-uploading')">⑤ 视频上传中</button>
+  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑥ 表情面板</button>
+</div>
+
+<div class="devices-row" style="display:flex;">
+
+<!-- ① 纯文字态 -->
+<div class="device-wrapper active" id="state-text">
+  <div class="device-label">① 纯文字态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn">发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">周末爬山，山顶风好大，人也好少，安静得只剩风声。#生活记录 就这样简单记录一下心情，纯文字动态也可以直接发布，不强制配图或视频。</div>
+        </div>
+        <div class="square-char-count filled">62 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 图文态 -->
+<div class="device-wrapper" id="state-image">
+  <div class="device-label">② 图文态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn">发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天做的brunch，拍了几张随手图，分享给大家<span class="inline-topic">#下厨日记</span></div>
+        </div>
+        <div class="square-char-count filled">24 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="image-grid">
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot add">
+            <div class="u-icon">＋</div>
+            <div class="u-count">4/9</div>
+          </div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ 视频态 -->
+<div class="device-wrapper" id="state-video">
+  <div class="device-label">③ 视频态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn">发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
+        </div>
+        <div class="square-char-count filled">20 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn disabled"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn active"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="video-wrap">
+          <div class="video-portrait done">
+            <div class="done-thumb-bg">▶</div>
+            <div class="done-duration">00:24</div>
+            <div class="video-remove">×</div>
+          </div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ 图片上传中 -->
+<div class="device-wrapper" id="state-image-uploading">
+  <div class="device-label">④ 图片上传中 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn inactive" disabled>发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天做的brunch，拍了几张随手图，分享给大家<span class="inline-topic">#下厨日记</span></div>
+        </div>
+        <div class="square-char-count filled">24 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="image-grid">
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot uploading">
+            <div class="upload-overlay">
+              <div class="upload-spinner"></div>
+              <div class="upload-pct">72%</div>
+            </div>
+            <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:72%;"></div></div>
+          </div>
+          <div class="image-slot uploading">
+            <div class="upload-overlay">
+              <div class="upload-spinner"></div>
+              <div class="upload-pct">35%</div>
+            </div>
+            <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:35%;"></div></div>
+          </div>
+          <div class="image-slot add">
+            <div class="u-icon">＋</div>
+            <div class="u-count">3/9</div>
+          </div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn inactive" disabled>图片上传中，请稍候…</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 视频上传中 -->
+<div class="device-wrapper" id="state-video-uploading">
+  <div class="device-label">⑤ 视频上传中 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn inactive" disabled>发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
+        </div>
+        <div class="square-char-count filled">20 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn disabled"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn active"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="video-wrap">
+          <div class="video-portrait uploading">
+            <div class="uploading-overlay">
+              <div class="uploading-spinner"></div>
+              <div class="uploading-pct">54%</div>
+            </div>
+            <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:54%;"></div></div>
+          </div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn inactive" disabled>视频上传中，请稍候…</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 表情面板中：点击正文下方的表情按钮后，展开表情面板 -->
+<div class="device-wrapper" id="state-emoji">
+  <div class="device-label">⑥ 表情面板中 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布广场动态</div>
+        <button class="nav-publish-btn">发布</button>
+      </div>
+
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">周末爬山，山顶风好大 😂<span class="caret"></span></div>
+        </div>
+        <div class="square-char-count filled">10 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn active" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="visibility-row">
+          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
+          <div class="visibility-val">公开 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 广场发布结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">内容类型新增</span>
+    <span class="spec-val">内容发布页在原有 <span class="spec-badge">视频</span><span class="spec-badge">图文</span> 之外新增 <span class="spec-badge dark">广场</span> 类型，用于发布朋友圈式动态</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布形式</span>
+    <span class="spec-val">与朋友圈一致：<span class="spec-badge">纯文字</span><span class="spec-badge">图文（文字+图片）</span><span class="spec-badge">视频（文字+视频）</span> 三种，无需分 Tab 选择，由是否添加媒体决定</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">正文输入</span>
+    <span class="spec-val">大段文字输入区（占位「这一刻的想法…」），最多 1000 字，键入 <span class="spec-badge">#</span> 内联识别话题；允许完全为空媒体、仅发文字</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发表情</span>
+    <span class="spec-val">正文下方一个表情按钮，点击后展开表情面板，选中的表情插入到光标处，与图片/视频输入互不影响，可与文字任意组合</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑥ 表情面板中</span>
+    <span class="spec-val">点击表情按钮后，原位置展开 8 列表情网格，再点一次收起；面板展开状态下仍可继续切换图片/视频媒体类型</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片 / 视频互斥</span>
+    <span class="spec-val">「图片」「视频」两个媒体入口二选一：选中一种后另一种禁用（灰色不可点），与文字任意组合，不能同时发图片和视频</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片</span>
+    <span class="spec-val">3 列宫格 · 最多 9 张 · 每张右上角可删除，上传中显示旋转加载圈 + 百分比 + 进度条</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频</span>
+    <span class="spec-val">竖版 9:16 单条缩略图 · 上传中显示旋转加载圈 + 百分比 + 进度条，完成后显示时长角标 + 删除入口</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">可见范围</span>
+    <span class="spec-val">仿朋友圈「谁可以看」入口，默认公开，点击进入可见范围选择（本图未展开）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布条件</span>
+    <span class="spec-val">文字 / 图片 / 视频三者至少填写一项即可发布；媒体上传中禁用发布按钮，直至全部完成</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      w.classList.toggle('active', w.id === 'state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
+  function toggleEmojiPanel(el) {
+    const panel = el.closest('.text-toolbar').nextElementSibling;
+    if (!panel || !panel.classList.contains('emoji-panel')) return;
+    const showing = panel.style.display !== 'none';
+    panel.style.display = showing ? 'none' : 'grid';
+    el.classList.toggle('active', !showing);
+  }
+
+  document.addEventListener('click', function(e) {
+    const item = e.target.closest('.emoji-item');
+    if (!item) return;
+    const panel = item.closest('.emoji-panel');
+    const textarea = panel.closest('.page-scroll').querySelector('.square-textarea');
+    if (!textarea) return;
+    const caret = textarea.querySelector('.caret');
+    const emojiText = document.createTextNode(item.textContent);
+    if (caret) textarea.insertBefore(emojiText, caret);
+    else textarea.appendChild(emojiText);
+  });
+</script>
+
+</body>
+</html>

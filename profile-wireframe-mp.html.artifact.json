@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "profile-wireframe-mp.html",
+  "entry": "profile-wireframe-mp.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-09T14:02:16.564Z",
+  "updatedAt": "2026-07-09T14:02:16.564Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

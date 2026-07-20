@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "feed-wireframe-mp.html",
+  "entry": "feed-wireframe-mp.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-09T12:41:42.289Z",
+  "updatedAt": "2026-07-09T12:41:42.289Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

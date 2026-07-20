@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "message-wireframe.html",
+  "entry": "message-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-08T14:03:25.089Z",
+  "updatedAt": "2026-07-08T14:03:25.089Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

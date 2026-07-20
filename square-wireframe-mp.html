@@ -1,0 +1,1475 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>广场页 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher（切换 默认/评论中/打赏中，避免三态平铺） ── */
+  .state-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Device ──────────────────────────────────────────────── */
+  .device-wrapper { display: none; flex-direction: column; align-items: center; gap: 12px; }
+  .device-wrapper.active { display: flex; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: var(--bg);
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.7); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  /* ─── NavBar（与图文首页一致：返回 + 标题 + 更多胶囊） ──────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .mp-nav-spacer { width: 28px; height: 28px; flex-shrink: 0; }
+  .mp-nav-title {
+    flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+  .mp-nav-more {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    flex-shrink: 0;
+  }
+  .mp-nav-more span { width: 3px; height: 3px; border-radius: 50%; background: var(--fg); display: block; }
+
+  /* ─── Devices row（广场默认态 + 评论中态 + 打赏中态，三态并列展示） ── */
+  .devices-row { display: flex; flex-direction: row; gap: 32px; align-items: flex-start; }
+
+  /* ─── 广场动态流：朋友圈式单列 Feed ──────────────────────── */
+  .square-scroll { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg); }
+  .moment-list { display: flex; flex-direction: column; }
+  .moment-item {
+    padding: 14px 16px; background: #ffffff;
+    border-bottom: 8px solid var(--border-soft);
+  }
+  .moment-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .moment-avatar {
+    width: 38px; height: 38px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+  .moment-meta { flex: 1; min-width: 0; }
+  .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .moment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .moment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; margin-bottom: 10px; }
+  /* 话题：纯文字 #标签，紧跟正文内联展示，不单独圈出，与图文首页/详情页的话题样式一致 */
+  .moment-text .inline-topic { color: #2563eb; font-weight: 600; }
+
+  .moment-images {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; width: 100%; margin-bottom: 10px;
+  }
+  .moment-images.count-1 { grid-template-columns: 150px; }
+  .moment-images.count-1 .moment-image { aspect-ratio: 4/3; }
+  .moment-image { aspect-ratio: 1/1; background: var(--wf-block); border-radius: 4px; }
+
+  .moment-video {
+    width: 160px; aspect-ratio: 9/16; background: var(--wf-block);
+    border-radius: 6px; position: relative; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .moment-video::after { content: '▶'; font-size: 17px; color: rgba(255,255,255,0.55); }
+  .moment-video-dur {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(13,17,23,0.55); color: #fff;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+    padding: 1px 6px; border-radius: var(--radius-pill);
+  }
+
+  /* 已点赞 / 已打赏（虚拟礼物）用户列表：内容下方常驻展示 */
+  .moment-social {
+    background: var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    margin-bottom: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .moment-social-row { display: flex; align-items: baseline; gap: 5px; font-size: 12px; line-height: 1.5; }
+  .moment-social-row .ic { font-size: 11px; flex-shrink: 0; }
+  .moment-social-row.liked-row .ic { color: #dc2626; }
+  .moment-social-row.reward-row .ic { font-size: 13px; }
+  .moment-social-names { font-family: var(--font-body); color: #576b95; }
+  .moment-social-row.reward-row .moment-social-names { color: var(--fg-2); }
+  /* 礼物名称：以徽章样式呈现，区别于普通文字，强调"打赏的是虚拟礼物"而非金额 */
+  .moment-social-row.reward-row .gift-name {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* 评论预览：若该动态有评论，紧接在点赞/打赏行下方 */
+  .moment-comments {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-top: 5px; margin-top: 1px;
+    border-top: 1px solid rgba(13,17,23,0.08);
+  }
+  .moment-comment-row { font-size: 12px; line-height: 1.5; color: var(--fg-2); }
+  .moment-comment-row .cmt-name { font-family: var(--font-body); font-weight: 600; color: #576b95; margin-right: 2px; }
+  .moment-comment-more { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  /* 功能按钮（···）：与文字/图片/视频内容并列一行、居右，位于点赞评论打赏展示区域之上
+     按钮始终对齐内容的最后一行/最后一个内容块（flex-end），而不是固定在文字第一行 */
+  .moment-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 8px; }
+  .moment-body { flex: 1; min-width: 0; }
+  .moment-body .moment-text:last-child,
+  .moment-body .moment-images:last-child,
+  .moment-body .moment-video:last-child { margin-bottom: 0; }
+  .moment-more-wrap { position: relative; flex-shrink: 0; }
+  .moment-more {
+    width: 26px; height: 18px; border-radius: var(--radius-pill);
+    background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer;
+  }
+  .moment-more .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+  /* 横向展开的互动菜单（参考微信朋友圈「···」样式）：向下横向铺开一排图标，避免顶部第一条动态被裁切 */
+  .moment-popover {
+    position: absolute; top: 100%; right: 0;
+    margin-top: 8px;
+    background: rgba(13,17,23,0.94);
+    border-radius: var(--radius-sm);
+    padding: 0 4px;
+    display: none; align-items: stretch; z-index: 20;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+  }
+  .moment-popover.open { display: flex; }
+  .moment-popover::after {
+    content: ''; position: absolute; top: -4px; right: 15px;
+    width: 8px; height: 8px; background: rgba(13,17,23,0.94); transform: rotate(45deg);
+  }
+  .moment-popover-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    padding: 9px 12px;
+    font-family: var(--font-body); font-size: 11px; font-weight: 500; color: #fff;
+    cursor: pointer; white-space: nowrap;
+  }
+  .moment-popover-item + .moment-popover-item { border-left: 1px solid rgba(255,255,255,0.12); }
+  .moment-popover-item .ic { font-size: 15px; width: auto; text-align: center; }
+  /* 点赞项可点击切换：已点赞态高亮，再次点击取消点赞 */
+  .moment-popover-item.like-item.liked { color: #ff6b6b; }
+  .moment-popover-item.like-item.liked .ic { color: #ff6b6b; }
+  .moment-popover-item.reward-item .ic { font-size: 15px; }
+
+  /* ─── Bottom tab bar (底Bar：与图文首页一致，广场为当前态) ── */
+  .mp-tabbar {
+    height: 56px; background: rgba(13,17,23,0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; padding-bottom: 4px;
+  }
+  .tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; }
+  .tab-icon { font-size: 20px; line-height: 1; color: rgba(255,255,255,0.45); }
+  .tab-item.active .tab-icon { color: var(--accent); }
+  .tab-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.01em; }
+  .tab-item.active .tab-label { color: var(--accent); }
+  .tab-publish .tab-icon { font-size: 22px; color: rgba(255,255,255,0.7); }
+
+  /* ─── 评论中态：底部评论输入条 + 模拟键盘，替换底Bar位置 ──── */
+  .comment-compose-bar {
+    height: 52px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 12px; flex-shrink: 0;
+  }
+  .compose-avatar {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .compose-input-active {
+    flex: 1; height: 34px; background: var(--border-soft); border-radius: var(--radius-pill);
+    display: flex; align-items: center; padding: 0 12px;
+    font-family: var(--font-body); font-size: 12px; color: var(--fg);
+    border: 1px solid var(--border);
+  }
+  .compose-input-active .caret {
+    display: inline-block; width: 1px; height: 13px; background: var(--fg);
+    margin-left: 1px; animation: caret-blink 1s step-end infinite;
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+  .compose-emoji {
+    width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+  }
+  .compose-emoji.active { background: var(--border-soft); }
+  .compose-send {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--muted); flex-shrink: 0; cursor: pointer;
+  }
+
+  /* 表情面板：点击发送按钮旁的表情图标后，替换掉模拟键盘的位置 */
+  .emoji-panel {
+    height: 216px; background: #f0f1f3; flex-shrink: 0;
+    display: grid; grid-template-columns: repeat(8, 1fr);
+    align-content: flex-start; gap: 4px;
+    padding: 12px 8px;
+  }
+  .emoji-panel .emoji-item {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border-radius: 4px; cursor: pointer;
+  }
+  .fake-keyboard {
+    height: 216px; background: #d1d3d8; flex-shrink: 0;
+    display: grid; grid-template-rows: repeat(4, 1fr); gap: 6px;
+    padding: 8px 5px;
+  }
+  .kb-row { display: flex; gap: 5px; }
+  .kb-key {
+    flex: 1; background: #ffffff; border-radius: 4px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  }
+  .kb-row.kb-row-3 .kb-key:first-child { flex: 1.5; background: #b9bcc3; }
+  .kb-row.kb-row-3 .kb-key:last-child { flex: 1.5; background: #b9bcc3; }
+  .kb-row.kb-row-4 .kb-key:nth-child(1) { flex: 1.5; background: #b9bcc3; }
+  .kb-row.kb-row-4 .kb-key:nth-child(2) { flex: 5; }
+  .kb-row.kb-row-4 .kb-key:nth-child(3) { flex: 1.5; background: var(--accent); }
+
+  /* 评论中态：目标动态左侧加一条灰色竖线，示意"正在评论这一条"（中性色，不用强调色/暖色底） */
+  .moment-item.commenting { position: relative; background: var(--border-soft); }
+  .moment-item.commenting::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--muted);
+  }
+  .moment-item.commenting .moment-more-wrap { display: none; }
+
+  /* ─── 打赏中态：底部弹层 + 遮罩，参考同城定位失败弹层结构 ──
+     打赏的是虚拟礼物，计价直接用真实货币数值，不做虚拟币中间层换算；面板内只展示数字，不带货币符号 */
+  .square-scroll.dimmed { filter: brightness(0.5); }
+  .reward-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    border-radius: 20px 20px 0 0;
+    z-index: 50;
+    display: flex; flex-direction: column;
+    padding: 12px 20px 24px;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.12);
+  }
+  .reward-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0; }
+  .reward-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); text-align: center; margin-bottom: 4px; }
+  .reward-target { font-family: var(--font-body); font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 18px; }
+  .reward-gifts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .reward-gift-chip {
+    height: 68px; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    color: var(--fg); cursor: pointer;
+  }
+  .reward-gift-chip .gift-icon { font-size: 22px; line-height: 1; }
+  .reward-gift-chip .gift-label { font-family: var(--font-body); font-size: 10px; font-weight: 500; }
+  .reward-gift-chip .gift-price { font-family: var(--font-mono); font-size: 9px; color: var(--muted); }
+  .reward-gift-chip.selected { border-color: var(--accent); background: var(--surface-warm); }
+  .reward-confirm {
+    width: 100%; height: 46px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: 23px; border: none;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── 打赏结果反馈：Toast 浮层，居中浮现在动态流上方，与打赏弹层解耦 ── */
+  .reward-toast {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 60;
+    background: rgba(13,17,23,0.92);
+    border-radius: var(--radius-md);
+    padding: 22px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    min-width: 160px;
+  }
+  .reward-toast-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff;
+  }
+  .reward-toast.success .reward-toast-icon { background: var(--success); }
+  .reward-toast.failed .reward-toast-icon { background: #dc2626; }
+  .reward-toast-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; }
+  .reward-toast-desc { font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.6); text-align: center; line-height: 1.5; }
+  .reward-toast-retry {
+    margin-top: 4px; padding: 6px 16px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── 图片浏览态：点击九宫格/大图后浮出的全屏图片浏览层 ──── */
+  .image-viewer {
+    position: absolute; inset: 0; z-index: 100;
+    background: #000000; display: flex; flex-direction: column;
+  }
+  .viewer-status-bar {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .viewer-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .viewer-close {
+    position: absolute; top: 54px; left: 10px; z-index: 10;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; cursor: pointer;
+  }
+  .viewer-image-stage {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .viewer-image-ph {
+    width: 100%; height: 70%; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.5);
+  }
+  .viewer-footer {
+    flex-shrink: 0; padding: 14px 0 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .viewer-dots { display: flex; align-items: center; gap: 5px; }
+  .viewer-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+  .viewer-dot.active { background: #ffffff; width: 14px; border-radius: 3px; }
+  .viewer-count { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6); }
+
+  /* ─── 视频播放态：点击动态里的视频缩略图后进入全屏竖版播放 ── */
+  .video-player {
+    position: absolute; inset: 0; z-index: 100;
+    background: #000000; display: flex; flex-direction: column;
+  }
+  .player-status-bar {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .player-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .player-close {
+    position: absolute; top: 54px; left: 10px; z-index: 10;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; cursor: pointer;
+  }
+  .player-stage {
+    flex: 1; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .player-stage-ph { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.5); }
+  .player-pause-btn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .player-pause-btn .bars { display: flex; gap: 6px; align-items: center; }
+  .player-pause-btn .bars span { width: 5px; height: 20px; background: #fff; border-radius: 2px; display: block; }
+  .player-info-row {
+    position: absolute; left: 16px; bottom: 96px; right: 70px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .player-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--wf-block-dark);
+    border: 1.5px solid rgba(255,255,255,0.6); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .player-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; }
+  .player-caption {
+    position: absolute; left: 16px; bottom: 64px; right: 70px;
+    font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.5;
+  }
+  .player-progress {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: rgba(255,255,255,0.25);
+  }
+  .player-progress-fill { width: 38%; height: 100%; background: var(--accent); }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>广场页 — 线框图（小程序）</h1>
+  <p>小程序 · 底Bar「广场」· 朋友圈式动态流（文字/视频/图片 + 点赞·评论·打赏虚拟礼物）· 默认 / 评论中 / 打赏中 / 图片浏览 / 视频播放 / 打赏成功 / 打赏失败 / 表情面板 八态</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="default" onclick="setState('default')">① 默认态</button>
+  <button class="state-btn" data-state="commenting" onclick="setState('commenting')">② 评论中态</button>
+  <button class="state-btn" data-state="rewarding" onclick="setState('rewarding')">③ 打赏中态</button>
+  <button class="state-btn" data-state="viewing" onclick="setState('viewing')">④ 图片浏览</button>
+  <button class="state-btn" data-state="playing" onclick="setState('playing')">⑤ 视频播放</button>
+  <button class="state-btn" data-state="reward-success" onclick="setState('reward-success')">⑥ 打赏成功</button>
+  <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑦ 打赏失败</button>
+  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑧ 表情面板</button>
+</div>
+
+<div class="devices-row">
+
+<!-- ① 默认态 -->
+<div class="device-wrapper active" id="state-default">
+  <div class="device-label">① 默认态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 小程序 NavBar：广场为底Bar根页面，无上一页可返回，故不展示返回箭头；用等宽占位块让标题保持居中 -->
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <!-- 广场动态流 -->
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <!-- 纯文字动态 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item liked" onclick="toggleMomentLike(this, 46)"><span class="ic">❤</span><span class="lbl">已赞 46</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 7</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
+                <div class="moment-comment-more">查看全部 7 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 图片+文字动态（多图） -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">Lucy</div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 212)"><span class="ic">♡</span><span class="lbl">点赞 212</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 23</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、小美 等 212 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">🚀 火箭</span> ×2 等 5 人打赏</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这摆盘也太精致了</div>
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>求教程！</div>
+                <div class="moment-comment-more">查看全部 23 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 视频动态 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿强</div>
+                <div class="moment-time">1 小时前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天练习的滑板小片段，摔了好几次才拍成</div>
+                <div class="moment-video"><span class="moment-video-dur">00:24</span></div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 68)"><span class="ic">♡</span><span class="lbl">点赞 68</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">Lucy 等 68 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">Lucy打赏 <span class="gift-name">🌹 玫瑰</span> ×1</span></div>
+            </div>
+          </div>
+
+          <!-- 图片+文字动态（单图） -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">小美</div>
+                <div class="moment-time">3 小时前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">养了两个月的多肉终于开花了</div>
+                <div class="moment-images count-1">
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 34)"><span class="ic">♡</span><span class="lbl">点赞 34</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 2</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 34 人点赞</span></div>
+            </div>
+          </div>
+
+          <!-- 图片+文字动态（含话题，纯文字内联展示 #标签） -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿强</div>
+                <div class="moment-time">5 小时前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">周末在公司楼下摆了个摊，第一次尝试摆摊卖手作饰品，紧张又兴奋 <span class="inline-topic">#摆摊日记</span> <span class="inline-topic">#副业记录</span></div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 127)"><span class="ic">♡</span><span class="lbl">点赞 127</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 15</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">小美、Lucy 等 127 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🧸 玩偶</span> ×1</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>饰品好好看，链接发一下</div>
+                <div class="moment-comment-more">查看全部 15 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 纯文字动态（无任何互动） -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">用户昵称</div>
+                <div class="moment-time">昨天 22:10</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">刚下班，好饿。</div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 0)"><span class="ic">♡</span><span class="lbl">点赞 0</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 底Bar：视频/图文/内容发布/广场/我的（广场为当前态） -->
+      <div class="mp-tabbar">
+        <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+        <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+        <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+        <div class="tab-item active"><div class="tab-icon">▦</div><span class="tab-label">广场</span></div>
+        <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ② 评论中态：点击某条动态的「评论」后，底Bar替换为评论输入条 + 键盘，目标动态高亮 -->
+<div class="device-wrapper" id="state-commenting">
+  <div class="device-label">② 评论中态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <!-- 正在评论的目标动态：左侧灰色竖线 + 浅灰底标记，隐藏「···」入口 -->
+          <div class="moment-item commenting">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
+                <div class="moment-comment-more">查看全部 7 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 后续动态原样展示，仅示意列表未变 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">Lucy</div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 评论输入条：替换底Bar位置，聚焦目标为「正在评论的动态」；发送按钮旁增加表情按钮 -->
+      <div class="comment-compose-bar">
+        <div class="compose-avatar">👤</div>
+        <div class="compose-input-active">回复 阿伟<span class="caret"></span></div>
+        <div class="compose-emoji" onclick="toggleEmojiPanel(this)">😀</div>
+        <span class="compose-send">发送</span>
+      </div>
+
+      <!-- 模拟弹出键盘 / 表情面板：二者同一位置，点击表情按钮切换显示 -->
+      <div class="fake-keyboard">
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-3"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-4"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+      </div>
+      <div class="emoji-panel" style="display:none;">
+        <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+        <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+        <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+        <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+        <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+        <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ③ 打赏中态：点击某条动态「···」菜单里的「打赏」后，弹出虚拟礼物选择底部弹层 -->
+<div class="device-wrapper" id="state-rewarding">
+  <div class="device-label">③ 打赏中态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll dimmed">
+        <div class="moment-list">
+
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+            </div>
+          </div>
+
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">Lucy</div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 打赏弹层：选择虚拟礼物，向目标动态创作者「阿伟」打赏（礼物计价直接用真实货币，不做虚拟币换算） -->
+      <div class="reward-sheet">
+        <div class="reward-handle"></div>
+        <div class="reward-title">打赏给 阿伟</div>
+        <div class="reward-target">选择一款虚拟礼物打赏，对方会收到礼物提醒</div>
+        <div class="reward-gifts">
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🌹</span><span class="gift-label">玫瑰</span>
+            <span class="gift-price">1</span>
+          </div>
+          <div class="reward-gift-chip selected">
+            <span class="gift-icon">🎈</span><span class="gift-label">气球</span>
+            <span class="gift-price">3</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🧸</span><span class="gift-label">玩偶</span>
+            <span class="gift-price">5</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🍰</span><span class="gift-label">蛋糕</span>
+            <span class="gift-price">6</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🚀</span><span class="gift-label">火箭</span>
+            <span class="gift-price">18</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">💎</span><span class="gift-label">钻戒</span>
+            <span class="gift-price">28</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">👑</span><span class="gift-label">皇冠</span>
+            <span class="gift-price">52</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🏰</span><span class="gift-label">城堡</span>
+            <span class="gift-price">99</span>
+          </div>
+        </div>
+        <button class="reward-confirm">打赏 🎈 气球 3</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ④ 图片浏览态：点击某条动态的图片（九宫格/单图）后进入全屏图片浏览 -->
+<div class="device-wrapper" id="state-viewing">
+  <div class="device-label">④ 图片浏览态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">Lucy</div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 图片浏览层：点击第 2 张图后进入全屏浏览，可左右滑动切换 -->
+      <div class="image-viewer">
+        <div class="viewer-status-bar">
+          <span class="viewer-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="viewer-close">×</div>
+        <div class="viewer-image-stage">
+          <div class="viewer-image-ph">图片 2</div>
+        </div>
+        <div class="viewer-footer">
+          <span class="viewer-count">2 / 4</span>
+          <div class="viewer-dots">
+            <span class="viewer-dot"></span>
+            <span class="viewer-dot active"></span>
+            <span class="viewer-dot"></span>
+            <span class="viewer-dot"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 视频播放态：点击某条动态的视频缩略图后进入全屏竖版播放 -->
+<div class="device-wrapper" id="state-playing">
+  <div class="device-label">⑤ 视频播放态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿强</div>
+                <div class="moment-time">1 小时前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天练习的滑板小片段，摔了好几次才拍成</div>
+                <div class="moment-video"><span class="moment-video-dur">00:24</span></div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 全屏视频播放层：点击视频缩略图后进入播放，竖版铺满屏幕，与视频 Feed 播放页风格一致 -->
+      <div class="video-player">
+        <div class="player-status-bar">
+          <span class="player-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="player-close">×</div>
+        <div class="player-stage">
+          <div class="player-stage-ph">视频播放画面</div>
+          <div class="player-pause-btn"><div class="bars"><span></span><span></span></div></div>
+          <div class="player-info-row">
+            <div class="player-avatar">👤</div>
+            <div class="player-name">阿强</div>
+          </div>
+          <div class="player-caption">今天练习的滑板小片段，摔了好几次才拍成</div>
+          <div class="player-progress"><div class="player-progress-fill"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 打赏成功态：确认打赏后，短暂浮现成功 Toast，随后自动消失回到默认动态流 -->
+<div class="device-wrapper" id="state-reward-success">
+  <div class="device-label">⑥ 打赏成功态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll dimmed">
+        <div class="moment-list">
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">你刚刚打赏 <span class="gift-name">🎈 气球</span> ×1，阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 打赏成功 Toast：绿色对勾 + 结果文案，2 秒后自动淡出，此时打赏弹层已收起 -->
+      <div class="reward-toast success">
+        <div class="reward-toast-icon">✓</div>
+        <div class="reward-toast-title">打赏成功</div>
+        <div class="reward-toast-desc">已送出 🎈 气球 ×1<br>感谢你对创作者的支持</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ⑦ 打赏失败态：网络异常/余额不足等原因导致打赏未完成，弹层保留在原状态方便重试 -->
+<div class="device-wrapper" id="state-reward-failed">
+  <div class="device-label">⑦ 打赏失败态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll dimmed">
+        <div class="moment-list">
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 打赏失败弹层：礼物选择保留原状态，追加失败 Toast + 重试按钮，不清空用户已选的礼物 -->
+      <div class="reward-sheet">
+        <div class="reward-handle"></div>
+        <div class="reward-title">打赏给 阿伟</div>
+        <div class="reward-target">选择一款虚拟礼物打赏，对方会收到礼物提醒</div>
+        <div class="reward-gifts">
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🌹</span><span class="gift-label">玫瑰</span>
+            <span class="gift-price">1</span>
+          </div>
+          <div class="reward-gift-chip selected">
+            <span class="gift-icon">🎈</span><span class="gift-label">气球</span>
+            <span class="gift-price">3</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🧸</span><span class="gift-label">玩偶</span>
+            <span class="gift-price">5</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🍰</span><span class="gift-label">蛋糕</span>
+            <span class="gift-price">6</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🚀</span><span class="gift-label">火箭</span>
+            <span class="gift-price">18</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">💎</span><span class="gift-label">钻戒</span>
+            <span class="gift-price">28</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">👑</span><span class="gift-label">皇冠</span>
+            <span class="gift-price">52</span>
+          </div>
+          <div class="reward-gift-chip">
+            <span class="gift-icon">🏰</span><span class="gift-label">城堡</span>
+            <span class="gift-price">99</span>
+          </div>
+        </div>
+        <button class="reward-confirm">打赏 🎈 气球 3</button>
+      </div>
+
+      <!-- 打赏失败 Toast：红色叉号 + 失败原因 + 重试按钮 -->
+      <div class="reward-toast failed">
+        <div class="reward-toast-icon">✕</div>
+        <div class="reward-toast-title">打赏失败</div>
+        <div class="reward-toast-desc">网络异常，礼物未送出<br>请检查网络后重试</div>
+        <button class="reward-toast-retry">重试</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ⑧ 表情面板中：点击评论输入条上的表情按钮后，模拟键盘被替换为表情面板 -->
+<div class="device-wrapper" id="state-emoji">
+  <div class="device-label">⑧ 表情面板中 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <!-- 正在评论的目标动态：左侧灰色竖线 + 浅灰底标记，隐藏「···」入口 -->
+          <div class="moment-item commenting">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">阿伟</div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
+                <div class="moment-comment-more">查看全部 7 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 后续动态原样展示，仅示意列表未变 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name">Lucy</div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 评论输入条：已输入表情，光标随文字移动到表情后面 -->
+      <div class="comment-compose-bar">
+        <div class="compose-avatar">👤</div>
+        <div class="compose-input-active">回复 阿伟：😂<span class="caret"></span></div>
+        <div class="compose-emoji active" onclick="toggleEmojiPanel(this)">😀</div>
+        <span class="compose-send">发送</span>
+      </div>
+
+      <!-- 模拟键盘：隐藏备用，供表情按钮切回文字输入时使用 -->
+      <div class="fake-keyboard" style="display:none;">
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-3"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-4"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+      </div>
+      <!-- 表情面板：替换模拟键盘的位置，点击某个表情后插入到输入框末尾 -->
+      <div class="emoji-panel">
+        <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+        <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+        <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+        <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+        <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+        <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel">
+  <h3>SPEC · 广场页结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">NavBar（广场 / 更多），标题左对齐 · 广场为底Bar根页面，无上一页可返回，不展示返回箭头</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">底 Bar</span>
+    <span class="spec-val">视频 / 图文 / 内容发布 / <span class="spec-badge dark">广场（当前）</span> / 我的</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">页面风格</span>
+    <span class="spec-val">类朋友圈动态流 · 单列时间倒序，聚合展示多用户动态（非单人主页）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">信息展示</span>
+    <span class="spec-val"><span class="spec-badge">文字</span><span class="spec-badge">图片</span><span class="spec-badge">视频</span> 三种内容形式，可单独或与文字搭配出现</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">话题标签</span>
+    <span class="spec-val">纯文字 <span class="spec-badge">#话题</span> 内联紧跟正文展示，不单独圈出/不带背景色胶囊，与图文首页/详情页话题样式一致（见"阿强"摆摊动态）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片动态</span>
+    <span class="spec-val">1 张时单图大图展示（4:3），多张时 3 列九宫格（1:1 裁切）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频动态</span>
+    <span class="spec-val">竖版视频缩略图（9:16）+ 右下角时长标签，点击进入播放</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">功能按钮位置</span>
+    <span class="spec-val">「···」与文字/图片/视频内容并列同一行、居右对齐，垂直对齐到内容最后一行（图片/视频则贴内容底部），位于点赞·评论·打赏展示区域之上</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">互动行为</span>
+    <span class="spec-val">点击「···」向下横向展开一排图标菜单（参考微信朋友圈样式），内含 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">打赏</span> 三项操作，避免向上展开导致列表首条被遮挡</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">点赞可取消</span>
+    <span class="spec-val">菜单内「点赞」为可点击开关：未点赞 ♡ 点击变已点赞 ❤（数字 +1）；已点赞再点一次则取消（数字 -1），与详情页点赞逻辑一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">已互动用户展示</span>
+    <span class="spec-val">有点赞/打赏时，「···」按钮行下方常驻浅灰底信息条展示具体用户、打赏的礼物名称与数量（非现金金额）；无互动则不展示该区块</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论展示（有条件）</span>
+    <span class="spec-val">若该动态有评论，在信息条内追加分隔线 + 评论预览（昵称+内容）+「查看全部 N 条评论」；无评论则不展示</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">零互动态</span>
+    <span class="spec-val">无点赞/评论/打赏时，内容下方不展示任何信息条，仅保留「···」入口（见最后一条动态）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">② 评论中态</span>
+    <span class="spec-val">点击「···」菜单「评论」后，目标动态左侧加灰色竖线 + 浅灰底标记（隐藏其「···」）· 底Bar 被评论输入条替换，输入框自动聚焦并弹出键盘</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论输入条</span>
+    <span class="spec-val">头像 + 输入框（含闪烁光标，占位文案随场景变化，如「回复 阿伟」）+ 表情按钮 +「发送」按钮，与图文详情页评论输入条同规格</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑧ 表情面板中</span>
+    <span class="spec-val">点击发送按钮旁的表情图标后，原本弹出的模拟键盘被替换为表情面板（同一位置切换），再点一次表情按钮切回键盘；选中的表情插入到输入框光标处</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">表情面板</span>
+    <span class="spec-val">8 列网格铺开常用表情，点击任意表情追加到输入内容末尾，不关闭面板，方便连续插入多个表情</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">③ 打赏中态</span>
+    <span class="spec-val">点击「···」菜单「打赏」后，动态流整体变暗，底部弹出虚拟礼物选择弹层（与同城定位失败弹层结构一致）· 打赏的是虚拟礼物，计价直接用真实货币数值，不引入虚拟币/余额换算</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">打赏弹层</span>
+    <span class="spec-val">标题「打赏给 [创作者昵称]」+ 8 款虚拟礼物图标胶囊（4 列 × 2 行，图标+名称+价格数字，不带货币符号，默认选中一档，超出两行可左右滑动/翻页）+「打赏 [礼物名] N」按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">④ 图片浏览态</span>
+    <span class="spec-val">点击动态里任意一张图片后进入全屏图片浏览层（黑底），可左右滑动切换，与图文详情页查看大图结构一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片浏览层</span>
+    <span class="spec-val">顶部左上角关闭按钮 + 图片舞台 + 底部页码「N / 总数」与指示点，点击关闭返回动态流原位置</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑤ 视频播放态</span>
+    <span class="spec-val">点击动态里的视频缩略图后进入全屏竖版播放，覆盖整个小程序屏幕，与视频 Feed 播放页风格一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">视频播放层</span>
+    <span class="spec-val">顶部左上角关闭按钮 + 播放画面 + 居中暂停/播放按钮 + 左下角创作者头像昵称与文案 + 底部进度条</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑥ 打赏成功态</span>
+    <span class="spec-val">点击「打赏 [礼物名] N」按钮且请求成功后，打赏弹层收起，居中浮现成功 Toast（绿色✓），已互动信息条同步追加「你刚刚打赏」记录</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">成功 Toast</span>
+    <span class="spec-val">绿色圆形✓图标 + 「打赏成功」标题 + 礼物名称与数量的确认文案，无需用户操作，短暂停留后自动淡出</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑦ 打赏失败态</span>
+    <span class="spec-val">请求失败（如网络异常）时，打赏弹层保留原选中的礼物不清空，叠加显示失败 Toast，方便用户直接重试</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">失败 Toast</span>
+    <span class="spec-val">红色圆形✕图标 + 「打赏失败」标题 + 失败原因文案 + 「重试」按钮，点击重试重新发起同一笔打赏请求</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      w.classList.toggle('active', w.id === 'state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
+  function toggleMomentMenu(el) {
+    const popover = el.nextElementSibling;
+    const isOpen = popover.classList.contains('open');
+    document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    if (!isOpen) popover.classList.add('open');
+  }
+
+  function toggleMomentLike(el, baseCount) {
+    const nowLiked = !el.classList.contains('liked');
+    el.classList.toggle('liked', nowLiked);
+    el.querySelector('.ic').textContent = nowLiked ? '❤' : '♡';
+    el.querySelector('.lbl').textContent = (nowLiked ? '已赞 ' : '点赞 ') + (nowLiked ? baseCount + 1 : baseCount);
+  }
+
+  function toggleEmojiPanel(el) {
+    const bar = el.closest('.comment-compose-bar');
+    const keyboard = bar.nextElementSibling;
+    const emojiPanel = keyboard ? keyboard.nextElementSibling : null;
+    if (!keyboard || !emojiPanel) return;
+    const showingEmoji = emojiPanel.style.display !== 'none';
+    emojiPanel.style.display = showingEmoji ? 'none' : 'grid';
+    keyboard.style.display = showingEmoji ? 'grid' : 'none';
+    el.classList.toggle('active', !showingEmoji);
+  }
+
+  document.addEventListener('click', function(e) {
+    const item = e.target.closest('.emoji-item');
+    if (!item) return;
+    const panel = item.closest('.emoji-panel');
+    const composeBar = panel.parentElement.querySelector('.comment-compose-bar');
+    const input = composeBar ? composeBar.querySelector('.compose-input-active') : null;
+    if (!input) return;
+    const caret = input.querySelector('.caret');
+    const emojiText = document.createTextNode(item.textContent);
+    if (caret) input.insertBefore(emojiText, caret);
+    else input.appendChild(emojiText);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.moment-more-wrap')) {
+      document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    }
+  });
+</script>
+
+</body>
+</html>

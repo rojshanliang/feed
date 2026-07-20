@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "imagetext-wireframe-mp.html",
+  "entry": "imagetext-wireframe-mp.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-13T06:01:35.617Z",
+  "updatedAt": "2026-07-13T06:01:35.617Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
