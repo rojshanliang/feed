@@ -253,17 +253,6 @@
     font-size: 11px; line-height: 1;
   }
 
-  /* ─── 可见范围（仿朋友圈：谁可以看） ────────────────────────── */
-  .visibility-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; border-top: 1px solid var(--border-soft);
-    margin-top: 4px;
-  }
-  .visibility-lbl { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--fg); }
-  .visibility-lbl .ic { font-size: 13px; }
-  .visibility-val { display: flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-  .visibility-val .arrow { font-size: 12px; color: var(--border); }
-
   /* ─── Bottom bar ──────────────────────────────────────────── */
   .bottom-bar {
     height: 64px; background: #ffffff;
@@ -347,10 +336,6 @@
           <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
           <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
         </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
-        </div>
       </div>
 
       <div class="bottom-bar">
@@ -408,10 +393,6 @@
             <div class="u-count">4/9</div>
           </div>
         </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
-        </div>
       </div>
 
       <div class="bottom-bar">
@@ -465,10 +446,6 @@
             <div class="done-duration">00:24</div>
             <div class="video-remove">×</div>
           </div>
-        </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
         </div>
       </div>
 
@@ -538,10 +515,6 @@
             <div class="u-count">3/9</div>
           </div>
         </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
-        </div>
       </div>
 
       <div class="bottom-bar">
@@ -598,10 +571,6 @@
             <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:54%;"></div></div>
           </div>
         </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
-        </div>
       </div>
 
       <div class="bottom-bar">
@@ -649,10 +618,6 @@
           <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
           <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
         </div>
-        <div class="visibility-row">
-          <div class="visibility-lbl"><span class="ic">🌐</span>谁可以看</div>
-          <div class="visibility-val">公开 <span class="arrow">›</span></div>
-        </div>
       </div>
 
       <div class="bottom-bar">
@@ -698,10 +663,6 @@
   <div class="spec-row">
     <span class="spec-key">视频</span>
     <span class="spec-val">竖版 9:16 单条缩略图 · 上传中显示旋转加载圈 + 百分比 + 进度条，完成后显示时长角标 + 删除入口</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">可见范围</span>
-    <span class="spec-val">仿朋友圈「谁可以看」入口，默认公开，点击进入可见范围选择（本图未展开）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">发布条件</span>
