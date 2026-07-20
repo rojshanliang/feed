@@ -112,6 +112,22 @@
   }
   .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
+  /* ─── 内容类型 Tab：视频 / 图文 / 广场 ─────────────────────────── */
+  .type-tabs {
+    display: flex; background: #ffffff;
+    border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
+  }
+  .type-tab {
+    flex: 1; padding: 11px 0; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); position: relative; cursor: pointer;
+  }
+  .type-tab.active { color: var(--fg); font-weight: 600; }
+  .type-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
   /* ─── Page scroll ─────────────────────────────────────────── */
   .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
 
@@ -316,6 +332,13 @@
         <button class="nav-publish-btn">发布</button>
       </div>
 
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
+      </div>
+
       <div class="page-scroll">
         <div class="square-text-wrap">
           <div class="square-textarea filled">周末爬山，山顶风好大，人也好少，安静得只剩风声。#生活记录 就这样简单记录一下心情，纯文字动态也可以直接发布，不强制配图或视频。</div>
@@ -361,6 +384,13 @@
         <div class="nav-back">‹</div>
         <div class="nav-title">发布广场动态</div>
         <button class="nav-publish-btn">发布</button>
+      </div>
+
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
       </div>
 
       <div class="page-scroll">
@@ -420,6 +450,13 @@
         <button class="nav-publish-btn">发布</button>
       </div>
 
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
+      </div>
+
       <div class="page-scroll">
         <div class="square-text-wrap">
           <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
@@ -472,6 +509,13 @@
         <div class="nav-back">‹</div>
         <div class="nav-title">发布广场动态</div>
         <button class="nav-publish-btn inactive" disabled>发布</button>
+      </div>
+
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
       </div>
 
       <div class="page-scroll">
@@ -542,6 +586,13 @@
         <button class="nav-publish-btn inactive" disabled>发布</button>
       </div>
 
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
+      </div>
+
       <div class="page-scroll">
         <div class="square-text-wrap">
           <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
@@ -598,6 +649,13 @@
         <button class="nav-publish-btn">发布</button>
       </div>
 
+      <!-- 内容类型 Tab -->
+      <div class="type-tabs">
+        <div class="type-tab">视频</div>
+        <div class="type-tab">图文</div>
+        <div class="type-tab active">广场</div>
+      </div>
+
       <div class="page-scroll">
         <div class="square-text-wrap">
           <div class="square-textarea filled">周末爬山，山顶风好大 😂<span class="caret"></span></div>
@@ -633,8 +691,8 @@
 <div class="spec-panel" style="width:782px;">
   <h3>SPEC · 广场发布结构说明</h3>
   <div class="spec-row">
-    <span class="spec-key">内容类型新增</span>
-    <span class="spec-val">内容发布页在原有 <span class="spec-badge">视频</span><span class="spec-badge">图文</span> 之外新增 <span class="spec-badge dark">广场</span> 类型，用于发布朋友圈式动态</span>
+    <span class="spec-key">内容类型 Tab</span>
+    <span class="spec-val"><span class="spec-badge">视频</span><span class="spec-badge">图文</span><span class="spec-badge dark">广场</span> — 位于 NavBar 下方，与 publish-wireframe-imagetext-mp.html 一致的 Tab 结构，广场为新增第三项并处于选中态</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">发布形式</span>
