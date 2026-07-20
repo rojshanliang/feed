@@ -58,6 +58,22 @@
     font-family: var(--font-mono);
   }
 
+  /* ─── State switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all var(--motion-fast) var(--ease-standard);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
   /* ─── Devices row ─────────────────────────────────────────── */
   .devices-row {
     display: flex;
@@ -68,8 +84,9 @@
 
   /* ─── Device wrapper ──────────────────────────────────────── */
   .device-wrapper {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    display: none; flex-direction: column; align-items: center; gap: 12px;
   }
+  .device-wrapper.active { display: flex; }
   .device-label {
     font-family: var(--font-mono); font-size: 11px; color: var(--muted);
     text-transform: uppercase; letter-spacing: 0.05em;
@@ -249,10 +266,6 @@
   .reward-stat-num {
     display: flex; align-items: baseline; gap: 3px; line-height: 1;
   }
-  .reward-stat-num .cur {
-    font-family: var(--font-body); font-size: 12px; font-weight: 600;
-    color: var(--muted);
-  }
   .reward-stat-num .amt {
     font-family: var(--font-mono); font-size: 16px; font-weight: 600;
     color: var(--fg);
@@ -398,12 +411,16 @@
   }
   .moment-social-row .ic { font-size: 11px; flex-shrink: 0; }
   .moment-social-row.liked-row .ic { color: #dc2626; }
-  .moment-social-row.reward-row .ic { font-family: var(--font-mono); font-weight: 700; color: var(--accent-hover); }
+  .moment-social-row.reward-row .ic { font-size: 13px; }
   .moment-social-names {
     font-family: var(--font-body); color: #576b95;
   }
   .moment-social-row.reward-row .moment-social-names { color: var(--fg-2); }
-  .moment-social-row.reward-row .amt { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  /* 礼物名称：以徽章样式呈现，区别于普通文字，强调"打赏的是虚拟礼物"而非金额 */
+  .moment-social-row.reward-row .gift-name {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
+  }
 
   /* 评论预览：若该动态有评论，紧接在点赞/打赏行下方，同一信息条内，用分隔线区隔 */
   .moment-comments {
@@ -454,7 +471,58 @@
   .moment-popover-item + .moment-popover-item { border-top: 1px solid rgba(255,255,255,0.12); }
   .moment-popover-item .ic { font-size: 13px; width: 14px; text-align: center; }
   .moment-popover-item.like-item.liked { color: #ff6b6b; }
-  .moment-popover-item.reward-item .ic { font-family: var(--font-mono); font-weight: 700; }
+  .moment-popover-item.reward-item .ic { font-size: 15px; }
+
+  /* 已点赞 / 已打赏行可点击，跳转查看完整名单弹层 */
+  .moment-social-row.clickable { cursor: pointer; }
+
+  /* ─── 点赞 / 打赏详情弹层：展示全部互动用户头像+昵称 ─────────── */
+  .profile-scroll-dim { filter: brightness(0.5); }
+  .engagement-modal {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #ffffff; border-top: 1px solid var(--border-soft);
+    border-radius: 20px 20px 0 0; z-index: 50;
+    display: none; flex-direction: column;
+    max-height: 62%;
+    padding: 12px 20px 20px;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.12);
+  }
+  .engagement-modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; flex-shrink: 0; }
+  .engagement-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; flex-shrink: 0;
+  }
+  .engagement-modal-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .engagement-modal-close {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--muted); cursor: pointer; flex-shrink: 0;
+  }
+  .engagement-avatar-wall {
+    display: flex; flex-wrap: wrap; gap: 14px 10px; overflow-y: auto;
+  }
+  .engagement-avatar-item { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 46px; }
+  .engagement-avatar-item .av {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+    position: relative; flex-shrink: 0;
+  }
+  .engagement-avatar-item .av-name {
+    font-family: var(--font-mono); font-size: 9px; color: var(--muted);
+    max-width: 46px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .engagement-avatar-item .gift-badge {
+    position: absolute; bottom: -3px; right: -3px;
+    width: 17px; height: 17px; border-radius: 50%;
+    background: #ffffff; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; box-shadow: 0 0 0 1px var(--border-soft);
+  }
+  .engagement-avatar-more {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--muted);
+    flex-shrink: 0;
+  }
 
   /* ─── Spec panel ──────────────────────────────────────────── */
   .spec-panel {
@@ -484,14 +552,21 @@
 
 <div class="page-header">
   <h1>个人页 / 创作者页 — 打赏额度模块线框图</h1>
-  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 新增广场 Tab（朋友圈式动态流）</p>
+  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 新增广场 Tab（朋友圈式动态流）· 点赞 / 打赏名单弹层</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="profile" onclick="setState('profile')">① 个人页</button>
+  <button class="state-btn" data-state="creator" onclick="setState('creator')">② 创作者页</button>
+  <button class="state-btn" data-state="like-list" onclick="setState('like-list')">③ 点赞名单弹层</button>
+  <button class="state-btn" data-state="reward-list" onclick="setState('reward-list')">④ 打赏名单弹层</button>
 </div>
 
 <div class="devices-row">
 
   <!-- 个人页 · 小程序 -->
-  <div class="device-wrapper">
-    <div class="device-label">个人页 · 小程序</div>
+  <div class="device-wrapper active" id="state-profile">
+    <div class="device-label">① 个人页 · 小程序</div>
     <div class="mp-device">
       <div class="mp-screen">
         <div class="mp-status-bar">
@@ -530,11 +605,11 @@
             <div class="reward-card">
               <div class="reward-stat">
                 <span class="reward-stat-lbl">七日打赏额度</span>
-                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">86.00</span></span>
+                <span class="reward-stat-num"><span class="amt">86.00</span></span>
               </div>
               <div class="reward-stat">
                 <span class="reward-stat-lbl">总打赏额度</span>
-                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">1,024.00</span></span>
+                <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
               </div>
             </div>
 
@@ -586,8 +661,8 @@
                 </div>
                 <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情，纯文字动态最多展示五行超出折叠…</div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 32 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿强打赏 <span class="amt">¥5.00</span>，小美打赏 <span class="amt">¥2.00</span></span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 32 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1，小美打赏 <span class="gift-name">🌹 玫瑰</span> ×1</span></div>
                   <div class="moment-comments">
                     <div class="moment-comment-row"><span class="cmt-name">阿强：</span>写得真好，感觉写的就是我</div>
                     <div class="moment-comment-row"><span class="cmt-name">小美：</span>今天也要加油鸭～</div>
@@ -600,7 +675,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item liked"><span class="ic">❤</span><span class="lbl">已赞 32</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 5</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -621,8 +696,8 @@
                   <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
                 </div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 156 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">Lucy打赏 <span class="amt">¥10.00</span> 等 3 人打赏</span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 156 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">Lucy打赏 <span class="gift-name">🚀 火箭</span> ×1 等 3 人打赏</span></div>
                   <div class="moment-comments">
                     <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这张构图绝了</div>
                     <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>求出图参数！</div>
@@ -635,7 +710,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 156</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 18</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -653,8 +728,8 @@
                 <div class="moment-text">随手拍的一个小视频</div>
                 <div class="moment-video"><span class="moment-video-dur">00:32</span></div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 89 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿伟打赏 <span class="amt">¥3.00</span></span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 89 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">🌹 玫瑰</span> ×1</span></div>
                 </div>
                 <div class="moment-footer">
                   <div class="moment-more-wrap">
@@ -662,7 +737,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 89</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -678,8 +753,8 @@
 
 
   <!-- 创作者页 · 小程序 -->
-  <div class="device-wrapper">
-    <div class="device-label">创作者页 · 小程序</div>
+  <div class="device-wrapper" id="state-creator">
+    <div class="device-label">② 创作者页 · 小程序</div>
     <div class="mp-device">
       <div class="mp-screen">
         <div class="mp-status-bar">
@@ -714,11 +789,11 @@
             <div class="reward-card">
               <div class="reward-stat">
                 <span class="reward-stat-lbl">七日打赏额度</span>
-                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">3,280.00</span></span>
+                <span class="reward-stat-num"><span class="amt">3,280.00</span></span>
               </div>
               <div class="reward-stat">
                 <span class="reward-stat-lbl">总打赏额度</span>
-                <span class="reward-stat-num"><span class="cur">¥</span><span class="amt">86,450.00</span></span>
+                <span class="reward-stat-num"><span class="amt">86,450.00</span></span>
               </div>
             </div>
 
@@ -773,8 +848,8 @@
                 </div>
                 <div class="moment-text">感谢大家一路支持，新一期内容正在准备中，敬请期待，纯文字动态最多展示五行超出折叠…</div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 1.8w 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿强打赏 <span class="amt">¥66.00</span> 等 214 人打赏</span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 1.8w 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">👑 皇冠</span> ×1 等 214 人打赏</span></div>
                   <div class="moment-comments">
                     <div class="moment-comment-row"><span class="cmt-name">小美：</span>等了好久，冲了！</div>
                     <div class="moment-comment-row"><span class="cmt-name">阿强：</span>什么时候上线呀老师</div>
@@ -787,7 +862,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item liked"><span class="ic">❤</span><span class="lbl">已赞 1.8w</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 246</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -808,8 +883,8 @@
                   <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
                 </div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 3.2w 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">Lucy打赏 <span class="amt">¥128.00</span> 等 380 人打赏</span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">♡</span><span class="moment-social-names">阿伟、Lucy 等 3.2w 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">Lucy打赏 <span class="gift-name">🏰 城堡</span> ×1 等 380 人打赏</span></div>
                   <div class="moment-comments">
                     <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>幕后原来是这样拍的</div>
                     <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>辛苦啦，效果绝了</div>
@@ -822,7 +897,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 3.2w</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 512</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -840,8 +915,8 @@
                 <div class="moment-text">拍摄花絮小片段</div>
                 <div class="moment-video"><span class="moment-video-dur">00:47</span></div>
                 <div class="moment-social">
-                  <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 9,420 人点赞</span></div>
-                  <div class="moment-social-row reward-row"><span class="ic">¥</span><span class="moment-social-names">阿伟打赏 <span class="amt">¥88.00</span> 等 96 人打赏</span></div>
+                  <div class="moment-social-row liked-row clickable" onclick="setState('like-list')"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 9,420 人点赞</span></div>
+                  <div class="moment-social-row reward-row clickable" onclick="setState('reward-list')"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">💎 钻戒</span> ×1 等 96 人打赏</span></div>
                   <div class="moment-comments">
                     <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这个镜头也太稳了吧</div>
                     <div class="moment-comment-more">查看全部 203 条评论</div>
@@ -853,7 +928,7 @@
                     <div class="moment-popover">
                       <div class="moment-popover-item like-item"><span class="ic">♡</span><span class="lbl">点赞 9,420</span></div>
                       <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 203</span></div>
-                      <div class="moment-popover-item reward-item"><span class="ic">¥</span><span class="lbl">打赏</span></div>
+                      <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                     </div>
                   </div>
                 </div>
@@ -863,6 +938,119 @@
           </div>
 
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 点赞名单弹层：点击动态的「已点赞用户」信息行后，底部弹出完整名单 -->
+  <div class="device-wrapper" id="state-like-list">
+    <div class="device-label">③ 点赞名单弹层 · 广场 Tab</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">我的</div>
+          <div style="display:flex;gap:6px;">
+            <div class="mp-nav-share">↗</div><div class="mp-nav-share">✉</div><div class="mp-nav-share">⚙</div>
+          </div>
+        </div>
+        <div class="profile-scroll profile-scroll-dim">
+          <div class="content-panel active">
+            <div class="moment-list">
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">用户昵称</div>
+                    <div class="moment-time">2 小时前</div>
+                  </div>
+                </div>
+                <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情，纯文字动态最多展示五行超出折叠…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 点赞名单弹层：展示全部点赞用户头像+昵称 -->
+        <div class="engagement-modal" style="display:flex;">
+          <div class="engagement-modal-handle"></div>
+          <div class="engagement-modal-header">
+            <span class="engagement-modal-title">❤ 32 人点赞</span>
+            <div class="engagement-modal-close" onclick="setState('profile')">×</div>
+          </div>
+          <div class="engagement-avatar-wall">
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">小美</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">阿强</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">Lucy</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">阿伟</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">用户_05</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">用户_06</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">用户_07</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤</div><span class="av-name">用户_08</span></div>
+            <div class="engagement-avatar-more">+24</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 打赏名单弹层：点击动态的「已打赏用户」信息行后，底部弹出完整名单，头像叠加所送礼物角标 -->
+  <div class="device-wrapper" id="state-reward-list">
+    <div class="device-label">④ 打赏名单弹层 · 广场 Tab</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">我的</div>
+          <div style="display:flex;gap:6px;">
+            <div class="mp-nav-share">↗</div><div class="mp-nav-share">✉</div><div class="mp-nav-share">⚙</div>
+          </div>
+        </div>
+        <div class="profile-scroll profile-scroll-dim">
+          <div class="content-panel active">
+            <div class="moment-list">
+              <div class="moment-item">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name">用户昵称</div>
+                    <div class="moment-time">2 小时前</div>
+                  </div>
+                </div>
+                <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情，纯文字动态最多展示五行超出折叠…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 打赏名单弹层：展示全部打赏用户头像+昵称，头像右下角叠加所送礼物图标 -->
+        <div class="engagement-modal" style="display:flex;">
+          <div class="engagement-modal-handle"></div>
+          <div class="engagement-modal-header">
+            <span class="engagement-modal-title">🎁 2 人打赏</span>
+            <div class="engagement-modal-close" onclick="setState('profile')">×</div>
+          </div>
+          <div class="engagement-avatar-wall">
+            <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div>
+            <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -878,7 +1066,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">数据展示</span>
-    <span class="spec-val"><span class="spec-badge">七日打赏额度</span><span class="spec-badge">总打赏额度</span> 两项并列，金额用等宽数字（IBM Plex Mono），¥ 符号用正文字体、弱化于金额</span>
+    <span class="spec-val"><span class="spec-badge">七日打赏额度</span><span class="spec-badge">总打赏额度</span> 两项并列，金额用等宽数字（IBM Plex Mono），不带货币符号（打赏为虚拟礼物，非真实货币）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">不重复展示</span>
@@ -915,7 +1103,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">已互动用户展示</span>
-    <span class="spec-val">内容下方常驻一块浅灰底信息条，分两行展示「已点赞用户」和「已打赏用户（含金额）」，点赞行超出人数用「等 N 人点赞」收尾</span>
+    <span class="spec-val">内容下方常驻一块浅灰底信息条，分两行展示「已点赞用户」和「已打赏用户」，打赏行展示对方所送的虚拟礼物徽章（与广场首页打赏逻辑一致，非金额），点赞行超出人数用「等 N 人点赞」收尾</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">评论展示（有条件）</span>
@@ -930,12 +1118,25 @@
     <span class="spec-val">点击「···」展开悬浮菜单，菜单内含 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">打赏</span> 三项操作；点击菜单外区域自动收起</span>
   </div>
   <div class="spec-row">
+    <span class="spec-key">点赞 / 打赏名单弹层（新增）</span>
+    <span class="spec-val">点击「已点赞用户」/「已打赏用户」信息行，底部弹出完整名单弹层，展示全部互动用户头像+昵称；打赏名单每个头像右下角叠加对应礼物图标，区分谁送了什么礼物，与 square-detail-wireframe-mp.html 的头像墙结构一致</span>
+  </div>
+  <div class="spec-row">
     <span class="spec-key">适用范围</span>
     <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，创作者页动态互动量级更高</span>
   </div>
 </div>
 
 <script>
+  function setState(state) {
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      w.classList.toggle('active', w.id === 'state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
   function setContentTab(el, scope) {
     const container = el.closest('.profile-scroll');
     container.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
