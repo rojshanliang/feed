@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "message-square-notif-wireframe-mp.html",
+  "entry": "message-square-notif-wireframe-mp.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-21T13:05:10.173Z",
+  "updatedAt": "2026-07-21T13:05:10.173Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
