@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>话题页 · 广场内容卡片 — 线框图（小程序）</title>
+<title>话题页 · 广场 Tab — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +18,7 @@
     --border-soft: #f3f4f6;
     --accent: #ffd21e;
     --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
     --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -42,6 +43,22 @@
   .page-header { text-align: center; }
   .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
   .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
 
   /* ─── Devices row ─────────────────────────────────────────── */
   .devices-row { display: flex; gap: 32px; align-items: flex-start; }
@@ -133,7 +150,7 @@
   .publish-row .topic-stat strong { color: var(--fg); }
   .publish-row .topic-stat-sep { background: var(--border); }
 
-  /* ─── Content tabs (推荐 / 最新) ────────────────────────────── */
+  /* ─── Content tabs (推荐 / 最新 / 广场) ─────────────────────── */
   .content-tabs {
     display: flex; background: #ffffff;
     border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
@@ -149,25 +166,22 @@
     width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
   }
 
-  /* ─── Mixed waterfall grid（广场三种内容：文字 / 图文 / 视频 混排） ── */
-  .content-scroll { flex: 1; background: var(--bg); }
+  /* ─── Content panels：推荐/最新 共用瀑布流面板，广场用独立 Feed 面板 ── */
+  .content-panel { display: none; flex: 1; min-height: 0; flex-direction: column; }
+  .content-panel.active { display: flex; }
+
+  /* ─── Waterfall grid（推荐 / 最新：仅图文卡 + 视频卡混排）──── */
+  .content-scroll { flex: 1; background: var(--bg); overflow-y: auto; }
   .waterfall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
   .wf-col { display: flex; flex-direction: column; gap: 8px; }
 
-  /* 来源角标：图文/广场共用同一套视觉样式（深底白字），只是文字内容不同——
-     UI 语言必须统一，用户靠文字判断来源模块（图文 / 广场），不靠配色区分；
-     视频模块内容仍不加任何角标，与话题页原有约定一致 */
-  .post-type-tag, .source-tag {
+  /* 图文来源角标：仅图文模块内容带标，视频模块内容不加角标（原有约定，不再与广场混排） */
+  .post-type-tag {
     position: absolute; top: 6px; left: 6px; z-index: 2;
     font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: #fff;
     background: rgba(13,17,23,0.55); padding: 2px 6px; border-radius: 3px;
   }
-  /* 文字卡片背景为浅灰底，角标改用静态定位放在文字上方 */
-  .text-card-content .source-tag {
-    position: static; display: inline-block; margin-bottom: 8px;
-  }
 
-  /* 视频卡片（竖版缩略图 + 创作者展示，与图文/文字卡片信息结构一致：均含头像/昵称/点赞量） */
   .video-card { background: #ffffff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); }
   .video-thumb {
     width: 100%; aspect-ratio: 9/16; background: var(--wf-block);
@@ -176,7 +190,6 @@
   .video-thumb::after { content: '▶'; font-size: 18px; color: rgba(255,255,255,0.55); }
   .video-info { padding: 7px 9px 9px; }
 
-  /* 图文卡片：头图 + 标题（兼容无标题）+ 创作者展示（昵称/头像/点赞量） */
   .post-card { background: #ffffff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); }
   .post-cover { width: 100%; background: var(--wf-block); position: relative; display: flex; align-items: center; justify-content: center; }
   .post-cover.h1 { height: 150px; }
@@ -190,21 +203,8 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     overflow: hidden; margin-bottom: 8px;
   }
-  /* 兼容无标题：不渲染标题行，头图下方直接衔接创作者信息 */
   .post-card.no-title .post-title { display: none; }
   .post-card.no-title .post-body { padding-top: 8px; }
-
-  /* 文字卡片（新增）：广场纯文字动态，无配图，正文本身作为卡片主体展示 */
-  .text-card { background: #ffffff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); }
-  .text-card-content { padding: 14px 12px 10px; background: var(--border-soft); position: relative; }
-  .text-card-quote {
-    font-size: 13px; color: var(--fg-2); line-height: 1.65;
-    font-family: var(--font-body);
-    display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .text-card-quote.lines-3 { -webkit-line-clamp: 3; }
-  .text-card-quote.lines-5 { -webkit-line-clamp: 5; }
-  .text-card-body { padding: 8px 10px 10px; }
 
   .post-footer { display: flex; align-items: center; justify-content: space-between; }
   .post-creator { display: flex; align-items: center; gap: 5px; min-width: 0; }
@@ -221,8 +221,169 @@
   .post-likes .heart.liked { color: #dc2626; }
   .post-likes span.num { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
 
+  /* ─── 广场 Tab：朋友圈式单列 Feed，与 square-wireframe-mp.html 广场首页结构完全一致 ── */
+  .square-scroll { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg); }
+  .moment-list { display: flex; flex-direction: column; }
+  .moment-item {
+    padding: 14px 16px; background: #ffffff;
+    border-bottom: 8px solid var(--border-soft);
+  }
+  .moment-item:last-child { border-bottom: none; }
+  .moment-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .moment-avatar {
+    width: 38px; height: 38px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+  .moment-meta { flex: 1; min-width: 0; }
+  .moment-name-row { display: flex; align-items: center; gap: 5px; }
+  .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .creator-level {
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); border: 1px solid var(--accent);
+    padding: 1px 5px; border-radius: 3px; line-height: 1.3; flex-shrink: 0;
+  }
+  .moment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .moment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; margin-bottom: 10px; }
+  .moment-text .inline-topic { color: #2563eb; font-weight: 600; }
+
+  .moment-images {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; width: 100%; margin-bottom: 10px;
+  }
+  .moment-images.count-1 { grid-template-columns: 150px; }
+  .moment-images.count-1 .moment-image { aspect-ratio: 4/3; }
+  .moment-image { aspect-ratio: 1/1; background: var(--wf-block); border-radius: 4px; }
+
+  .moment-video {
+    width: 160px; aspect-ratio: 9/16; background: var(--wf-block);
+    border-radius: 6px; position: relative; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .moment-video::after { content: '▶'; font-size: 17px; color: rgba(255,255,255,0.55); }
+  .moment-video-dur {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(13,17,23,0.55); color: #fff;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+    padding: 1px 6px; border-radius: var(--radius-pill);
+  }
+
+  .moment-social {
+    background: var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    margin-bottom: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .moment-social-row { display: flex; align-items: baseline; gap: 5px; font-size: 12px; line-height: 1.5; cursor: pointer; }
+  .moment-social-row .ic { font-size: 11px; flex-shrink: 0; }
+  .moment-social-row.liked-row .ic { color: #dc2626; }
+  .moment-social-row.reward-row .ic { font-size: 13px; }
+  .moment-social-names { font-family: var(--font-body); color: #576b95; }
+  .moment-social-row.reward-row .moment-social-names { color: var(--fg-2); }
+  .moment-social-row.reward-row .gift-name {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
+  }
+
+  .moment-comments {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-top: 5px; margin-top: 1px;
+    border-top: 1px solid rgba(13,17,23,0.08);
+  }
+  .moment-comment-row { font-size: 12px; line-height: 1.5; color: var(--fg-2); }
+  .moment-comment-row .cmt-name { font-family: var(--font-body); font-weight: 600; color: #576b95; margin-right: 2px; }
+  .moment-comment-more { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; cursor: pointer; }
+
+  /* 功能按钮（···）：与文字/图片/视频内容并列一行、居右，始终对齐内容最后一行 */
+  .moment-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 8px; }
+  .moment-body { flex: 1; min-width: 0; }
+  .moment-body .moment-text:last-child,
+  .moment-body .moment-images:last-child,
+  .moment-body .moment-video:last-child { margin-bottom: 0; }
+  .moment-more-wrap { position: relative; flex-shrink: 0; }
+  .moment-more {
+    width: 26px; height: 18px; border-radius: var(--radius-pill);
+    background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer;
+  }
+  .moment-more .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+  .moment-popover {
+    position: absolute; top: 100%; right: 0;
+    margin-top: 8px;
+    background: rgba(13,17,23,0.94);
+    border-radius: var(--radius-sm);
+    padding: 0 4px;
+    display: none; align-items: stretch; z-index: 20;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+  }
+  .moment-popover.open { display: flex; }
+  .moment-popover::after {
+    content: ''; position: absolute; top: -4px; right: 15px;
+    width: 8px; height: 8px; background: rgba(13,17,23,0.94); transform: rotate(45deg);
+  }
+  .moment-popover-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    padding: 9px 12px;
+    font-family: var(--font-body); font-size: 11px; font-weight: 500; color: #fff;
+    cursor: pointer; white-space: nowrap;
+  }
+  .moment-popover-item + .moment-popover-item { border-left: 1px solid rgba(255,255,255,0.12); }
+  .moment-popover-item .ic { font-size: 15px; width: auto; text-align: center; }
+  .moment-popover-item.like-item.liked { color: #ff6b6b; }
+  .moment-popover-item.like-item.liked .ic { color: #ff6b6b; }
+  .moment-popover-item.reward-item .ic { font-size: 15px; }
+
+  /* 卡片内互动信息展开：与 square-wireframe-mp.html 完全一致——点赞/打赏/评论依次堆叠、全部直接展示 */
+  .moment-item.engagement-expanded .moment-social { display: none; }
+  .moment-engagement-full {
+    display: none; flex-direction: column; gap: 10px;
+    background: var(--border-soft); border-radius: var(--radius-sm);
+    padding: 10px; margin-bottom: 8px;
+  }
+  .moment-item.engagement-expanded .moment-engagement-full { display: flex; }
+  .engagement-full-collapse-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .engagement-full-section { display: flex; flex-direction: column; gap: 8px; }
+  .engagement-full-section + .engagement-full-section { padding-top: 8px; border-top: 1px solid rgba(13,17,23,0.08); }
+  .engagement-full-heading {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--fg);
+    margin-bottom: 8px;
+  }
+  .engagement-full-heading .ic.liked { color: #dc2626; }
+  .engagement-avatar-wall { display: flex; flex-wrap: wrap; gap: 10px; }
+  .engagement-avatar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 40px; flex-shrink: 0; }
+  .engagement-avatar-item .av {
+    width: 34px; height: 34px; border-radius: 6px; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; position: relative;
+  }
+  .engagement-avatar-item .av-name {
+    font-family: var(--font-mono); font-size: 9px; color: var(--muted);
+    max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .engagement-avatar-item .gift-badge {
+    position: absolute; bottom: -3px; right: -3px;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #ffffff; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; box-shadow: 0 0 0 1px var(--border-soft);
+  }
+  .engagement-full-comments { display: flex; flex-direction: column; gap: 4px; }
+  .engagement-comment-line { font-size: 13px; line-height: 1.6; color: var(--fg-2); }
+  .engagement-comment-line .cmt-name { color: #576b95; font-weight: 600; margin-right: 3px; }
+  .engagement-comment-line .comment-reply-btn {
+    color: var(--muted); font-family: var(--font-mono); font-size: 10px;
+    margin-left: 6px; cursor: pointer;
+  }
+  .engagement-collapse-btn {
+    display: flex; align-items: center; gap: 3px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--muted);
+    cursor: pointer;
+  }
+
   /* ─── Spec panel ──────────────────────────────────────────── */
-  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 782px; }
   .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
   .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
   .spec-row:last-child { border-bottom: none; }
@@ -235,15 +396,15 @@
 <body>
 
 <div class="page-header">
-  <h1>话题页 · 广场内容卡片 — 线框图（小程序）</h1>
-  <p>小程序 · 广场三种内容形式（文字 / 图文 / 视频）汇聚到话题页 · 双列瀑布流三卡混排</p>
+  <h1>话题页 · 广场 Tab — 线框图（小程序）</h1>
+  <p>小程序 · 内容 Tab 新增「广场」独立入口 · 推荐/最新仅展示图文卡+视频卡（不再与广场内容混排）· 广场 Tab 展示风格与 square-wireframe-mp.html 广场首页完全一致</p>
 </div>
 
 <div class="devices-row">
 
-  <!-- ① 小程序 -->
+  <!-- ① 推荐/最新：仅图文卡 + 视频卡 -->
   <div class="device-wrapper">
-    <div class="device-label">话题页 · 小程序</div>
+    <div class="device-label">① 推荐 · 话题页</div>
     <div class="mp-device">
       <div class="mp-screen">
 
@@ -255,7 +416,6 @@
           </div>
         </div>
 
-        <!-- 小程序 NavBar -->
         <div class="mp-nav">
           <div class="nav-back">‹</div>
           <div class="nav-title">#摆摊日记</div>
@@ -264,14 +424,12 @@
 
         <div class="page-scroll">
 
-          <!-- Topic hero -->
           <div class="topic-hero">
             <div class="topic-hero-bg">TOPIC COVER IMAGE</div>
             <div class="topic-tag-label"># 话题</div>
             <div class="topic-name">摆摊日记</div>
           </div>
 
-          <!-- Stats -->
           <div class="publish-row">
             <div class="topic-stats">
               <span class="topic-stat"><strong>8,940</strong> 内容</span>
@@ -280,101 +438,325 @@
             </div>
           </div>
 
-          <!-- 内容 Tab：推荐 / 最新 -->
+          <!-- 内容 Tab：推荐 / 最新 / 广场（新增） -->
           <div class="content-tabs">
-            <div class="content-tab active">推荐</div>
-            <div class="content-tab">最新</div>
+            <div class="content-tab active" data-target="panel-waterfall" onclick="setContentTab(this)">推荐</div>
+            <div class="content-tab" data-target="panel-waterfall" onclick="setContentTab(this)">最新</div>
+            <div class="content-tab" data-target="panel-square" onclick="setContentTab(this)">广场</div>
           </div>
 
-          <!-- 广场三种内容混排双列瀑布流 -->
-          <div class="content-scroll">
-            <div class="waterfall-grid">
+          <!-- 推荐 / 最新 面板：仅图文卡 + 视频卡双列瀑布流，广场内容已移至独立 Tab，不再混排 -->
+          <div class="content-panel active" id="panel-waterfall">
+            <div class="content-scroll">
+              <div class="waterfall-grid">
 
-              <!-- 左列 -->
-              <div class="wf-col">
-
-                <!-- 文字卡片：广场纯文字动态，图文/视频模块不支持纯文字，故必然带「广场」来源角标 -->
-                <div class="text-card">
-                  <div class="text-card-content">
-                    <span class="source-tag">广场</span>
-                    <div class="text-card-quote lines-5">第一次摆摊卖手作饰品，紧张又兴奋，从下午摆到天黑，卖出去了三件，虽然不多但已经很开心了，明天准备继续来摆～</div>
+                <!-- 左列 -->
+                <div class="wf-col">
+                  <div class="post-card">
+                    <div class="post-cover h2"><span class="post-type-tag">图文</span></div>
+                    <div class="post-body">
+                      <div class="post-title">周末在公司楼下摆了个摊，拍了几张现场照片…</div>
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿强</span></div>
+                        <div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="text-card-body">
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿强</span></div>
-                      <div class="post-likes"><span class="heart liked">❤</span><span class="num">127</span></div>
+                  <div class="video-card">
+                    <div class="video-thumb"></div>
+                    <div class="video-info">
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿伟</span></div>
+                        <div class="post-likes"><span class="heart liked">❤</span><span class="num">8,204</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-card no-title">
+                    <div class="post-cover h3"><span class="post-type-tag">图文</span></div>
+                    <div class="post-body">
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称D</span></div>
+                        <div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- 图文卡片：来自图文模块发布，标「图文」，与原话题页角标一致 -->
-                <div class="post-card">
-                  <div class="post-cover h2"><span class="post-type-tag">图文</span></div>
-                  <div class="post-body">
-                    <div class="post-title">周末在公司楼下摆了个摊，拍了几张现场照片…</div>
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿强</span></div>
-                      <div class="post-likes"><span class="heart liked">❤</span><span class="num">1.2w</span></div>
+                <!-- 右列 -->
+                <div class="wf-col">
+                  <div class="video-card">
+                    <div class="video-thumb"></div>
+                    <div class="video-info">
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">小美</span></div>
+                        <div class="post-likes"><span class="heart">♡</span><span class="num">1,530</span></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <!-- 视频卡片：来自视频模块发布，不标角标，与原话题页约定一致 -->
-                <div class="video-card">
-                  <div class="video-thumb"></div>
-                  <div class="video-info">
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿伟</span></div>
-                      <div class="post-likes"><span class="heart liked">❤</span><span class="num">8,204</span></div>
+                  <div class="post-card">
+                    <div class="post-cover h1"><span class="post-type-tag">图文</span></div>
+                    <div class="post-body">
+                      <div class="post-title">摆摊三个月复盘：收入、心态与选品经验分享</div>
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">Lucy</span></div>
+                        <div class="post-likes"><span class="heart">♡</span><span class="num">3,204</span></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-              </div>
-
-              <!-- 右列 -->
-              <div class="wf-col">
-
-                <!-- 视频卡片：来自广场发布的视频动态，标「广场」区分来源 -->
-                <div class="video-card">
-                  <div class="video-thumb"><span class="source-tag">广场</span></div>
-                  <div class="video-info">
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">阿强</span></div>
-                      <div class="post-likes"><span class="heart">♡</span><span class="num">1,530</span></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 文字卡片（较短），同样来自广场 -->
-                <div class="text-card">
-                  <div class="text-card-content">
-                    <span class="source-tag">广场</span>
-                    <div class="text-card-quote lines-3">摆摊第三天，认识了隔壁摊位的朋友，感觉这条路没那么孤单了。</div>
-                  </div>
-                  <div class="text-card-body">
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">小美</span></div>
-                      <div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 图文卡片（无标题兼容态）：来自广场发布的图文动态，标「广场」区分来源 -->
-                <div class="post-card no-title">
-                  <div class="post-cover h3"><span class="source-tag">广场</span></div>
-                  <div class="post-body">
-                    <div class="post-footer">
-                      <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称D</span></div>
-                      <div class="post-likes"><span class="heart">♡</span><span class="num">217</span></div>
+                  <div class="video-card">
+                    <div class="video-thumb"></div>
+                    <div class="video-info">
+                      <div class="post-footer">
+                        <div class="post-creator"><div class="post-avatar">👤</div><span class="post-creator-name">用户昵称B</span></div>
+                        <div class="post-likes"><span class="heart">♡</span><span class="num">342</span></div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
               </div>
+            </div><!-- /content-scroll -->
+          </div>
 
+          <!-- 广场面板：与 panel-waterfall 结构相同的容器，此设备示例默认停在推荐/最新，故此处留空占位 -->
+          <div class="content-panel" id="panel-square-placeholder-1" style="display:none;"></div>
+
+        </div><!-- /page-scroll -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 广场 Tab：与 square-wireframe-mp.html 广场首页结构完全一致 -->
+  <div class="device-wrapper">
+    <div class="device-label">② 广场 Tab · 话题页</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-title">#摆摊日记</div>
+          <div class="nav-more"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="page-scroll">
+
+          <div class="topic-hero">
+            <div class="topic-hero-bg">TOPIC COVER IMAGE</div>
+            <div class="topic-tag-label"># 话题</div>
+            <div class="topic-name">摆摊日记</div>
+          </div>
+
+          <div class="publish-row">
+            <div class="topic-stats">
+              <span class="topic-stat"><strong>8,940</strong> 内容</span>
+              <span class="topic-stat-sep"></span>
+              <span class="topic-stat"><strong>1,203</strong> 参与</span>
             </div>
-          </div><!-- /content-scroll -->
+          </div>
+
+          <div class="content-tabs">
+            <div class="content-tab" data-target="panel-waterfall-2" onclick="setContentTab(this)">推荐</div>
+            <div class="content-tab" data-target="panel-waterfall-2" onclick="setContentTab(this)">最新</div>
+            <div class="content-tab active" data-target="panel-square-2" onclick="setContentTab(this)">广场</div>
+          </div>
+
+          <div class="content-panel" id="panel-waterfall-2" style="display:none;"></div>
+
+          <!-- 广场面板：单列朋友圈式 Feed，聚合带 #摆摊日记 话题标签发布的广场动态 -->
+          <div class="content-panel active" id="panel-square-2">
+            <div class="square-scroll">
+              <div class="moment-list">
+
+                <!-- 纯文字动态 -->
+                <div class="moment-item">
+                  <div class="moment-header">
+                    <div class="moment-avatar">👤</div>
+                    <div class="moment-meta">
+                      <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
+                      <div class="moment-time">3 小时前</div>
+                    </div>
+                  </div>
+                  <div class="moment-row">
+                    <div class="moment-body">
+                      <div class="moment-text">第一次摆摊卖手作饰品，紧张又兴奋，从下午摆到天黑，卖出去了三件，虽然不多但已经很开心了，明天准备继续来摆～ <span class="inline-topic">#摆摊日记</span></div>
+                    </div>
+                    <div class="moment-more-wrap">
+                      <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <div class="moment-popover">
+                        <div class="moment-popover-item like-item liked" onclick="toggleMomentLike(this, 127)"><span class="ic">❤</span><span class="lbl">已赞 127</span></div>
+                        <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 15</span></div>
+                        <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="moment-social">
+                    <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">❤</span><span class="moment-social-names">小美、Lucy 等 127 人点赞</span></div>
+                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🧸 玩偶</span> ×1</span></div>
+                    <div class="moment-comments">
+                      <div class="moment-comment-row"><span class="cmt-name">小美：</span>饰品好好看，链接发一下</div>
+                      <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>摆摊辛苦了，第一次都很不容易</div>
+                      <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 15 条评论</div>
+                    </div>
+                  </div>
+
+                  <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表 -->
+                  <div class="moment-engagement-full">
+                    <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic liked">❤</span>127 人点赞</div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🧸</span></div><span class="av-name">小美</span></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">💬</span>15 条评论</div>
+                      <div class="engagement-full-comments">
+                        <div class="engagement-comment-line"><span class="cmt-name">小美：</span>饰品好好看，链接发一下<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">Lucy：</span>摆摊辛苦了，第一次都很不容易<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">阿伟：</span>这个价格可以接受，支持一下<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">用户_04：</span>摊位在哪个位置呀<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">用户_05：</span>手作真的很有心意<span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 图片+文字动态 -->
+                <div class="moment-item">
+                  <div class="moment-header">
+                    <div class="moment-avatar">👤</div>
+                    <div class="moment-meta">
+                      <div class="moment-name-row"><span class="moment-name">小美</span><span class="creator-level">Lv.3</span></div>
+                      <div class="moment-time">昨天 21:04</div>
+                    </div>
+                  </div>
+                  <div class="moment-row">
+                    <div class="moment-body">
+                      <div class="moment-text">摆摊第三天，认识了隔壁摊位的朋友，感觉这条路没那么孤单了 <span class="inline-topic">#摆摊日记</span></div>
+                      <div class="moment-images">
+                        <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                      </div>
+                    </div>
+                    <div class="moment-more-wrap">
+                      <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <div class="moment-popover">
+                        <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 342)"><span class="ic">♡</span><span class="lbl">点赞 342</span></div>
+                        <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 6</span></div>
+                        <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="moment-social">
+                    <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">阿强、阿伟 等 342 人点赞</span></div>
+                    <div class="moment-comments">
+                      <div class="moment-comment-row"><span class="cmt-name">阿强：</span>互相支持！</div>
+                      <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 6 条评论</div>
+                    </div>
+                  </div>
+
+                  <!-- 展开态：无打赏时仅展示点赞头像墙 + 评论列表 -->
+                  <div class="moment-engagement-full">
+                    <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic liked">❤</span>342 人点赞</div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">💬</span>6 条评论</div>
+                      <div class="engagement-full-comments">
+                        <div class="engagement-comment-line"><span class="cmt-name">阿强：</span>互相支持！<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">阿伟：</span>摆摊圈也很有爱啊<span class="comment-reply-btn">回复</span></div>
+                        <div class="engagement-comment-line"><span class="cmt-name">用户_03：</span>加油，多认识几个朋友<span class="comment-reply-btn">回复</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 视频动态 -->
+                <div class="moment-item">
+                  <div class="moment-header">
+                    <div class="moment-avatar">👤</div>
+                    <div class="moment-meta">
+                      <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
+                      <div class="moment-time">2 天前</div>
+                    </div>
+                  </div>
+                  <div class="moment-row">
+                    <div class="moment-body">
+                      <div class="moment-text">收摊路上偷拍了一段夜景，配上今天的心情 <span class="inline-topic">#摆摊日记</span></div>
+                      <div class="moment-video"><span class="moment-video-dur">00:24</span></div>
+                    </div>
+                    <div class="moment-more-wrap">
+                      <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <div class="moment-popover">
+                        <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 8204)"><span class="ic">♡</span><span class="lbl">点赞 8,204</span></div>
+                        <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
+                        <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="moment-social">
+                    <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">小美 等 8,204 人点赞</span></div>
+                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🏰 城堡</span> ×1</span></div>
+                  </div>
+
+                  <!-- 展开态：无评论时仅展示点赞/打赏头像墙 -->
+                  <div class="moment-engagement-full">
+                    <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic liked">❤</span>8,204 人点赞</div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                        <div class="engagement-avatar-item"><div class="av">👤</div></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🏰</span></div><span class="av-name">小美</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- /square-scroll -->
+          </div>
 
         </div><!-- /page-scroll -->
       </div>
@@ -384,52 +766,84 @@
 </div><!-- /devices-row -->
 
 <div class="spec-panel">
-  <h3>SPEC · 话题页广场内容卡片结构说明</h3>
+  <h3>SPEC · 话题页「广场」Tab 结构说明</h3>
   <div class="spec-row">
-    <span class="spec-key">内容来源</span>
-    <span class="spec-val">广场动态发布时带 <span class="spec-badge">#话题</span> 即自动汇聚进对应话题页，覆盖广场支持的 <span class="spec-badge">文字</span><span class="spec-badge">图文</span><span class="spec-badge">视频</span> 三种内容形式</span>
+    <span class="spec-key">Tab 结构调整（本次核心变更）</span>
+    <span class="spec-val">内容 Tab 由「推荐 / 最新」二项，扩展为「推荐 / 最新 / 广场」三项；广场为新增第三项，不与推荐/最新融合展示</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">内容 Tab</span>
-    <span class="spec-val"><span class="spec-badge dark">推荐</span><span class="spec-badge">最新</span> — 与原话题页一致，三种卡片类型混合排序，不单独分类筛选</span>
+    <span class="spec-key">推荐 / 最新（不再混排广场内容）</span>
+    <span class="spec-val">双列瀑布流仅展示 <span class="spec-badge">图文卡</span><span class="spec-badge">视频卡</span> 两种类型，广场来源的文字/图文/视频动态已全部移出，不再与图文/视频模块内容混合展示</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">内容布局</span>
-    <span class="spec-val">双列瀑布流 · 文字卡 / 图文卡 / 视频卡三种类型自由混排</span>
+    <span class="spec-key">来源角标（恢复为原有双来源约定）</span>
+    <span class="spec-val">由于广场内容已移出，无需再区分三种来源：<span class="spec-badge">图文</span> 标注来自图文模块（原有约定），视频模块内容不加角标（原有约定），与融合广场之前的规则保持一致</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">来源角标（关键区分）</span>
-    <span class="spec-val">话题页内容来自多个模块混合聚合，非单一来源：<span class="spec-badge">图文</span> 标注来自图文模块（原有约定）；来自视频模块的内容不加角标（原有约定）；<span class="spec-badge">广场</span> 标注来自广场模块，不管文字/图文/视频哪种格式统一展示；三者文字含义不同，但视觉样式统一（同一深底白字角标），UI 语言保持一致</span>
+    <span class="spec-key">广场 Tab（新增）</span>
+    <span class="spec-val">承载该话题下所有带 <span class="spec-badge">#话题</span> 发布的广场动态（文字 / 图文 / 视频三种形式），单列朋友圈式 Feed，与瀑布流双列布局完全独立</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">本图示例分布</span>
-    <span class="spec-val">6 张卡片中：1 张图文模块（标「图文」）+ 1 张视频模块（无角标）+ 4 张广场模块（文字×2 / 图文×1 / 视频×1，均标「广场」），示意同一话题下多来源内容共存</span>
+    <span class="spec-key">广场 Tab 展示风格（与广场首页一致）</span>
+    <span class="spec-val">卡片结构、头像+昵称+等级标签、话题内联展示、图片九宫格/视频缩略图、已互动信息条、「···」横向弹出菜单，均与 square-wireframe-mp.html 广场首页完全一致，直接复用同一套组件与交互逻辑</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">文字卡片（新增）</span>
-    <span class="spec-val">无配图 · 浅灰底文字预览区（最多 3-5 行，超出截断）+ 创作者展示，卡片高度随文字行数错落</span>
+    <span class="spec-key">卡片内互动信息展开（与广场首页一致）</span>
+    <span class="spec-val">点击「已点赞用户」行、「已打赏用户」行，或「查看全部 N 条评论」，直接在该条动态卡片内展开完整互动信息：点赞头像墙 → 打赏头像墙 → 评论列表依次堆叠、全部直接展示，不做「+N」截断；「收起」置于展开内容最上方</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">图文卡片</span>
-    <span class="spec-val">头图错落高度 + 标题（最多 2 行，兼容无标题）+ 创作者展示，与广场图文动态样式一致</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">视频卡片</span>
-    <span class="spec-val">竖版缩略图 + 创作者展示，信息结构与图文/文字卡片一致（此前遗漏头像昵称，现已补齐）</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">创作者展示（三卡统一）</span>
-    <span class="spec-val">头像 18px + 昵称（左）· 点赞量（右，红心为已点赞态）——文字卡 / 图文卡 / 视频卡三种卡片信息结构完全一致，不因卡片类型而缺项</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">话题标签展示</span>
-    <span class="spec-val">卡片内不重复展示 <span class="spec-badge">#话题</span> 文字（页面本身即话题上下文），与图文卡片既有约定一致</span>
+    <span class="spec-key">顶部结构不变</span>
+    <span class="spec-val">话题封面、话题名称、内容/参与数据统计行在三个 Tab 下保持不变，仅 Tab 下方的内容区域随 Tab 切换</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">点击行为</span>
-    <span class="spec-val">文字卡进入广场动态详情 · 图文卡进入图文详情页 · 视频卡进入视频播放页（本图未展示）</span>
+    <span class="spec-val">图文卡进入图文详情页 · 视频卡进入视频播放页 · 广场 Tab 内动态点击进入 square-detail-wireframe-mp.html 广场详情页（均未在本图展示）</span>
   </div>
 </div>
+
+<script>
+  function setContentTab(el) {
+    const nav = el.closest('.content-tabs');
+    nav.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const pageScroll = nav.closest('.page-scroll');
+    pageScroll.querySelectorAll('.content-panel').forEach(p => {
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    const target = pageScroll.querySelector('#' + el.dataset.target);
+    target.classList.add('active');
+    target.style.display = 'flex';
+  }
+
+  function toggleMomentMenu(el) {
+    const popover = el.nextElementSibling;
+    const isOpen = popover.classList.contains('open');
+    document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    if (!isOpen) popover.classList.add('open');
+  }
+
+  function expandEngagement(el) {
+    el.closest('.moment-item').classList.add('engagement-expanded');
+  }
+
+  function collapseEngagement(el) {
+    el.closest('.moment-item').classList.remove('engagement-expanded');
+  }
+
+  function toggleMomentLike(el, baseCount) {
+    const nowLiked = !el.classList.contains('liked');
+    el.classList.toggle('liked', nowLiked);
+    el.querySelector('.ic').textContent = nowLiked ? '❤' : '♡';
+    el.querySelector('.lbl').textContent = (nowLiked ? '已赞 ' : '点赞 ') + (nowLiked ? baseCount + 1 : baseCount);
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.moment-more-wrap')) {
+      document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    }
+  });
+</script>
 
 </body>
 </html>

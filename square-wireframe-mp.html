@@ -134,7 +134,14 @@
     font-size: 17px;
   }
   .moment-meta { flex: 1; min-width: 0; }
+  .moment-name-row { display: flex; align-items: center; gap: 5px; }
   .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  /* 创作者等级标签：紧跟昵称展示，弱化于昵称本身，与图文/详情页保持同一视觉权重 */
+  .creator-level {
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); border: 1px solid var(--accent);
+    padding: 1px 5px; border-radius: 3px; line-height: 1.3; flex-shrink: 0;
+  }
   .moment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
   .moment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; margin-bottom: 10px; }
   /* 话题：纯文字 #标签，紧跟正文内联展示，不单独圈出，与图文首页/详情页的话题样式一致 */
@@ -169,7 +176,7 @@
     margin-bottom: 8px;
     display: flex; flex-direction: column; gap: 4px;
   }
-  .moment-social-row { display: flex; align-items: baseline; gap: 5px; font-size: 12px; line-height: 1.5; }
+  .moment-social-row { display: flex; align-items: baseline; gap: 5px; font-size: 12px; line-height: 1.5; cursor: pointer; }
   .moment-social-row .ic { font-size: 11px; flex-shrink: 0; }
   .moment-social-row.liked-row .ic { color: #dc2626; }
   .moment-social-row.reward-row .ic { font-size: 13px; }
@@ -189,7 +196,7 @@
   }
   .moment-comment-row { font-size: 12px; line-height: 1.5; color: var(--fg-2); }
   .moment-comment-row .cmt-name { font-family: var(--font-body); font-weight: 600; color: #576b95; margin-right: 2px; }
-  .moment-comment-more { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .moment-comment-more { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; cursor: pointer; }
 
   /* 功能按钮（···）：与文字/图片/视频内容并列一行、居右，位于点赞评论打赏展示区域之上
      按钮始终对齐内容的最后一行/最后一个内容块（flex-end），而不是固定在文字第一行 */
@@ -463,6 +470,67 @@
   }
   .player-progress-fill { width: 38%; height: 100%; background: var(--accent); }
 
+  /* ─── 全部互动信息内联展开：点击点赞/打赏信息行或「查看全部评论」后，
+       不跳转页面，直接在该条动态卡片内展开，点赞/评论/打赏三块依次堆叠、
+       同时全部直接展示，不分 Tab、不做「+N」截断——全部头像、全部评论
+       都直给地铺在页面上，跟随外层页面滚动（不设内部滚动框）；
+       头像采用微信朋友圈式圆角正方形，而非圆形 ── */
+  .moment-item.engagement-expanded .moment-social { display: none; }
+  .moment-engagement-full {
+    display: none; flex-direction: column; gap: 10px;
+    background: var(--border-soft); border-radius: var(--radius-sm);
+    padding: 10px; margin-bottom: 8px;
+  }
+  .moment-item.engagement-expanded .moment-engagement-full { display: flex; }
+
+  /* 收起入口：置于展开内容最上方，与触发展开的「点赞/打赏/查看全部评论」文字入口同一视觉量级
+     （细体小字+右上角位置），点击即可就地收回，不需要先滚动到展开内容末尾才能收起 */
+  .engagement-full-collapse-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .engagement-full-section { display: flex; flex-direction: column; gap: 8px; }
+  .engagement-full-section + .engagement-full-section { padding-top: 8px; border-top: 1px solid rgba(13,17,23,0.08); }
+
+  .engagement-full-heading {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--fg);
+    margin-bottom: 8px;
+  }
+  .engagement-full-heading .ic.liked { color: #dc2626; }
+
+  /* 头像墙：全部展示，不做「+N」截断，不设内部滚动，随页面自然向下延展；
+     头像为微信朋友圈式圆角正方形（非圆形） */
+  .engagement-avatar-wall { display: flex; flex-wrap: wrap; gap: 10px; }
+  .engagement-avatar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 40px; flex-shrink: 0; }
+  .engagement-avatar-item .av {
+    width: 34px; height: 34px; border-radius: 6px; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; position: relative;
+  }
+  .engagement-avatar-item .av-name {
+    font-family: var(--font-mono); font-size: 9px; color: var(--muted);
+    max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .engagement-avatar-item .gift-badge {
+    position: absolute; bottom: -3px; right: -3px;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #ffffff; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; box-shadow: 0 0 0 1px var(--border-soft);
+  }
+
+  /* 完整评论列表：全部展示，不做省略、不设内部滚动 */
+  .engagement-full-comments { display: flex; flex-direction: column; gap: 4px; }
+  .engagement-comment-line { font-size: 13px; line-height: 1.6; color: var(--fg-2); }
+  .engagement-comment-line .cmt-name { color: #576b95; font-weight: 600; margin-right: 3px; }
+  .engagement-comment-line .comment-reply-btn {
+    color: var(--muted); font-family: var(--font-mono); font-size: 10px;
+    margin-left: 6px; cursor: pointer;
+  }
+
+  /* 收起：与「查看全部N条评论」同等量级的纯文字入口，收回展开内容，恢复到点赞/打赏/评论摘要预览 */
+  .engagement-collapse-btn {
+    display: flex; align-items: center; gap: 3px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--muted);
+    cursor: pointer;
+  }
+
   /* ─── Spec panel ──────────────────────────────────────────── */
   .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
   .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
@@ -478,7 +546,7 @@
 
 <div class="page-header">
   <h1>广场页 — 线框图（小程序）</h1>
-  <p>小程序 · 底Bar「广场」· 朋友圈式动态流（文字/视频/图片 + 点赞·评论·打赏虚拟礼物）· 默认 / 评论中 / 打赏中 / 图片浏览 / 视频播放 / 打赏成功 / 打赏失败 / 表情面板 八态</p>
+  <p>小程序 · 底Bar「广场」· 朋友圈式动态流（文字/视频/图片 + 点赞·评论·打赏虚拟礼物 + 创作者等级标签）· 默认 / 评论中 / 打赏中 / 图片浏览 / 视频播放 / 打赏成功 / 打赏失败 / 表情面板 / 互动信息展开 九态</p>
 </div>
 
 <div class="state-switcher" role="group">
@@ -490,6 +558,7 @@
   <button class="state-btn" data-state="reward-success" onclick="setState('reward-success')">⑥ 打赏成功</button>
   <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑦ 打赏失败</button>
   <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑧ 表情面板</button>
+  <button class="state-btn" data-state="engagement-expanded" onclick="setState('engagement-expanded')">⑨ 互动信息展开</button>
 </div>
 
 <div class="devices-row">
@@ -524,7 +593,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -542,21 +611,24 @@
               </div>
             </div>
             <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
-              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
               <div class="moment-comments">
                 <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
-                <div class="moment-comment-more">查看全部 7 条评论</div>
+                <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 7 条评论</div>
               </div>
             </div>
+
+            <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>46 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">💬</span>7 条评论</div><div class="engagement-full-comments"><div class="engagement-comment-line"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">Lucy：</span>加油，期待你摆摊成功！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">阿强：</span>回复 @小美：山顶信号很差，发朋友圈等了半天才发出去<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_04：</span>这景色也太好了吧<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_05：</span>求定位！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_06：</span>周末也想去爬山了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_07：</span>拍得真好看<span class="comment-reply-btn">回复</span></div></div></div></div>
           </div>
 
-          <!-- 图片+文字动态（多图） -->
-          <div class="moment-item">
+          <!-- 图片+文字动态（多图）：示范点击点赞/打赏/查看全部评论后，卡片内直接展开完整互动信息 -->
+          <div class="moment-item" id="moment-brunch">
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">Lucy</div>
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
                 <div class="moment-time">38 分钟前</div>
               </div>
             </div>
@@ -578,14 +650,17 @@
               </div>
             </div>
             <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、小美 等 212 人点赞</span></div>
-              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">🚀 火箭</span> ×2 等 5 人打赏</span></div>
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">阿伟、小美 等 212 人点赞</span></div>
+              <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">🚀 火箭</span> ×2 等 5 人打赏</span></div>
               <div class="moment-comments">
                 <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这摆盘也太精致了</div>
                 <div class="moment-comment-row"><span class="cmt-name">小美：</span>求教程！</div>
-                <div class="moment-comment-more">查看全部 23 条评论</div>
+                <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 23 条评论</div>
               </div>
             </div>
+
+            <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>212 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">🎁</span>5 人打赏</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🚀</span></div><span class="av-name">阿伟</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🧸</span></div><span class="av-name">用户_10</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">用户_11</span></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">💬</span>23 条评论</div><div class="engagement-full-comments"><div class="engagement-comment-line"><span class="cmt-name">阿伟：</span>这摆盘也太精致了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">小美：</span>求教程！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">阿强：</span>回复 @小美：我也想要，一起催一下<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_09：</span>看起来好好吃，周末也要做一次<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_12：</span>这家店在哪里呀<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_13：</span>摄影技术也太好了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_14：</span>酸奶碗是自己做的吗<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_15：</span>看饿了，晚安<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_16：</span>求同款餐具链接<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_17：</span>周末brunch 冲了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_18：</span>太诱人了吧<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_19：</span>摆盘天花板了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_20：</span>已经收藏，下周尝试<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_21：</span>这个滤镜也好好看<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_22：</span>请问用的什么相机<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_23：</span>看起来好治愈<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_24：</span>水果拼盘配色绝了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_25：</span>已经饿到不行<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_26：</span>求菜谱！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_27：</span>这也太精致了叭<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_28：</span>早餐天花板<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_29：</span>看着就很有食欲<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_30：</span>已转发给朋友<span class="comment-reply-btn">回复</span></div></div></div></div>
           </div>
 
           <!-- 视频动态 -->
@@ -593,7 +668,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿强</div>
+                <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
                 <div class="moment-time">1 小时前</div>
               </div>
             </div>
@@ -612,9 +687,12 @@
               </div>
             </div>
             <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">Lucy 等 68 人点赞</span></div>
-              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">Lucy打赏 <span class="gift-name">🌹 玫瑰</span> ×1</span></div>
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">Lucy 等 68 人点赞</span></div>
+              <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">Lucy打赏 <span class="gift-name">🌹 玫瑰</span> ×1</span></div>
             </div>
+
+            <!-- 展开态：无评论时仅展示点赞/打赏头像墙，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>68 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">Lucy</span></div></div></div></div>
           </div>
 
           <!-- 图片+文字动态（单图） -->
@@ -622,7 +700,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">小美</div>
+                <div class="moment-name-row"><span class="moment-name">小美</span><span class="creator-level">Lv.3</span></div>
                 <div class="moment-time">3 小时前</div>
               </div>
             </div>
@@ -643,8 +721,11 @@
               </div>
             </div>
             <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 34 人点赞</span></div>
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">阿伟 等 34 人点赞</span></div>
             </div>
+
+            <!-- 展开态：无打赏/评论时仅展示点赞头像墙，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>34 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div></div>
           </div>
 
           <!-- 图片+文字动态（含话题，纯文字内联展示 #标签） -->
@@ -652,7 +733,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿强</div>
+                <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
                 <div class="moment-time">5 小时前</div>
               </div>
             </div>
@@ -673,13 +754,16 @@
               </div>
             </div>
             <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">小美、Lucy 等 127 人点赞</span></div>
-              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🧸 玩偶</span> ×1</span></div>
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">小美、Lucy 等 127 人点赞</span></div>
+              <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🧸 玩偶</span> ×1</span></div>
               <div class="moment-comments">
                 <div class="moment-comment-row"><span class="cmt-name">小美：</span>饰品好好看，链接发一下</div>
-                <div class="moment-comment-more">查看全部 15 条评论</div>
+                <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 15 条评论</div>
               </div>
             </div>
+
+            <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>127 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🧸</span></div><span class="av-name">小美</span></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">💬</span>15 条评论</div><div class="engagement-full-comments"><div class="engagement-comment-line"><span class="cmt-name">小美：</span>饰品好好看，链接发一下<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">Lucy：</span>摆摊辛苦了，第一次都很不容易<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">阿伟：</span>这个价格可以接受，支持一下<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_04：</span>摊位在哪个位置呀<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_05：</span>手作真的很有心意<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_06：</span>求同款材料包<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_07：</span>周末也想去摆摊了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_08：</span>第一次就卖出去很棒了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_09：</span>设计感很强<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_10：</span>支持！下次去买<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_11：</span>摆摆着回本了吗<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_12：</span>有教程可以学吗<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_13：</span>颜色搭配好看<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_14：</span>加油，越摆越好<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_15：</span>已经关注啦<span class="comment-reply-btn">回复</span></div></div></div></div>
           </div>
 
           <!-- 纯文字动态（无任何互动） -->
@@ -687,7 +771,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">用户昵称</div>
+                <div class="moment-name-row"><span class="moment-name">用户昵称</span><span class="creator-level">Lv.1</span></div>
                 <div class="moment-time">昨天 22:10</div>
               </div>
             </div>
@@ -750,7 +834,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -770,7 +854,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">Lucy</div>
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
                 <div class="moment-time">38 分钟前</div>
               </div>
             </div>
@@ -846,7 +930,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -861,7 +945,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">Lucy</div>
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
                 <div class="moment-time">38 分钟前</div>
               </div>
             </div>
@@ -943,7 +1027,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">Lucy</div>
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
                 <div class="moment-time">38 分钟前</div>
               </div>
             </div>
@@ -1017,7 +1101,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿强</div>
+                <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
                 <div class="moment-time">1 小时前</div>
               </div>
             </div>
@@ -1086,7 +1170,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -1136,7 +1220,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -1231,7 +1315,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">阿伟</div>
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
                 <div class="moment-time">12 分钟前</div>
               </div>
             </div>
@@ -1251,7 +1335,7 @@
             <div class="moment-header">
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
-                <div class="moment-name">Lucy</div>
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
                 <div class="moment-time">38 分钟前</div>
               </div>
             </div>
@@ -1301,6 +1385,87 @@
   </div>
 </div>
 
+
+
+<!-- ⑨ 互动信息展开态：独立展示某条动态点击「点赞/打赏/查看全部评论」后的效果——
+     不分 Tab，点赞头像墙、评论列表、打赏头像墙三块依次直接铺开、全部展示，跟随页面滚动 -->
+<div class="device-wrapper" id="state-engagement-expanded">
+  <div class="device-label">⑨ 互动信息展开态 · 广场</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">广场</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <div class="moment-item engagement-expanded" id="moment-brunch-standalone">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 212)"><span class="ic">♡</span><span class="lbl">点赞 212</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 23</span></div>
+                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">阿伟、小美 等 212 人点赞</span></div>
+              <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">阿伟打赏 <span class="gift-name">🚀 火箭</span> ×2 等 5 人打赏</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">阿伟：</span>这摆盘也太精致了</div>
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>求教程！</div>
+                <div class="moment-comment-more" onclick="expandEngagement(this)">查看全部 23 条评论</div>
+              </div>
+            </div>
+
+            <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表，末尾提供「收起」按钮 -->
+            <div class="moment-engagement-full"><div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic liked">❤</span>212 人点赞</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div><div class="engagement-avatar-item"><div class="av">👤</div></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">🎁</span>5 人打赏</div><div class="engagement-avatar-wall"><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🚀</span></div><span class="av-name">阿伟</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🧸</span></div><span class="av-name">用户_10</span></div><div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">用户_11</span></div></div></div><div class="engagement-full-section"><div class="engagement-full-heading"><span class="ic">💬</span>23 条评论</div><div class="engagement-full-comments"><div class="engagement-comment-line"><span class="cmt-name">阿伟：</span>这摆盘也太精致了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">小美：</span>求教程！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">阿强：</span>回复 @小美：我也想要，一起催一下<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_09：</span>看起来好好吃，周末也要做一次<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_12：</span>这家店在哪里呀<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_13：</span>摄影技术也太好了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_14：</span>酸奶碗是自己做的吗<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_15：</span>看饿了，晚安<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_16：</span>求同款餐具链接<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_17：</span>周末brunch 冲了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_18：</span>太诱人了吧<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_19：</span>摆盘天花板了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_20：</span>已经收藏，下周尝试<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_21：</span>这个滤镜也好好看<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_22：</span>请问用的什么相机<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_23：</span>看起来好治愈<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_24：</span>水果拼盘配色绝了<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_25：</span>已经饿到不行<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_26：</span>求菜谱！<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_27：</span>这也太精致了叭<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_28：</span>早餐天花板<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_29：</span>看着就很有食欲<span class="comment-reply-btn">回复</span></div><div class="engagement-comment-line"><span class="cmt-name">用户_30：</span>已转发给朋友<span class="comment-reply-btn">回复</span></div></div></div></div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 底Bar：与默认态一致 -->
+      <div class="mp-tabbar">
+        <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+        <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+        <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+        <div class="tab-item active"><div class="tab-icon">▦</div><span class="tab-label">广场</span></div>
+        <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </div><!-- /devices-row -->
 
 <!-- Spec -->
@@ -1321,6 +1486,10 @@
   <div class="spec-row">
     <span class="spec-key">信息展示</span>
     <span class="spec-val"><span class="spec-badge">文字</span><span class="spec-badge">图片</span><span class="spec-badge">视频</span> 三种内容形式，可单独或与文字搭配出现</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">创作者等级标签（新增）</span>
+    <span class="spec-val">昵称右侧紧跟一个等级徽章（如 Lv.5），黄色描边+暖色底，弱化于昵称本身；卡片内展开的点赞/打赏头像墙同样展示各用户的等级</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">话题标签</span>
@@ -1348,11 +1517,11 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">已互动用户展示</span>
-    <span class="spec-val">有点赞/打赏时，「···」按钮行下方常驻浅灰底信息条展示具体用户、打赏的礼物名称与数量（非现金金额）；无互动则不展示该区块</span>
+    <span class="spec-val">有点赞/打赏时，「···」按钮行下方常驻浅灰底信息条展示具体用户、打赏的礼物名称与数量（非现金金额）；无互动则不展示该区块；点击点赞/打赏这两行，卡片内直接展开完整名单（不跳转页面）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">评论展示（有条件）</span>
-    <span class="spec-val">若该动态有评论，在信息条内追加分隔线 + 评论预览（昵称+内容）+「查看全部 N 条评论」；无评论则不展示</span>
+    <span class="spec-val">若该动态有评论，在信息条内追加分隔线 + 评论预览（昵称+内容）+「查看全部 N 条评论」；无评论则不展示；点击「查看全部」同样在卡片内展开完整评论列表</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">零互动态</span>
@@ -1414,6 +1583,34 @@
     <span class="spec-key">失败 Toast</span>
     <span class="spec-val">红色圆形✕图标 + 「打赏失败」标题 + 失败原因文案 + 「重试」按钮，点击重试重新发起同一笔打赏请求</span>
   </div>
+  <div class="spec-row">
+    <span class="spec-key">卡片内互动信息展开（新增）</span>
+    <span class="spec-val">点击信息条内的「点赞」行、「打赏」行，或「查看全部 N 条评论」，不跳转页面、不打开弹层，直接在该条动态卡片内向下展开完整互动信息，原本的截断预览（.moment-social）隐藏</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">展开内容结构 · 不分 Tab</span>
+    <span class="spec-val">依次为「点赞头像墙 → 打赏头像墙 → 评论列表」，三块同时全部直接展示（仿微信朋友圈，直给式呈现），不做 Tab 切换；有几类数据就展示几个分区，分区间用细分隔线隔开</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">点赞头像墙（仅头像，无昵称）</span>
+    <span class="spec-val">展示全部点赞用户头像，头像下方不展示昵称文字，纯头像密排；不做「+N」截断，也不设内部滚动框，随页面自然向下延展；头像采用微信朋友圈式圆角正方形（非圆形）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">打赏头像墙（头像 + 昵称）</span>
+    <span class="spec-val">展示全部打赏用户，头像下方保留昵称，用于分辨具体是谁打赏；头像右下角额外叠加所送礼物角标；不做「+N」截断</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">评论列表（展开态，完整展示）</span>
+    <span class="spec-val">展示该条动态的全部评论，不做省略、不设内部滚动；昵称+等级+完整评论正文同行紧凑排布，仅单层展示（不支持二级评论嵌套）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑨ 互动信息展开态（新增，独立状态）</span>
+    <span class="spec-val">在顶部状态切换栏新增独立入口，单独展示某条动态的完整展开效果（点赞头像墙→打赏头像墙→评论列表依次铺开），无需先操作默认态再点击触发</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">收起</span>
+    <span class="spec-val">「收起」置于展开内容最上方、右对齐，与触发展开的「点赞/查看全部评论」文字入口同一视觉量级（纯文字，非独立按钮），点击后就地收回展开区域，恢复为原本的点赞/打赏/评论摘要预览；无需先滚动到展开内容末尾才能收起</span>
+  </div>
 </div>
 
 <script>
@@ -1431,6 +1628,14 @@
     const isOpen = popover.classList.contains('open');
     document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
     if (!isOpen) popover.classList.add('open');
+  }
+
+  function expandEngagement(el) {
+    el.closest('.moment-item').classList.add('engagement-expanded');
+  }
+
+  function collapseEngagement(el) {
+    el.closest('.moment-item').classList.remove('engagement-expanded');
   }
 
   function toggleMomentLike(el, baseCount) {
