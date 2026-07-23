@@ -479,7 +479,6 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; color: #fff;
   }
-  .reward-toast.success .reward-toast-icon { background: var(--success); }
   .reward-toast.failed .reward-toast-icon { background: #dc2626; }
   .reward-toast-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; }
   .reward-toast-desc { font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.6); text-align: center; line-height: 1.5; }
@@ -700,7 +699,7 @@
 
 <div class="page-header">
   <h1>大舞台页 — 线框图（小程序）</h1>
-  <p>小程序 · 底Bar「大舞台」· 朋友圈式动态流（文字/视频/图片 + 点赞·评论·打赏虚拟礼物 + 创作者等级标签）· 默认 / 评论中 / 打赏中 / 图片浏览 / 视频播放 / 打赏成功 / 打赏失败 / 表情面板 / 互动信息展开 / 互动信息分页展开【尝试】 / 打赏特效播放 十一态</p>
+  <p>小程序 · 底Bar「大舞台」· 朋友圈式动态流（文字/视频/图片 + 点赞·评论·打赏虚拟礼物 + 创作者等级标签）· 默认 / 评论中 / 打赏中 / 图片浏览 / 视频播放 / 打赏失败 / 表情面板 / 互动信息展开 / 互动信息分页展开【尝试】 / 打赏特效播放 十态</p>
 </div>
 
 <div class="state-switcher" role="group">
@@ -709,12 +708,11 @@
   <button class="state-btn" data-state="rewarding" onclick="setState('rewarding')">③ 打赏中态</button>
   <button class="state-btn" data-state="viewing" onclick="setState('viewing')">④ 图片浏览</button>
   <button class="state-btn" data-state="playing" onclick="setState('playing')">⑤ 视频播放</button>
-  <button class="state-btn" data-state="reward-success" onclick="setState('reward-success')">⑥ 打赏成功</button>
-  <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑦ 打赏失败</button>
-  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑧ 表情面板</button>
-  <button class="state-btn" data-state="engagement-expanded" onclick="setState('engagement-expanded')">⑨ 互动信息展开</button>
-  <button class="state-btn" data-state="engagement-paginated" onclick="setState('engagement-paginated')">⑩ 互动信息分页展开【尝试】</button>
-  <button class="state-btn" data-state="reward-effect" onclick="setState('reward-effect')">⑪ 打赏特效播放</button>
+  <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑥ 打赏失败</button>
+  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑦ 表情面板</button>
+  <button class="state-btn" data-state="engagement-expanded" onclick="setState('engagement-expanded')">⑧ 互动信息展开</button>
+  <button class="state-btn" data-state="engagement-paginated" onclick="setState('engagement-paginated')">⑨ 互动信息分页展开【尝试】</button>
+  <button class="state-btn" data-state="reward-effect" onclick="setState('reward-effect')">⑩ 打赏特效播放</button>
 </div>
 
 <div class="devices-row">
@@ -1427,59 +1425,9 @@
   </div>
 </div>
 
-<!-- ⑥ 打赏成功态：确认打赏后，短暂浮现成功 Toast，随后自动消失回到默认动态流 -->
-<div class="device-wrapper" id="state-reward-success">
-  <div class="device-label">⑥ 打赏成功态 · 大舞台</div>
-  <div class="mp-device">
-    <div class="mp-screen">
-
-      <div class="mp-status-bar">
-        <span class="mp-status-time">9:41</span>
-        <div class="mp-status-icons">
-          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
-          <div class="wifi-icon"></div><div class="battery-icon"></div>
-        </div>
-      </div>
-
-      <div class="mp-nav">
-        <div class="mp-nav-spacer"></div>
-        <div class="mp-nav-title">大舞台</div>
-        <div class="mp-nav-more"><span></span><span></span><span></span></div>
-      </div>
-
-      <div class="square-scroll dimmed">
-        <div class="moment-list">
-          <div class="moment-item">
-            <div class="moment-header">
-              <div class="moment-avatar">👤</div>
-              <div class="moment-meta">
-                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
-                <div class="moment-time">12 分钟前</div>
-              </div>
-            </div>
-            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
-            <div class="moment-social">
-              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
-              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">你刚刚打赏 <span class="gift-name">🎈 气球</span> ×1，阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /square-scroll -->
-
-      <!-- 打赏成功 Toast：绿色对勾 + 结果文案，2 秒后自动淡出，此时打赏弹层已收起 -->
-      <div class="reward-toast success">
-        <div class="reward-toast-icon">✓</div>
-        <div class="reward-toast-title">打赏成功</div>
-        <div class="reward-toast-desc">已送出 🎈 气球 ×1<br>感谢你对创作者的支持</div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ⑦ 打赏失败态：网络异常/余额不足等原因导致打赏未完成，弹层保留在原状态方便重试 -->
+<!-- ⑥ 打赏失败态：网络异常/余额不足等原因导致打赏未完成，弹层保留在原状态方便重试 -->
 <div class="device-wrapper" id="state-reward-failed">
-  <div class="device-label">⑦ 打赏失败态 · 大舞台</div>
+  <div class="device-label">⑥ 打赏失败态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1600,9 +1548,9 @@
   </div>
 </div>
 
-<!-- ⑧ 表情面板中：点击评论输入条上的表情按钮后，模拟键盘被替换为表情面板 -->
+<!-- ⑦ 表情面板中：点击评论输入条上的表情按钮后，模拟键盘被替换为表情面板 -->
 <div class="device-wrapper" id="state-emoji">
-  <div class="device-label">⑧ 表情面板中 · 大舞台</div>
+  <div class="device-label">⑦ 表情面板中 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1700,10 +1648,10 @@
 
 
 
-<!-- ⑨ 互动信息展开态：独立展示某条动态点击「点赞/打赏/查看全部评论」后的效果——
+<!-- ⑧ 互动信息展开态：独立展示某条动态点击「点赞/打赏/查看全部评论」后的效果——
      不分 Tab，点赞头像墙、评论列表、打赏头像墙三块依次直接铺开、全部展示，跟随页面滚动 -->
 <div class="device-wrapper" id="state-engagement-expanded">
-  <div class="device-label">⑨ 互动信息展开态 · 大舞台</div>
+  <div class="device-label">⑧ 互动信息展开态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1779,12 +1727,12 @@
   </div>
 </div>
 
-<!-- ⑩ 互动信息分页展开态【尝试】：与⑨态对比——点赞/打赏量很大时，
+<!-- ⑨ 互动信息分页展开态【尝试】：与⑧态对比——点赞/打赏量很大时，
      默认只展示 4 行头像（每行 6 个，共 24 个），超出部分收起；点击「展开更多」按钮
      每次显示接下来的 4 行，而非一次性铺开全部；评论列表不受影响，仍完整展示（评论天然需要逐条阅读，
      不存在"扫一眼"诉求，故本次尝试只针对点赞/打赏头像墙分页，不改动评论区） -->
 <div class="device-wrapper" id="state-engagement-paginated">
-  <div class="device-label">⑩ 互动信息分页展开态【尝试】· 大舞台</div>
+  <div class="device-label">⑨ 互动信息分页展开态【尝试】· 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1883,11 +1831,11 @@
   </div>
 </div>
 
-<!-- ⑪ 打赏特效播放态：用户成功打赏后，创作者/其他用户都能在该条动态的打赏头像墙里看到
+<!-- ⑩ 打赏特效播放态：用户成功打赏后，创作者/其他用户都能在该条动态的打赏头像墙里看到
      此次打赏；点击任意一个已打赏用户的头像，可重新播放当时送出的礼物特效（全屏放大 + 弹入动画），
      用于回顾"谁送了什么礼物"，而非仅仅在成功瞬间一闪而过 -->
 <div class="device-wrapper" id="state-reward-effect">
-  <div class="device-label">⑪ 打赏特效播放态 · 大舞台</div>
+  <div class="device-label">⑩ 打赏特效播放态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -2103,7 +2051,7 @@
     <span class="spec-val">头像 + 输入框（含闪烁光标，占位文案随场景变化，如「回复 阿伟」）+ 表情按钮 +「发送」按钮，与图文详情页评论输入条同规格</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">⑧ 表情面板中</span>
+    <span class="spec-key">⑦ 表情面板中</span>
     <span class="spec-val">点击发送按钮旁的表情图标后，原本弹出的模拟键盘被替换为表情面板（同一位置切换），再点一次表情按钮切回键盘；选中的表情插入到输入框光标处</span>
   </div>
   <div class="spec-row">
@@ -2139,15 +2087,7 @@
     <span class="spec-val">顶部左上角关闭按钮 + 播放画面 + 居中暂停/播放按钮 + 左下角创作者头像昵称与文案 + 底部进度条</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">⑥ 打赏成功态</span>
-    <span class="spec-val">点击「打赏 [礼物名] N」按钮且请求成功后，打赏弹层收起，居中浮现成功 Toast（绿色✓），已互动信息条同步追加「你刚刚打赏」记录</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">成功 Toast</span>
-    <span class="spec-val">绿色圆形✓图标 + 「打赏成功」标题 + 礼物名称与数量的确认文案，无需用户操作，短暂停留后自动淡出</span>
-  </div>
-  <div class="spec-row">
-    <span class="spec-key">⑦ 打赏失败态</span>
+    <span class="spec-key">⑥ 打赏失败态</span>
     <span class="spec-val">请求失败（如网络异常）时，打赏弹层保留原选中的礼物不清空，叠加显示失败 Toast，方便用户直接重试</span>
   </div>
   <div class="spec-row">
@@ -2175,7 +2115,7 @@
     <span class="spec-val">展示该条动态的全部评论，不做省略、不设内部滚动；昵称+等级+完整评论正文同行紧凑排布，仅单层展示（不支持二级评论嵌套）</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">⑨ 互动信息展开态（新增，独立状态）</span>
+    <span class="spec-key">⑧ 互动信息展开态（新增，独立状态）</span>
     <span class="spec-val">在顶部状态切换栏新增独立入口，单独展示某条动态的完整展开效果（点赞头像墙→打赏头像墙→评论列表依次铺开），无需先操作默认态再点击触发</span>
   </div>
   <div class="spec-row">
@@ -2183,8 +2123,8 @@
     <span class="spec-val">「收起」置于展开内容最上方、右对齐，与触发展开的「点赞/查看全部评论」文字入口同一视觉量级（纯文字，非独立按钮），点击后就地收回展开区域，恢复为原本的点赞/打赏/评论摘要预览；无需先滚动到展开内容末尾才能收起</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">⑩ 互动信息分页展开态【尝试，新增】</span>
-    <span class="spec-val">与⑨态方案并列对比：当点赞/打赏量很大时，头像墙默认只展示 4 行（每行 6 个，共 24 个头像），超出部分收起；点击「展开更多（4 行）」按钮，每次追加显示接下来的 4 行，而非⑨态那种一次性全部铺开；全部展开后按钮变为置灰的「已展开全部」</span>
+    <span class="spec-key">⑨ 互动信息分页展开态【尝试，新增】</span>
+    <span class="spec-val">与⑧态方案并列对比：当点赞/打赏量很大时，头像墙默认只展示 4 行（每行 6 个，共 24 个头像），超出部分收起；点击「展开更多（4 行）」按钮，每次追加显示接下来的 4 行，而非⑧态那种一次性全部铺开；全部展开后按钮变为置灰的「已展开全部」</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">分页展开 · 适用范围</span>
@@ -2195,7 +2135,7 @@
     <span class="spec-val">本态用于对比测试「全部展示」vs「分页展示」两种方案在点赞数很大（212 人）/打赏数较多（38 人）场景下的浏览体验与滚动性能，尚未确定最终采纳哪一种，需结合真实数据量与用户反馈决策</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">⑪ 打赏特效播放态（新增）</span>
+    <span class="spec-key">⑩ 打赏特效播放态（新增）</span>
     <span class="spec-val">打赏成功后，该次打赏会作为一个头像追加到动态的「打赏头像墙」中（永久可见，而非只在成功瞬间弹一次 Toast）；打赏头像墙内每个头像均可点击，用于回顾"谁送了什么礼物"</span>
   </div>
   <div class="spec-row">
