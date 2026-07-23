@@ -522,6 +522,34 @@
     cursor: pointer;
   }
 
+  /* ─── 【与 square-wireframe-mp.html 同步】打赏特效播放层：点击打赏头像墙里的头像，
+       可重新播放该用户当时送出的礼物特效——全屏半透明遮罩 + 居中放大的礼物图标
+       （带弹入动画）+「谁打赏了什么」的文案，点击遮罩任意位置关闭 ── */
+  .reward-effect-overlay {
+    position: absolute; inset: 0; z-index: 70;
+    background: rgba(13,17,23,0.75);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px;
+    cursor: pointer;
+  }
+  .reward-effect-overlay.playing { display: flex; }
+  .reward-effect-icon {
+    font-size: 72px; line-height: 1;
+    animation: reward-effect-pop 900ms cubic-bezier(0.2,0,0,1);
+  }
+  @keyframes reward-effect-pop {
+    0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+    55% { transform: scale(1.15) translateY(-6px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .reward-effect-text { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; text-align: center; }
+  .reward-effect-text .rt-name { color: var(--accent); }
+  .reward-effect-sub { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6); }
+
+  /* 打赏头像墙内的头像：点击可重放该用户的打赏特效 */
+  .engagement-avatar-item.reward-clickable .av { cursor: pointer; }
+  .engagement-avatar-item.reward-clickable .av:active { transform: scale(0.92); }
+
   /* ─── Spec panel ──────────────────────────────────────────── */
   .spec-panel {
     background: var(--surface); border: 1px solid var(--border);
@@ -550,7 +578,7 @@
 
 <div class="page-header">
   <h1>个人页 / 创作者页 — 打赏额度模块线框图</h1>
-  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 去除编辑个人资料按钮 · 广场 Tab 卡片互动展示与 square-wireframe-mp.html 广场首页一致（卡片内展开点赞/打赏/评论）</p>
+  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 去除编辑个人资料按钮 · 去除分享入口 · 广场 Tab 卡片互动展示与 square-wireframe-mp.html 广场首页一致（卡片内展开点赞/打赏/评论 + 点击打赏头像回放打赏特效）</p>
 </div>
 
 <div class="state-switcher" role="group">
@@ -576,7 +604,6 @@
           <div class="mp-nav-back">‹</div>
           <div class="mp-nav-title">我的</div>
           <div style="display:flex;gap:6px;">
-            <div class="mp-nav-share">↗</div>
             <div class="mp-nav-share">✉</div>
             <div class="mp-nav-share">⚙</div>
           </div>
@@ -696,8 +723,8 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>2 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿强" data-reward-gift="🎈" data-reward-label="阿强打赏了 🎈 气球 ×1"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">阿强</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="小美" data-reward-gift="🌹" data-reward-label="小美打赏了 🌹 玫瑰 ×1"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div>
                     </div>
                   </div>
                   <div class="engagement-full-section">
@@ -770,9 +797,9 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>3 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🚀</span></div><span class="av-name">Lucy</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">阿伟</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">用户_03</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="Lucy" data-reward-gift="🚀" data-reward-label="Lucy打赏了 🚀 火箭 ×1"><div class="av">👤<span class="gift-badge">🚀</span></div><span class="av-name">Lucy</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿伟" data-reward-gift="🌹" data-reward-label="阿伟打赏了 🌹 玫瑰 ×1"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">阿伟</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="用户_03" data-reward-gift="🎈" data-reward-label="用户_03打赏了 🎈 气球 ×1"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">用户_03</span></div>
                     </div>
                   </div>
                   <div class="engagement-full-section">
@@ -832,7 +859,7 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">阿伟</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿伟" data-reward-gift="🌹" data-reward-label="阿伟打赏了 🌹 玫瑰 ×1"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">阿伟</span></div>
                     </div>
                   </div>
                 </div>
@@ -842,6 +869,14 @@
           </div>
 
         </div>
+
+        <!-- 打赏特效播放层：点击打赏头像墙里任意头像后全屏浮现，点击遮罩任意位置关闭 -->
+        <div class="reward-effect-overlay" onclick="closeRewardEffect(this)">
+          <div class="reward-effect-icon">🎈</div>
+          <div class="reward-effect-text"><span class="rt-name">阿强</span> 打赏了</div>
+          <div class="reward-effect-sub">阿强打赏了 🎈 气球 ×1</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -862,7 +897,7 @@
         <div class="mp-nav">
           <div class="mp-nav-back">‹</div>
           <div class="mp-nav-title">创作者</div>
-          <div class="mp-nav-share">↗</div>
+          <div style="width:28px;height:28px;flex-shrink:0;"></div>
         </div>
         <div class="profile-scroll">
           <div class="profile-cover">
@@ -894,7 +929,6 @@
 
             <div class="profile-actions">
               <button class="btn-follow">+ 关注</button>
-              <div class="btn-icon">↗</div>
             </div>
             <div style="height:14px;"></div>
           </div>
@@ -985,9 +1019,9 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>214 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">👑</span></div><span class="av-name">阿强</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">用户_03</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿强" data-reward-gift="👑" data-reward-label="阿强打赏了 👑 皇冠 ×1"><div class="av">👤<span class="gift-badge">👑</span></div><span class="av-name">阿强</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="小美" data-reward-gift="🌹" data-reward-label="小美打赏了 🌹 玫瑰 ×1"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">小美</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="用户_03" data-reward-gift="🎈" data-reward-label="用户_03打赏了 🎈 气球 ×1"><div class="av">👤<span class="gift-badge">🎈</span></div><span class="av-name">用户_03</span></div>
                     </div>
                   </div>
                   <div class="engagement-full-section">
@@ -1060,9 +1094,9 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>380 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🏰</span></div><span class="av-name">Lucy</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">💎</span></div><span class="av-name">阿伟</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">👑</span></div><span class="av-name">用户_03</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="Lucy" data-reward-gift="🏰" data-reward-label="Lucy打赏了 🏰 城堡 ×1"><div class="av">👤<span class="gift-badge">🏰</span></div><span class="av-name">Lucy</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿伟" data-reward-gift="💎" data-reward-label="阿伟打赏了 💎 钻戒 ×1"><div class="av">👤<span class="gift-badge">💎</span></div><span class="av-name">阿伟</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="用户_03" data-reward-gift="👑" data-reward-label="用户_03打赏了 👑 皇冠 ×1"><div class="av">👤<span class="gift-badge">👑</span></div><span class="av-name">用户_03</span></div>
                     </div>
                   </div>
                   <div class="engagement-full-section">
@@ -1129,8 +1163,8 @@
                   <div class="engagement-full-section">
                     <div class="engagement-full-heading"><span class="ic">🎁</span>96 人打赏</div>
                     <div class="engagement-avatar-wall">
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">💎</span></div><span class="av-name">阿伟</span></div>
-                      <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">用户_02</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="阿伟" data-reward-gift="💎" data-reward-label="阿伟打赏了 💎 钻戒 ×1"><div class="av">👤<span class="gift-badge">💎</span></div><span class="av-name">阿伟</span></div>
+                      <div class="engagement-avatar-item reward-clickable" onclick="playRewardEffect(this)" data-reward-name="用户_02" data-reward-gift="🌹" data-reward-label="用户_02打赏了 🌹 玫瑰 ×1"><div class="av">👤<span class="gift-badge">🌹</span></div><span class="av-name">用户_02</span></div>
                     </div>
                   </div>
                   <div class="engagement-full-section">
@@ -1148,6 +1182,14 @@
           </div>
 
         </div>
+
+        <!-- 打赏特效播放层：点击打赏头像墙里任意头像后全屏浮现，点击遮罩任意位置关闭 -->
+        <div class="reward-effect-overlay" onclick="closeRewardEffect(this)">
+          <div class="reward-effect-icon">👑</div>
+          <div class="reward-effect-text"><span class="rt-name">阿强</span> 打赏了</div>
+          <div class="reward-effect-sub">阿强打赏了 👑 皇冠 ×1</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1176,6 +1218,10 @@
   <div class="spec-row">
     <span class="spec-key">与原页面差异</span>
     <span class="spec-val">在 profile-content-tab-wireframe-mp.html 基础上新增本模块，其余结构保持一致；个人页移除「编辑个人资料」按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">分享入口（已移除）</span>
+    <span class="spec-val">个人页 NavBar 右上角、创作者页 NavBar 右上角、创作者页「+关注」按钮旁均移除原有分享（↗）图标；个人页保留消息（✉）与设置（⚙）入口，创作者页 NavBar 右侧改为等宽占位以保持标题居中</span>
   </div>
 </div>
 
@@ -1219,6 +1265,10 @@
     <span class="spec-val">「收起」置于展开内容最上方、右对齐，与触发展开的文字入口同一视觉量级，点击后就地收回，恢复为原本的摘要预览</span>
   </div>
   <div class="spec-row">
+    <span class="spec-key">打赏特效播放（与 square-wireframe-mp.html 同步）</span>
+    <span class="spec-val">打赏头像墙内每个头像均可点击，全屏浮现半透明遮罩 + 居中放大的礼物图标（弹入动画）+「[昵称] 打赏了」+ 礼物名称与数量，用于回顾该用户当时送出的礼物特效；点击遮罩任意位置关闭；点赞头像墙不可点击（无礼物特效可回顾）</span>
+  </div>
+  <div class="spec-row">
     <span class="spec-key">适用范围</span>
     <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，创作者页动态互动量级更高</span>
   </div>
@@ -1255,6 +1305,26 @@
 
   function collapseEngagement(el) {
     el.closest('.moment-item').classList.remove('engagement-expanded');
+  }
+
+  /* 【与 square-wireframe-mp.html 同步】点击打赏头像墙里的某个头像，重新播放该用户当时送出的礼物特效 */
+  function playRewardEffect(el) {
+    const name = el.dataset.rewardName;
+    const gift = el.dataset.rewardGift;
+    const label = el.dataset.rewardLabel;
+    const screen = el.closest('.mp-screen');
+    const overlay = screen.querySelector('.reward-effect-overlay');
+    if (!overlay) return;
+    overlay.querySelector('.reward-effect-icon').textContent = gift;
+    overlay.querySelector('.rt-name').textContent = name;
+    overlay.querySelector('.reward-effect-sub').textContent = label;
+    overlay.classList.remove('playing');
+    void overlay.offsetWidth; // 强制重排，确保再次点击同一用户时动画能重新播放
+    overlay.classList.add('playing');
+  }
+
+  function closeRewardEffect(el) {
+    el.classList.remove('playing');
   }
 
   function toggleMomentLike(el, baseCount) {
