@@ -158,6 +158,8 @@
     background: rgba(13,17,23,0.7); padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
   }
 
+  .notif-source-tag.official { background: #1d9bf0; }
+
   /* 打赏礼物标签：与广场页/广场详情页 .gift-name 样式一致 */
   .gift-name {
     font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
@@ -240,6 +242,22 @@
                   <span class="notif-time">刚刚</span>
                 </div>
                 <div class="notif-text unread">新功能上线：现在可以在视频中添加话题标签，快来试试吧！</div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 官方动态（大舞台官方信息，来源标签为"官方"） -->
+            <div class="notif-item">
+              <div class="notif-icon announce">📣</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">平台官方</span>
+                    <span class="notif-source-tag official">官方</span>
+                  </div>
+                  <span class="notif-time">3分钟</span>
+                </div>
+                <div class="notif-text unread">大舞台本周精选创作者已上线，快去看看有没有你关注的朋友入选～</div>
               </div>
               <div class="unread-dot"></div>
             </div>

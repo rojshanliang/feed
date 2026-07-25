@@ -75,7 +75,7 @@
   .mp-screen {
     width: 100%; height: 100%; background: #ffffff;
     border-radius: 34px; overflow: hidden;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; position: relative;
   }
 
   /* ─── Status bar ──────────────────────────────────────────── */
@@ -281,10 +281,34 @@
   .moment-social-row.reward-row .ic { font-size: 13px; }
   .moment-social-names { font-family: var(--font-body); color: #576b95; }
   .moment-social-row.reward-row .moment-social-names { color: var(--fg-2); }
-  .moment-social-row.reward-row .gift-name {
-    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
-    background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
+
+  /* 打赏行折叠预览（Follow square-wireframe-mp.html）：展示打赏者头像（最多 3 个，Top3 顶部叠加金/银/铜皇冠）
+     + 衔接词 + 总打赏金额（真实法币「元」，非虚拟币值）；单人用「打赏了」，多人用「[实际总人数]人共打赏了」 */
+  .moment-social-row.reward-row .reward-mini-avatars {
+    display: flex; align-items: center; gap: 3px; flex-shrink: 0;
   }
+  .moment-social-row.reward-row .reward-mini-avatar {
+    position: relative;
+    width: 18px; height: 18px; border-radius: 5px; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+    box-shadow: 0 0 0 1.5px var(--border-soft);
+  }
+  .moment-social-row.reward-row .reward-mini-avatar .mini-crown {
+    position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    width: 11px; height: 11px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; line-height: 1; box-shadow: 0 0 0 1px var(--border-soft);
+  }
+  .moment-social-row.reward-row .reward-mini-avatar .mini-crown.gold   { background: #fde047; box-shadow: 0 0 0 1px #ca8a04; }
+  .moment-social-row.reward-row .reward-mini-avatar .mini-crown.silver { background: #e5e7eb; box-shadow: 0 0 0 1px #9ca3af; }
+  .moment-social-row.reward-row .reward-mini-avatar .mini-crown.bronze { background: #f0b27a; box-shadow: 0 0 0 1px #b45309; }
+  .moment-social-row.reward-row .reward-total-amount {
+    font-family: var(--font-body); font-size: 12px; color: var(--fg-2);
+  }
+  .moment-social-row.reward-row .reward-total-amount .amt {
+    font-family: var(--font-mono); font-weight: 700; color: var(--accent-hover);
+  }
+  .moment-social-row.reward-row .reward-total-amount .unit { font-size: 9px; color: var(--muted); font-weight: 500; margin-left: 1px; }
 
   .moment-comments {
     display: flex; flex-direction: column; gap: 4px;
@@ -363,12 +387,47 @@
     font-family: var(--font-mono); font-size: 9px; color: var(--muted);
     max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .engagement-avatar-item .gift-badge {
-    position: absolute; bottom: -3px; right: -3px;
+  /* 打赏榜（Follow square-wireframe-mp.html）：复用点赞头像墙结构，Top1/2/3 头像右上角叠加金/银/铜皇冠角标，
+     头像下方叠加紫色用户等级角标 */
+  .reward-crown-badge {
+    position: absolute; top: -3px; right: -3px;
     width: 15px; height: 15px; border-radius: 50%;
     background: #ffffff; display: flex; align-items: center; justify-content: center;
-    font-size: 8px; box-shadow: 0 0 0 1px var(--border-soft);
+    font-size: 9px; box-shadow: 0 0 0 1px var(--border-soft);
   }
+  .reward-crown-badge.gold   { background: #fde047; box-shadow: 0 0 0 1px #ca8a04; }
+  .reward-crown-badge.silver { background: #e5e7eb; box-shadow: 0 0 0 1px #9ca3af; }
+  .reward-crown-badge.bronze { background: #f0b27a; box-shadow: 0 0 0 1px #b45309; }
+  .reward-user-level {
+    position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 1px;
+    height: 12px; padding: 0 4px; border-radius: 6px;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    box-shadow: 0 0 0 1.5px #ffffff;
+    white-space: nowrap;
+  }
+  .reward-user-level .ic { font-size: 7px; line-height: 1; }
+  .reward-user-level .lv-num { font-family: var(--font-mono); font-size: 8px; font-weight: 700; color: #fde68a; line-height: 1; }
+
+  /* 礼物聚合（Follow square-wireframe-mp.html）：按礼物种类合并，展示总个数，横排 chip 展示；
+     每个 chip 均可点击，重新播放当时送出该礼物的打赏特效 */
+  .reward-aggregate-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .reward-aggregate-row {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--border-soft); border-radius: 8px; padding: 5px 8px 5px 5px;
+  }
+  .reward-aggregate-icon {
+    width: 26px; height: 26px; border-radius: 6px; background: var(--surface-warm);
+    border: 1px solid var(--accent); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .reward-aggregate-info { display: flex; flex-direction: column; gap: 0; }
+  .reward-aggregate-name { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: var(--fg); line-height: 1.3; }
+  .reward-aggregate-count { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent-hover); flex-shrink: 0; margin-left: 2px; }
+  .reward-aggregate-count .unit { font-size: 9px; color: var(--muted); font-weight: 500; margin-left: 1px; }
+  .reward-aggregate-row.reward-clickable { cursor: pointer; }
+  .reward-aggregate-row.reward-clickable:active { transform: scale(0.94); }
+
   .engagement-full-comments { display: flex; flex-direction: column; gap: 4px; }
   .engagement-comment-line { font-size: 13px; line-height: 1.6; color: var(--fg-2); }
   .engagement-comment-line .cmt-name { color: #576b95; font-weight: 600; margin-right: 3px; }
@@ -381,6 +440,30 @@
     font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--muted);
     cursor: pointer;
   }
+
+  /* ─── 打赏特效播放层（Follow square-wireframe-mp.html）：点击礼物聚合列表里的礼物，
+       可重新播放该礼物当时送出的特效——全屏半透明遮罩 + 居中放大的礼物图标
+       （带弹入动画）+「谁打赏了什么」的文案，点击遮罩任意位置关闭 ── */
+  .reward-effect-overlay {
+    position: absolute; inset: 0; z-index: 70;
+    background: rgba(13,17,23,0.75);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px;
+    cursor: pointer;
+  }
+  .reward-effect-overlay.playing { display: flex; }
+  .reward-effect-icon {
+    font-size: 72px; line-height: 1;
+    animation: reward-effect-pop 900ms cubic-bezier(0.2,0,0,1);
+  }
+  @keyframes reward-effect-pop {
+    0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+    55% { transform: scale(1.15) translateY(-6px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .reward-effect-text { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; text-align: center; }
+  .reward-effect-text .rt-name { color: var(--accent); }
+  .reward-effect-sub { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6); }
 
   /* ─── Spec panel ──────────────────────────────────────────── */
   .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 782px; }
@@ -598,8 +681,8 @@
                     </div>
                   </div>
                   <div class="moment-social">
+                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="reward-mini-avatars"><span class="reward-mini-avatar">👤</span></span><span class="reward-total-amount">打赏了 <span class="amt">5</span><span class="unit">元</span></span></div>
                     <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">❤</span><span class="moment-social-names">小美、Lucy 等 127 人点赞</span></div>
-                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🧸 玩偶</span> ×1</span></div>
                     <div class="moment-comments">
                       <div class="moment-comment-row"><span class="cmt-name">小美：</span>饰品好好看，链接发一下</div>
                       <div class="moment-comment-row"><span class="cmt-name">Lucy：</span>摆摊辛苦了，第一次都很不容易</div>
@@ -607,9 +690,22 @@
                     </div>
                   </div>
 
-                  <!-- 展开态：完整点赞头像墙 + 完整打赏头像墙 + 完整评论列表 -->
+                  <!-- 展开态：打赏榜 → 礼物聚合 → 点赞头像墙 → 评论列表（Follow square-wireframe-mp.html） -->
                   <div class="moment-engagement-full">
                     <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏，共 <span class="amt">5</span><span class="unit">元</span></div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤<span class="reward-user-level"><span class="ic">🏆</span><span class="lv-num">14</span></span></div><span class="av-name">小美</span></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="reward-aggregate-list">
+                        <div class="reward-aggregate-row reward-clickable" onclick="playRewardEffect(this)" data-reward-name="小美" data-reward-gift="🧸" data-reward-label="小美打赏了 🧸 玩偶 ×1">
+                          <div class="reward-aggregate-icon">🧸</div><div class="reward-aggregate-info"><div class="reward-aggregate-name">玩偶</div></div><div class="reward-aggregate-count">×1</div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="engagement-full-section">
                       <div class="engagement-full-heading"><span class="ic liked">❤</span>127 人点赞</div>
                       <div class="engagement-avatar-wall">
@@ -623,12 +719,6 @@
                         <div class="engagement-avatar-item"><div class="av">👤</div></div>
                         <div class="engagement-avatar-item"><div class="av">👤</div></div>
                         <div class="engagement-avatar-item"><div class="av">👤</div></div>
-                      </div>
-                    </div>
-                    <div class="engagement-full-section">
-                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div>
-                      <div class="engagement-avatar-wall">
-                        <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🧸</span></div><span class="av-name">小美</span></div>
                       </div>
                     </div>
                     <div class="engagement-full-section">
@@ -728,13 +818,26 @@
                     </div>
                   </div>
                   <div class="moment-social">
+                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="reward-mini-avatars"><span class="reward-mini-avatar">👤</span></span><span class="reward-total-amount">打赏了 <span class="amt">99</span><span class="unit">元</span></span></div>
                     <div class="moment-social-row liked-row" onclick="expandEngagement(this)"><span class="ic">♡</span><span class="moment-social-names">小美 等 8,204 人点赞</span></div>
-                    <div class="moment-social-row reward-row" onclick="expandEngagement(this)"><span class="ic">🎁</span><span class="moment-social-names">小美打赏 <span class="gift-name">🏰 城堡</span> ×1</span></div>
                   </div>
 
-                  <!-- 展开态：无评论时仅展示点赞/打赏头像墙 -->
+                  <!-- 展开态：无评论时仅展示打赏榜/礼物聚合/点赞头像墙（Follow square-wireframe-mp.html） -->
                   <div class="moment-engagement-full">
                     <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
+                    <div class="engagement-full-section">
+                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏，共 <span class="amt">99</span><span class="unit">元</span></div>
+                      <div class="engagement-avatar-wall">
+                        <div class="engagement-avatar-item"><div class="av">👤<span class="reward-user-level"><span class="ic">🏆</span><span class="lv-num">14</span></span></div><span class="av-name">小美</span></div>
+                      </div>
+                    </div>
+                    <div class="engagement-full-section">
+                      <div class="reward-aggregate-list">
+                        <div class="reward-aggregate-row reward-clickable" onclick="playRewardEffect(this)" data-reward-name="小美" data-reward-gift="🏰" data-reward-label="小美打赏了 🏰 城堡 ×1">
+                          <div class="reward-aggregate-icon">🏰</div><div class="reward-aggregate-info"><div class="reward-aggregate-name">城堡</div></div><div class="reward-aggregate-count">×1</div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="engagement-full-section">
                       <div class="engagement-full-heading"><span class="ic liked">❤</span>8,204 人点赞</div>
                       <div class="engagement-avatar-wall">
@@ -745,12 +848,6 @@
                         <div class="engagement-avatar-item"><div class="av">👤</div></div>
                       </div>
                     </div>
-                    <div class="engagement-full-section">
-                      <div class="engagement-full-heading"><span class="ic">🎁</span>1 人打赏</div>
-                      <div class="engagement-avatar-wall">
-                        <div class="engagement-avatar-item"><div class="av">👤<span class="gift-badge">🏰</span></div><span class="av-name">小美</span></div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -759,6 +856,14 @@
           </div>
 
         </div><!-- /page-scroll -->
+
+        <!-- 打赏特效播放层：点击礼物聚合列表里任意礼物后全屏浮现，点击遮罩任意位置关闭 -->
+        <div class="reward-effect-overlay" onclick="closeRewardEffect(this)">
+          <div class="reward-effect-icon">🧸</div>
+          <div class="reward-effect-text"><span class="rt-name">小美</span> 打赏了</div>
+          <div class="reward-effect-sub">小美打赏了 🧸 玩偶 ×1</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -784,12 +889,12 @@
     <span class="spec-val">承载该话题下所有带 <span class="spec-badge">#话题</span> 发布的广场动态（文字 / 图文 / 视频三种形式），单列朋友圈式 Feed，与瀑布流双列布局完全独立</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">广场 Tab 展示风格（与广场首页一致）</span>
-    <span class="spec-val">卡片结构、头像+昵称+等级标签、话题内联展示、图片九宫格/视频缩略图、已互动信息条、「···」横向弹出菜单，均与 square-wireframe-mp.html 广场首页完全一致，直接复用同一套组件与交互逻辑</span>
+    <span class="spec-key">广场 Tab 展示风格（Follow square-wireframe-mp.html）</span>
+    <span class="spec-val">卡片结构、头像+昵称+等级标签、话题内联展示、图片九宫格/视频缩略图、已互动信息条（打赏行展示打赏者头像 Top3 + 皇冠角标 + 总打赏金额）、「···」横向弹出菜单，均与 square-wireframe-mp.html 广场首页完全一致，直接复用同一套组件与交互逻辑</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">卡片内互动信息展开（与广场首页一致）</span>
-    <span class="spec-val">点击「已点赞用户」行、「已打赏用户」行，或「查看全部 N 条评论」，直接在该条动态卡片内展开完整互动信息：点赞头像墙 → 打赏头像墙 → 评论列表依次堆叠、全部直接展示，不做「+N」截断；「收起」置于展开内容最上方</span>
+    <span class="spec-key">卡片内互动信息展开（Follow square-wireframe-mp.html）</span>
+    <span class="spec-val">点击「打赏」行、「点赞」行，或「查看全部 N 条评论」，直接在该条动态卡片内展开完整互动信息：打赏榜（头像下方叠加用户等级角标，Top1/2/3 叠加金/银/铜皇冠）→ 礼物聚合（按礼物种类合并、可点击回放打赏特效）→ 点赞头像墙 → 评论列表依次堆叠、全部直接展示，不做「+N」截断；「收起」置于展开内容最上方</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">顶部结构不变</span>
@@ -829,6 +934,26 @@
 
   function collapseEngagement(el) {
     el.closest('.moment-item').classList.remove('engagement-expanded');
+  }
+
+  /* 点击礼物聚合列表里的某款礼物，重新播放该用户当时送出的礼物特效（居中放大 + 弹入动画） */
+  function playRewardEffect(el) {
+    const name = el.dataset.rewardName;
+    const gift = el.dataset.rewardGift;
+    const label = el.dataset.rewardLabel;
+    const screen = el.closest('.mp-screen');
+    const overlay = screen.querySelector('.reward-effect-overlay');
+    if (!overlay) return;
+    overlay.querySelector('.reward-effect-icon').textContent = gift;
+    overlay.querySelector('.rt-name').textContent = name;
+    overlay.querySelector('.reward-effect-sub').textContent = label;
+    overlay.classList.remove('playing');
+    void overlay.offsetWidth; // 强制重排，确保再次点击同一用户时动画能重新播放
+    overlay.classList.add('playing');
+  }
+
+  function closeRewardEffect(el) {
+    el.classList.remove('playing');
   }
 
   function toggleMomentLike(el, baseCount) {
