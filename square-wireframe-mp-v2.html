@@ -869,20 +869,84 @@
 </div>
 
 <div class="state-switcher" role="group">
-  <button class="state-btn active" data-state="default" onclick="setState('default')">① 大舞台样式</button>
-  <button class="state-btn" data-state="commenting" onclick="setState('commenting')">② 评论中态</button>
-  <button class="state-btn" data-state="rewarding" onclick="setState('rewarding')">③ 打赏中态</button>
-  <button class="state-btn" data-state="viewing" onclick="setState('viewing')">④ 图片浏览</button>
-  <button class="state-btn" data-state="playing" onclick="setState('playing')">⑤ 视频播放</button>
-  <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑥ 打赏失败</button>
-  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑦ 表情面板</button>
-  <button class="state-btn" data-state="reward-effect" onclick="setState('reward-effect')">⑧ 打赏特效播放</button>
+  <button class="state-btn active" data-state="discover" onclick="setState('discover')">① 发现</button>
+  <button class="state-btn" data-state="default" onclick="setState('default')">② 大舞台样式</button>
+  <button class="state-btn" data-state="official" onclick="setState('official')">③ 官方动态</button>
+  <button class="state-btn" data-state="commenting" onclick="setState('commenting')">④ 评论中态</button>
+  <button class="state-btn" data-state="rewarding" onclick="setState('rewarding')">⑤ 打赏中态</button>
+  <button class="state-btn" data-state="viewing" onclick="setState('viewing')">⑥ 图片浏览</button>
+  <button class="state-btn" data-state="playing" onclick="setState('playing')">⑦ 视频播放</button>
+  <button class="state-btn" data-state="reward-failed" onclick="setState('reward-failed')">⑧ 打赏失败</button>
+  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑨ 表情面板</button>
+  <button class="state-btn" data-state="reward-effect" onclick="setState('reward-effect')">⑩ 打赏特效播放</button>
 </div>
 
 <div class="devices-row">
 
-<!-- ① 大舞台样式 -->
-<div class="device-wrapper active" id="state-default">
+<!-- ① 发现：入口列表页，展示「官方动态」和「大舞台」两个入口 -->
+<div class="device-wrapper active" id="state-discover">
+  <div class="device-label">① 发现</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- NavBar：左上角用户头像 + 居中标题「动态」 -->
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">动态</div>
+        <div class="mp-nav-spacer"></div>
+      </div>
+
+      <!-- 入口列表 -->
+      <div class="discover-list">
+
+        <!-- 官方动态入口：左侧图标 + 名称 + 未读数字角标 | 右侧缩略图 -->
+        <div class="discover-entry" data-od-id="entry-official">
+          <div class="discover-entry-left">
+            <div class="discover-entry-icon official-icon">📣</div>
+            <div class="discover-entry-name">官方动态</div>
+          </div>
+          <div class="discover-entry-right">
+            <span class="discover-entry-badge">28</span>
+          </div>
+        </div>
+
+        <!-- 大舞台入口：左侧图标 + 名称 | 右侧用户头像（最新发布者）+ 红点 + 箭头 -->
+        <div class="discover-entry" data-od-id="entry-square">
+          <div class="discover-entry-left">
+            <div class="discover-entry-icon square-icon">🎬</div>
+            <div class="discover-entry-name">大舞台</div>
+          </div>
+          <div class="discover-entry-right">
+            <div class="discover-entry-avatar">👤<span class="discover-entry-dot"></span></div>
+            <span class="discover-entry-arrow">›</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底Bar -->
+      <div class="mp-tabbar">
+        <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+        <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+        <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">28</span></div><span class="tab-label">发现</span></div>
+        <div class="tab-item"><div class="tab-icon-wrap"><div class="tab-icon">◉</div><span class="tab-unread-badge">15</span></div><span class="tab-label">我的</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ② 大舞台样式 -->
+<div class="device-wrapper" id="state-default">
   <div class="device-label">② 大舞台样式</div>
   <div class="mp-device">
     <div class="mp-screen">
@@ -924,14 +988,7 @@
 
 
 
-      <!-- Content Tab：广场 / 官方 -->
-      <div class="square-content-tabs chip-tabs">
-        <div class="square-content-tab chip-tab active" data-target="panel-square" onclick="setSquareTab(this)"><span class="tab-chip-ic">🌼</span>广场</div>
-        <div class="square-content-tab chip-tab" data-target="panel-official" onclick="setSquareTab(this)"><span class="tab-chip-ic">📣</span>官方<span class="tab-unread-dot"></span></div>
-      </div>
-
-      <!-- 广场面板 -->
-      <div class="square-panel" id="panel-square">
+      <!-- 大舞台动态流 -->
         <div class="moment-list">
 
           <!-- 纯文字动态 -->
@@ -1141,12 +1198,62 @@
 
 
 
-      </div><!-- /panel-square -->
+      </div><!-- /square-page-scroll -->
 
-      <!-- 官方面板：平台官方发布的信息，不允许打赏 -->
-      <div class="square-panel" id="panel-official" style="display:none;">
+      <!-- 底Bar：视频/图文/内容发布/大舞台/我的（大舞台为当前态） -->
+      <div class="mp-tabbar">
+        <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+        <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+        <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">发现</span></div>
+        <div class="tab-item"><div class="tab-icon-wrap"><div class="tab-icon">◉</div><span class="tab-unread-badge">15</span></div><span class="tab-label">我的</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ③ 官方动态：平台官方发布的内容，不允许打赏 -->
+<div class="device-wrapper" id="state-official">
+  <div class="device-label">③ 官方动态</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">大舞台</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-page-scroll">
+
+      <!-- 个人资料头部：与大舞台样式一致——头图 + 头像/昵称 + 新消息气泡 -->
+      <div class="profile-header">
+        <div class="profile-cover"></div>
+        <div class="profile-identity">
+          <div class="profile-identity-group">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name">阿伟</div>
+          </div>
+        </div>
+
+        <div class="square-message-toast">
+          <div class="square-message-toast-avatar">👤</div>
+          <div class="square-message-toast-label">3条新消息</div>
+        </div>
+      </div>
+
         <div class="moment-list">
 
+          <!-- 置顶示例：该条被平台置顶展示 -->
           <div class="moment-item pinned">
             <div class="moment-header">
               <div class="moment-avatar">📣</div>
@@ -1162,6 +1269,7 @@
               </div>
               <div class="moment-more-wrap">
                 <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <!-- 官方动态不允许打赏：菜单仅保留点赞/评论两项 -->
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 358)"><span class="ic">♡</span><span class="lbl">点赞 358</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 12</span></div>
@@ -1231,16 +1339,15 @@
           </div>
 
         </div>
-      </div><!-- /panel-official -->
 
       </div><!-- /square-page-scroll -->
 
-      <!-- 底Bar：视频/图文/内容发布/大舞台/我的（大舞台为当前态） -->
+      <!-- 底Bar -->
       <div class="mp-tabbar">
         <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
         <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
         <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
-        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">大舞台</span></div>
+        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">发现</span></div>
         <div class="tab-item"><div class="tab-icon-wrap"><div class="tab-icon">◉</div><span class="tab-unread-badge">15</span></div><span class="tab-label">我的</span></div>
       </div>
 
@@ -1249,9 +1356,105 @@
 </div>
 
 
+<div class="device-wrapper" id="state-commenting">
+  <div class="device-label">④ 评论中态 · 大舞台</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">大舞台</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <!-- 正在评论的目标动态：左侧灰色竖线 + 浅灰底标记，隐藏「···」入口 -->
+          <div class="moment-item commenting">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
+                <div class="moment-comment-more">查看全部 7 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 后续动态原样展示，仅示意列表未变 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 评论输入条：替换底Bar位置，聚焦目标为「正在评论的动态」；发送按钮旁增加表情按钮 -->
+      <div class="comment-compose-bar">
+        <div class="compose-avatar">👤</div>
+        <div class="compose-input-active">回复 阿伟<span class="caret"></span></div>
+        <div class="compose-emoji" onclick="toggleEmojiPanel(this)">😀</div>
+        <span class="compose-send">发送</span>
+      </div>
+
+      <!-- 模拟弹出键盘 / 表情面板：二者同一位置，点击表情按钮切换显示 -->
+      <div class="fake-keyboard">
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-3"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-4"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+      </div>
+      <div class="emoji-panel" style="display:none;">
+        <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+        <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+        <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+        <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+        <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+        <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ③ 打赏中态：点击某条动态「···」菜单里的「打赏」后，弹出虚拟礼物选择底部弹层 -->
 <div class="device-wrapper" id="state-rewarding">
-  <div class="device-label">③ 打赏中态 · 大舞台</div>
+  <div class="device-label">⑤ 打赏中态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1448,7 +1651,7 @@
 
 <!-- ④ 图片浏览态：点击某条动态的图片（九宫格/单图）后进入全屏图片浏览 -->
 <div class="device-wrapper" id="state-viewing">
-  <div class="device-label">④ 图片浏览态 · 大舞台</div>
+  <div class="device-label">⑥ 图片浏览态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1522,7 +1725,7 @@
 
 <!-- ⑤ 视频播放态：点击某条动态的视频缩略图后进入全屏竖版播放 -->
 <div class="device-wrapper" id="state-playing">
-  <div class="device-label">⑤ 视频播放态 · 大舞台</div>
+  <div class="device-label">⑦ 视频播放态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1591,7 +1794,7 @@
 
 <!-- ⑥ 打赏失败态：网络异常/余额不足等原因导致打赏未完成，不再展示打赏面板本身，仅保留失败 Toast 方便重试 -->
 <div class="device-wrapper" id="state-reward-failed">
-  <div class="device-label">⑥ 打赏失败态 · 大舞台</div>
+  <div class="device-label">⑧ 打赏失败态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1643,7 +1846,7 @@
 
 <!-- ⑦ 表情面板中：点击评论输入条上的表情按钮后，模拟键盘被替换为表情面板 -->
 <div class="device-wrapper" id="state-emoji">
-  <div class="device-label">⑦ 表情面板中 · 大舞台</div>
+  <div class="device-label">⑨ 表情面板中 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1746,7 +1949,7 @@
      此次打赏；点击礼物聚合列表中的任意一款礼物，可重新播放当时送出该礼物的特效（全屏放大 + 弹入动画），
      用于回顾"谁送了什么礼物"，而非仅仅在成功瞬间一闪而过 -->
 <div class="device-wrapper" id="state-reward-effect">
-  <div class="device-label">⑧ 打赏特效播放态 · 大舞台</div>
+  <div class="device-label">⑩ 打赏特效播放态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
 
@@ -1870,7 +2073,7 @@
         <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
         <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
         <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
-        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">大舞台</span></div>
+        <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">发现</span></div>
         <div class="tab-item"><div class="tab-icon-wrap"><div class="tab-icon">◉</div><span class="tab-unread-badge">15</span></div><span class="tab-label">我的</span></div>
       </div>
 

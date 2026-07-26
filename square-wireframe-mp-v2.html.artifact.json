@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "square-wireframe-mp-v2.html",
+  "entry": "square-wireframe-mp-v2.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-26T13:23:37.172Z",
+  "updatedAt": "2026-07-26T13:23:37.172Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
