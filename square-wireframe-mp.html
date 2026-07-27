@@ -1249,6 +1249,103 @@
 </div>
 
 
+<!-- ② 评论中态：点击某条动态的「评论」后，底Bar替换为评论输入条 + 键盘，目标动态高亮 -->
+<div class="device-wrapper" id="state-commenting">
+  <div class="device-label">② 评论中态 · 大舞台</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <div class="mp-nav">
+        <div class="mp-nav-spacer"></div>
+        <div class="mp-nav-title">大舞台</div>
+        <div class="mp-nav-more"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="square-scroll">
+        <div class="moment-list">
+
+          <!-- 正在评论的目标动态：左侧灰色竖线 + 浅灰底标记，隐藏「···」入口 -->
+          <div class="moment-item commenting">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
+                <div class="moment-time">12 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+            <div class="moment-social">
+              <div class="moment-social-row reward-row"><span class="ic">🎁</span><span class="moment-social-names">阿强打赏 <span class="gift-name">🎈 气球</span> ×1</span></div>
+              <div class="moment-social-row liked-row"><span class="ic">❤</span><span class="moment-social-names">小美、阿强 等 46 人点赞</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">小美：</span>好羡慕，山顶有信号吗</div>
+                <div class="moment-comment-more">查看全部 7 条评论</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 后续动态原样展示 -->
+          <div class="moment-item">
+            <div class="moment-header">
+              <div class="moment-avatar">👤</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
+                <div class="moment-time">38 分钟前</div>
+              </div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                <div class="moment-images">
+                  <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                  <div class="moment-image"></div>
+                </div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /square-scroll -->
+
+      <!-- 评论输入条 + 表情按钮 -->
+      <div class="comment-compose-bar">
+        <div class="compose-avatar">👤</div>
+        <div class="compose-input-active">回复 阿伟<span class="caret"></span></div>
+        <div class="compose-emoji" onclick="toggleEmojiPanel(this)">😀</div>
+        <span class="compose-send">发送</span>
+      </div>
+
+      <!-- 模拟弹出键盘 -->
+      <div class="fake-keyboard">
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-3"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+        <div class="kb-row kb-row-4"><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div></div>
+      </div>
+      <div class="emoji-panel" style="display:none;">
+        <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+        <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+        <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+        <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+        <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+        <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ③ 打赏中态：点击某条动态「···」菜单里的「打赏」后，弹出虚拟礼物选择底部弹层 -->
 <div class="device-wrapper" id="state-rewarding">
   <div class="device-label">③ 打赏中态 · 大舞台</div>
@@ -1806,7 +1903,7 @@
               <div class="engagement-full-collapse-row"><div class="engagement-collapse-btn" onclick="collapseEngagement(this)"><span>收起</span><span>︿</span></div></div>
 
               <div class="engagement-full-section">
-                <div class="engagement-full-heading"><span class="ic">🎁</span>4 人打赏</div>
+                <div class="engagement-full-heading"><span class="ic">🎁</span>4 人打赏，共 <span class="amt">96</span><span class="unit">元</span></div>
                 <div class="engagement-avatar-wall">
                   <div class="engagement-avatar-item"><div class="av">👤<span class="reward-crown-badge gold">👑</span><span class="reward-user-level"><span class="ic">🏆</span><span class="lv-num">45</span></span></div><span class="av-name">Lucy</span></div>
                   <div class="engagement-avatar-item"><div class="av">👤<span class="reward-crown-badge silver">👑</span><span class="reward-user-level"><span class="ic">🏆</span><span class="lv-num">33</span></span></div><span class="av-name">阿伟</span></div>
