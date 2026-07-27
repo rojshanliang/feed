@@ -263,7 +263,7 @@
     background: #ffffff;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    display: flex; align-items: center;
+    display: flex; flex-direction: column; align-items: stretch;
   }
   .reward-stat {
     flex: 1;
@@ -282,6 +282,40 @@
     font-family: var(--font-mono); font-size: 16px; font-weight: 600;
     color: var(--fg);
   }
+
+  /* ─── 打赏额度卡展开态：点击卡片展开礼物明细 ─────────────── */
+  .reward-card { cursor: pointer; }
+  .reward-card-top { display: flex; align-items: center; width: 100%; }
+  .reward-card-toggle {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    text-align: center; padding: 6px 0 2px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .reward-card-toggle .arrow { font-size: 8px; transition: transform 150ms; }
+  .reward-card.expanded .reward-card-toggle .arrow { transform: rotate(180deg); }
+  .reward-detail-panel {
+    display: none; width: 100%; padding: 10px 14px 4px;
+    border-top: 1px solid var(--border-soft); margin-top: 8px;
+  }
+  .reward-card.expanded .reward-detail-panel { display: block; }
+  .reward-detail-title {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-bottom: 8px; letter-spacing: 0.02em;
+  }
+  .reward-detail-list {
+    display: flex; flex-wrap: wrap; gap: 10px 12px;
+    max-height: 96px; overflow-y: auto;
+  }
+  .reward-detail-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 11px; color: var(--fg-2);
+    background: var(--border-soft); border-radius: var(--radius-sm);
+    padding: 6px 10px 6px 6px;
+  }
+  .reward-detail-icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
+  .reward-detail-count { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 600; }
+  .reward-detail-name { display: none; }
+  .reward-detail-amount { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-left: 2px; }
 
   /* ─── Action buttons ──────────────────────────────────────── */
   .profile-actions {
@@ -552,15 +586,82 @@
               <div class="stat-item"><span class="stat-num">56</span><span class="stat-lbl">内容</span></div>
             </div>
 
-            <!-- 打赏额度卡（新增） -->
-            <div class="reward-card">
-              <div class="reward-stat">
-                <span class="reward-stat-lbl">七日打赏额度</span>
-                <span class="reward-stat-num"><span class="amt">86.00</span></span>
+            <!-- 打赏额度卡：点击展开/收起礼物明细 -->
+            <div class="reward-card expanded" onclick="toggleRewardDetail(this)">
+              <div class="reward-card-top">
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">七日打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">86.00</span></span>
+                </div>
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">总打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
+                </div>
               </div>
-              <div class="reward-stat">
-                <span class="reward-stat-lbl">总打赏额度</span>
-                <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
+              <div class="reward-card-toggle"><span>礼物明细</span><span class="arrow">▾</span></div>
+              <div class="reward-detail-panel">
+                <div class="reward-detail-list">
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🌹</span>
+                    <span class="reward-detail-name">玫瑰</span>
+                    <span class="reward-detail-count">×32</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎈</span>
+                    <span class="reward-detail-name">气球</span>
+                    <span class="reward-detail-count">×18</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧸</span>
+                    <span class="reward-detail-name">玩偶</span>
+                    <span class="reward-detail-count">×8</span>
+                    <span class="reward-detail-amount">¥40</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🚀</span>
+                    <span class="reward-detail-name">火箭</span>
+                    <span class="reward-detail-count">×3</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">👑</span>
+                    <span class="reward-detail-name">皇冠</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥52</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🍰</span>
+                    <span class="reward-detail-name">蛋糕</span>
+                    <span class="reward-detail-count">×5</span>
+                    <span class="reward-detail-amount">¥30</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🏰</span>
+                    <span class="reward-detail-name">城堡</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥99</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">💎</span>
+                    <span class="reward-detail-name">钻戒</span>
+                    <span class="reward-detail-count">×2</span>
+                    <span class="reward-detail-amount">¥56</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎉</span>
+                    <span class="reward-detail-name">派对</span>
+                    <span class="reward-detail-count">×4</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧧</span>
+                    <span class="reward-detail-name">红包</span>
+                    <span class="reward-detail-count">×6</span>
+                    <span class="reward-detail-amount">¥90</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1016,6 +1117,10 @@
   /* 仿照微信「相册时光轴」方式展示：点击整条动态卡片跳转至动态详情页（另一独立页面，本图未展示） */
   function goToMomentDetail(el) {
     console.log('跳转至动态详情页 square-detail-wireframe-mp.html');
+  }
+
+  function toggleRewardDetail(card) {
+    card.classList.toggle('expanded');
   }
 </script>
 
