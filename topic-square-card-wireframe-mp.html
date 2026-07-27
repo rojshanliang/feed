@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>话题页 · 广场 Tab — 线框图（小程序）</title>
+<title>话题页 · 大舞台 Tab — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -150,7 +150,7 @@
   .publish-row .topic-stat strong { color: var(--fg); }
   .publish-row .topic-stat-sep { background: var(--border); }
 
-  /* ─── Content tabs (推荐 / 最新 / 广场) ─────────────────────── */
+  /* ─── Content tabs (推荐 / 最新 / 大舞台) ─────────────────────── */
   .content-tabs {
     display: flex; background: #ffffff;
     border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
@@ -166,7 +166,7 @@
     width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
   }
 
-  /* ─── Content panels：推荐/最新 共用瀑布流面板，广场用独立 Feed 面板 ── */
+  /* ─── Content panels：推荐/最新 共用瀑布流面板，大舞台用独立 Feed 面板 ── */
   .content-panel { display: none; flex: 1; min-height: 0; flex-direction: column; }
   .content-panel.active { display: flex; }
 
@@ -175,7 +175,7 @@
   .waterfall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
   .wf-col { display: flex; flex-direction: column; gap: 8px; }
 
-  /* 图文来源角标：仅图文模块内容带标，视频模块内容不加角标（原有约定，不再与广场混排） */
+  /* 图文来源角标：仅图文模块内容带标，视频模块内容不加角标（原有约定，不再与大舞台混排） */
   .post-type-tag {
     position: absolute; top: 6px; left: 6px; z-index: 2;
     font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: #fff;
@@ -221,7 +221,7 @@
   .post-likes .heart.liked { color: #dc2626; }
   .post-likes span.num { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
 
-  /* ─── 广场 Tab：朋友圈式单列 Feed，与 square-wireframe-mp.html 广场首页结构完全一致 ── */
+  /* ─── 大舞台 Tab：朋友圈式单列 Feed，与 square-wireframe-mp.html 大舞台首页结构完全一致 ── */
   .square-scroll { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg); }
   .moment-list { display: flex; flex-direction: column; }
   .moment-item {
@@ -478,8 +478,8 @@
 <body>
 
 <div class="page-header">
-  <h1>话题页 · 广场 Tab — 线框图（小程序）</h1>
-  <p>小程序 · 内容 Tab 新增「广场」独立入口 · 推荐/最新仅展示图文卡+视频卡（不再与广场内容混排）· 广场 Tab 展示风格与 square-wireframe-mp.html 广场首页完全一致</p>
+  <h1>话题页 · 大舞台 Tab — 线框图（小程序）</h1>
+  <p>小程序 · 内容 Tab 新增「大舞台」独立入口 · 推荐/最新仅展示图文卡+视频卡（不再与大舞台内容混排）· 大舞台 Tab 展示风格与 square-wireframe-mp.html 大舞台首页完全一致</p>
 </div>
 
 <div class="devices-row">
@@ -520,14 +520,14 @@
             </div>
           </div>
 
-          <!-- 内容 Tab：推荐 / 最新 / 广场（新增） -->
+          <!-- 内容 Tab：推荐 / 最新 / 大舞台（新增） -->
           <div class="content-tabs">
             <div class="content-tab active" data-target="panel-waterfall" onclick="setContentTab(this)">推荐</div>
             <div class="content-tab" data-target="panel-waterfall" onclick="setContentTab(this)">最新</div>
-            <div class="content-tab" data-target="panel-square" onclick="setContentTab(this)">广场</div>
+            <div class="content-tab" data-target="panel-square" onclick="setContentTab(this)">大舞台</div>
           </div>
 
-          <!-- 推荐 / 最新 面板：仅图文卡 + 视频卡双列瀑布流，广场内容已移至独立 Tab，不再混排 -->
+          <!-- 推荐 / 最新 面板：仅图文卡 + 视频卡双列瀑布流，大舞台内容已移至独立 Tab，不再混排 -->
           <div class="content-panel active" id="panel-waterfall">
             <div class="content-scroll">
               <div class="waterfall-grid">
@@ -600,7 +600,7 @@
             </div><!-- /content-scroll -->
           </div>
 
-          <!-- 广场面板：与 panel-waterfall 结构相同的容器，此设备示例默认停在推荐/最新，故此处留空占位 -->
+          <!-- 大舞台面板：与 panel-waterfall 结构相同的容器，此设备示例默认停在推荐/最新，故此处留空占位 -->
           <div class="content-panel" id="panel-square-placeholder-1" style="display:none;"></div>
 
         </div><!-- /page-scroll -->
@@ -608,9 +608,9 @@
     </div>
   </div>
 
-  <!-- ② 广场 Tab：与 square-wireframe-mp.html 广场首页结构完全一致 -->
+  <!-- ② 大舞台 Tab：与 square-wireframe-mp.html 大舞台首页结构完全一致 -->
   <div class="device-wrapper">
-    <div class="device-label">② 广场 Tab · 话题页</div>
+    <div class="device-label">② 大舞台 Tab · 话题页</div>
     <div class="mp-device">
       <div class="mp-screen">
 
@@ -647,12 +647,12 @@
           <div class="content-tabs">
             <div class="content-tab" data-target="panel-waterfall-2" onclick="setContentTab(this)">推荐</div>
             <div class="content-tab" data-target="panel-waterfall-2" onclick="setContentTab(this)">最新</div>
-            <div class="content-tab active" data-target="panel-square-2" onclick="setContentTab(this)">广场</div>
+            <div class="content-tab active" data-target="panel-square-2" onclick="setContentTab(this)">大舞台</div>
           </div>
 
           <div class="content-panel" id="panel-waterfall-2" style="display:none;"></div>
 
-          <!-- 广场面板：单列朋友圈式 Feed，聚合带 #摆摊日记 话题标签发布的广场动态 -->
+          <!-- 大舞台面板：单列朋友圈式 Feed，聚合带 #摆摊日记 话题标签发布的大舞台动态 -->
           <div class="content-panel active" id="panel-square-2">
             <div class="square-scroll">
               <div class="moment-list">
@@ -870,26 +870,26 @@
 </div><!-- /devices-row -->
 
 <div class="spec-panel">
-  <h3>SPEC · 话题页「广场」Tab 结构说明</h3>
+  <h3>SPEC · 话题页「大舞台」Tab 结构说明</h3>
   <div class="spec-row">
     <span class="spec-key">Tab 结构调整（本次核心变更）</span>
-    <span class="spec-val">内容 Tab 由「推荐 / 最新」二项，扩展为「推荐 / 最新 / 广场」三项；广场为新增第三项，不与推荐/最新融合展示</span>
+    <span class="spec-val">内容 Tab 由「推荐 / 最新」二项，扩展为「推荐 / 最新 / 大舞台」三项；大舞台为新增第三项，不与推荐/最新融合展示</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">推荐 / 最新（不再混排广场内容）</span>
-    <span class="spec-val">双列瀑布流仅展示 <span class="spec-badge">图文卡</span><span class="spec-badge">视频卡</span> 两种类型，广场来源的文字/图文/视频动态已全部移出，不再与图文/视频模块内容混合展示</span>
+    <span class="spec-key">推荐 / 最新（不再混排大舞台内容）</span>
+    <span class="spec-val">双列瀑布流仅展示 <span class="spec-badge">图文卡</span><span class="spec-badge">视频卡</span> 两种类型，大舞台来源的文字/图文/视频动态已全部移出，不再与图文/视频模块内容混合展示</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">来源角标（恢复为原有双来源约定）</span>
-    <span class="spec-val">由于广场内容已移出，无需再区分三种来源：<span class="spec-badge">图文</span> 标注来自图文模块（原有约定），视频模块内容不加角标（原有约定），与融合广场之前的规则保持一致</span>
+    <span class="spec-val">由于大舞台内容已移出，无需再区分三种来源：<span class="spec-badge">图文</span> 标注来自图文模块（原有约定），视频模块内容不加角标（原有约定），与融合大舞台之前的规则保持一致</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">广场 Tab（新增）</span>
-    <span class="spec-val">承载该话题下所有带 <span class="spec-badge">#话题</span> 发布的广场动态（文字 / 图文 / 视频三种形式），单列朋友圈式 Feed，与瀑布流双列布局完全独立</span>
+    <span class="spec-key">大舞台 Tab（新增）</span>
+    <span class="spec-val">承载该话题下所有带 <span class="spec-badge">#话题</span> 发布的大舞台动态（文字 / 图文 / 视频三种形式），单列朋友圈式 Feed，与瀑布流双列布局完全独立</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">广场 Tab 展示风格（Follow square-wireframe-mp.html）</span>
-    <span class="spec-val">卡片结构、头像+昵称+等级标签、话题内联展示、图片九宫格/视频缩略图、已互动信息条（打赏行展示打赏者头像 Top3 + 皇冠角标 + 总打赏金额）、「···」横向弹出菜单，均与 square-wireframe-mp.html 广场首页完全一致，直接复用同一套组件与交互逻辑</span>
+    <span class="spec-key">大舞台 Tab 展示风格（Follow square-wireframe-mp.html）</span>
+    <span class="spec-val">卡片结构、头像+昵称+等级标签、话题内联展示、图片九宫格/视频缩略图、已互动信息条（打赏行展示打赏者头像 Top3 + 皇冠角标 + 总打赏金额）、「···」横向弹出菜单，均与 square-wireframe-mp.html 大舞台首页完全一致，直接复用同一套组件与交互逻辑</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">卡片内互动信息展开（Follow square-wireframe-mp.html）</span>
@@ -901,7 +901,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">点击行为</span>
-    <span class="spec-val">图文卡进入图文详情页 · 视频卡进入视频播放页 · 广场 Tab 内动态点击进入 square-detail-wireframe-mp.html 广场详情页（均未在本图展示）</span>
+    <span class="spec-val">图文卡进入图文详情页 · 视频卡进入视频播放页 · 大舞台 Tab 内动态点击进入 square-detail-wireframe-mp.html 详情页（均未在本图展示）</span>
   </div>
 </div>
 

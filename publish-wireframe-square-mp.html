@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>内容发布页 · 广场发布 — 线框图（小程序）</title>
+<title>内容发布页 · 大舞台发布 — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -112,7 +112,7 @@
   }
   .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
-  /* ─── 内容类型 Tab：视频 / 图文 / 广场 ─────────────────────────── */
+  /* ─── 内容类型 Tab：视频 / 图文 / 大舞台 ─────────────────────────── */
   .type-tabs {
     display: flex; background: #ffffff;
     border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
@@ -299,8 +299,8 @@
 <body>
 
 <div class="page-header">
-  <h1>内容发布页 · 广场发布 — 线框图</h1>
-  <p>小程序 · 内容类型新增「广场」· 像朋友圈一样发文字 / 图文 / 视频 · 纯文字 / 图文 / 视频 / 图片上传中 / 视频上传中 / 表情面板 六态</p>
+  <h1>内容发布页 · 大舞台发布 — 线框图</h1>
+  <p>小程序 · 内容类型新增「大舞台」· 像朋友圈一样发文字 / 图文 / 视频 · 纯文字 / 图文 / 视频 / 图片上传中 / 视频上传中 / 表情面板 六态</p>
 </div>
 
 <div class="state-switcher" role="group">
@@ -316,7 +316,7 @@
 
 <!-- ① 纯文字态 -->
 <div class="device-wrapper active" id="state-text">
-  <div class="device-label">① 纯文字态 · 广场</div>
+  <div class="device-label">① 纯文字态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -328,7 +328,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn">发布</button>
       </div>
 
@@ -336,7 +336,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -370,7 +370,7 @@
 
 <!-- ② 图文态 -->
 <div class="device-wrapper" id="state-image">
-  <div class="device-label">② 图文态 · 广场</div>
+  <div class="device-label">② 图文态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -382,7 +382,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn">发布</button>
       </div>
 
@@ -390,7 +390,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -434,7 +434,7 @@
 
 <!-- ③ 视频态 -->
 <div class="device-wrapper" id="state-video">
-  <div class="device-label">③ 视频态 · 广场</div>
+  <div class="device-label">③ 视频态 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -446,7 +446,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn">发布</button>
       </div>
 
@@ -454,7 +454,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -495,7 +495,7 @@
 
 <!-- ④ 图片上传中 -->
 <div class="device-wrapper" id="state-image-uploading">
-  <div class="device-label">④ 图片上传中 · 广场</div>
+  <div class="device-label">④ 图片上传中 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -507,7 +507,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn inactive" disabled>发布</button>
       </div>
 
@@ -515,7 +515,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -570,7 +570,7 @@
 
 <!-- ⑤ 视频上传中 -->
 <div class="device-wrapper" id="state-video-uploading">
-  <div class="device-label">⑤ 视频上传中 · 广场</div>
+  <div class="device-label">⑤ 视频上传中 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -582,7 +582,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn inactive" disabled>发布</button>
       </div>
 
@@ -590,7 +590,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -633,7 +633,7 @@
 
 <!-- ⑥ 表情面板中：点击正文下方的表情按钮后，展开表情面板 -->
 <div class="device-wrapper" id="state-emoji">
-  <div class="device-label">⑥ 表情面板中 · 广场</div>
+  <div class="device-label">⑥ 表情面板中 · 大舞台</div>
   <div class="mp-device">
     <div class="mp-screen">
       <div class="mp-status-bar">
@@ -645,7 +645,7 @@
       </div>
       <div class="mp-nav">
         <div class="nav-back">‹</div>
-        <div class="nav-title">发布广场动态</div>
+        <div class="nav-title">发布大舞台动态</div>
         <button class="nav-publish-btn">发布</button>
       </div>
 
@@ -653,7 +653,7 @@
       <div class="type-tabs">
         <div class="type-tab">视频</div>
         <div class="type-tab">图文</div>
-        <div class="type-tab active">广场</div>
+        <div class="type-tab active">大舞台</div>
       </div>
 
       <div class="page-scroll">
@@ -689,10 +689,10 @@
 
 <!-- Spec -->
 <div class="spec-panel" style="width:782px;">
-  <h3>SPEC · 广场发布结构说明</h3>
+  <h3>SPEC · 大舞台发布结构说明</h3>
   <div class="spec-row">
     <span class="spec-key">内容类型 Tab</span>
-    <span class="spec-val"><span class="spec-badge">视频</span><span class="spec-badge">图文</span><span class="spec-badge dark">广场</span> — 位于 NavBar 下方，与 publish-wireframe-imagetext-mp.html 一致的 Tab 结构，广场为新增第三项并处于选中态</span>
+    <span class="spec-val"><span class="spec-badge">视频</span><span class="spec-badge">图文</span><span class="spec-badge dark">大舞台</span> — 位于 NavBar 下方，与 publish-wireframe-imagetext-mp.html 一致的 Tab 结构，大舞台为新增第三项并处于选中态</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">发布形式</span>

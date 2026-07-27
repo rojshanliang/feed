@@ -397,7 +397,7 @@
   .video-thumb:nth-child(3n+2) { background: #c8ccd2; }
   .video-thumb:nth-child(3n+3) { background: #b8bcc4; }
 
-  /* ─── 广场 Tab：仿照微信「相册时光轴」方式展示（见参考图 image-16.png）——
+  /* ─── 大舞台 Tab：仿照微信「相册时光轴」方式展示（见参考图 image-16.png）——
        顶部按年份分组吸顶标题 + 左侧日期角标 + 小尺寸缩略图 + 右侧截断文字，整条整行可点击，
        点击后跳转至动态详情页（另一独立页面，本图未展示）；
        不展示头像/昵称/点赞评论打赏摘要/「···」菜单，全部移至动态详情页展示 ────── */
@@ -540,7 +540,7 @@
 
 <div class="page-header">
   <h1>个人页 / 创作者页 — 打赏额度模块线框图</h1>
-  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 去除编辑个人资料按钮 · 去除分享入口 · 广场 Tab 仿照微信「相册时光轴」方式展示（日期角标 + 缩略图 + 截断文字），点击卡片跳转至动态详情页（另一页面，本图未展示）· 个人页消息入口常驻未读角标</p>
+  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 去除编辑个人资料按钮 · 去除分享入口 · 大舞台 Tab 仿照微信「相册时光轴」方式展示（日期角标 + 缩略图 + 截断文字），点击卡片跳转至动态详情页（另一页面，本图未展示）· 个人页消息入口常驻未读角标</p>
 </div>
 
 <div class="state-switcher" role="group">
@@ -669,11 +669,11 @@
           </div>
           <div class="section-gap"></div>
 
-          <!-- 内容 Tab：默认停在「广场」，方便直接查看仿朋友圈样式改版 -->
+          <!-- 内容 Tab：默认停在「大舞台」，方便直接查看仿朋友圈样式改版 -->
           <div class="content-tabs">
             <div class="content-tab" data-target="profile-video" onclick="setContentTab(this, 'profile')">视频</div>
             <div class="content-tab" data-target="profile-imagetext" onclick="setContentTab(this, 'profile')">图文</div>
-            <div class="content-tab active" data-target="profile-square" onclick="setContentTab(this, 'profile')">广场</div>
+            <div class="content-tab active" data-target="profile-square" onclick="setContentTab(this, 'profile')">大舞台</div>
           </div>
 
           <!-- 视频面板 -->
@@ -697,7 +697,7 @@
             </div>
           </div>
 
-          <!-- 广场面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
+          <!-- 大舞台面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
                点击后跳转至动态详情页（另一独立页面，本图未展示）；
                示例覆盖：纯文字 / 单图 / 多图（最多 9 张）/ 单视频 四种内容形式，
                外加同一天发布多条（日期角标不重复）、跨月、跨年三种时间场景 -->
@@ -877,11 +877,11 @@
           </div>
           <div class="section-gap"></div>
 
-          <!-- 内容 Tab：默认停在「广场」，方便直接查看仿朋友圈样式改版 -->
+          <!-- 内容 Tab：默认停在「大舞台」，方便直接查看仿朋友圈样式改版 -->
           <div class="content-tabs">
             <div class="content-tab" data-target="creator-video" onclick="setContentTab(this, 'creator')">视频</div>
             <div class="content-tab" data-target="creator-imagetext" onclick="setContentTab(this, 'creator')">图文</div>
-            <div class="content-tab active" data-target="creator-square" onclick="setContentTab(this, 'creator')">广场</div>
+            <div class="content-tab active" data-target="creator-square" onclick="setContentTab(this, 'creator')">大舞台</div>
           </div>
 
           <!-- 视频面板 -->
@@ -905,7 +905,7 @@
             </div>
           </div>
 
-          <!-- 广场面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
+          <!-- 大舞台面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
                点击后跳转至动态详情页（另一独立页面，本图未展示）；
                示例覆盖：纯文字 / 单图 / 多图（最多 9 张）/ 单视频 四种内容形式，
                外加同一天发布多条（日期角标不重复）、跨月、跨年三种时间场景 -->
@@ -1067,12 +1067,12 @@
   </div>
 </div>
 
-<!-- Spec panel · 广场 Tab -->
+<!-- Spec panel · 大舞台 Tab -->
 <div class="spec-panel" style="width:782px;">
-  <h3>SPEC · 广场 Tab 结构说明（个人页 / 创作者页）</h3>
+  <h3>SPEC · 大舞台 Tab 结构说明（个人页 / 创作者页）</h3>
   <div class="spec-row">
     <span class="spec-key">Tab 位置</span>
-    <span class="spec-val">内容 Tab 由「视频 / 图文」扩展为「视频 / 图文 / 广场」三个 Tab，广场为第三项</span>
+    <span class="spec-val">内容 Tab 由「视频 / 图文」扩展为「视频 / 图文 / 大舞台」三个 Tab，大舞台为第三项</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">卡片样式（仿照微信「相册时光轴」，本次核心变更）</span>

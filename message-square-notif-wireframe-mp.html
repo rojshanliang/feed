@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>消息页 · 广场互动通知 — 线框图（小程序）</title>
+<title>消息页 · 大舞台互动通知 — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -151,7 +151,7 @@
     width: 8px; height: 8px; border-radius: 50%; background: #dc2626; flex-shrink: 0; margin-top: 4px;
   }
 
-  /* 来源标签：区分广场互动通知与图文/视频互动通知（后者不加标签，沿用原有约定），
+  /* 来源标签：区分大舞台互动通知与图文/视频互动通知（后者不加标签，沿用原有约定），
      样式复用话题页卡片角标（.post-type-tag/.source-tag）既有约定 ── */
   .notif-source-tag {
     font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: #fff;
@@ -160,7 +160,7 @@
 
   .notif-source-tag.official { background: #1d9bf0; }
 
-  /* 打赏礼物标签：与广场页/广场详情页 .gift-name 样式一致 */
+  /* 打赏礼物标签：与大舞台页/详情页 .gift-name 样式一致 */
   .gift-name {
     font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
     background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
@@ -200,17 +200,17 @@
 <body>
 
 <div class="page-header">
-  <h1>消息页 · 广场互动通知 — 线框图（小程序）</h1>
-  <p>小程序 · 系统通知 · 在原有消息页基础上新增广场点赞/评论/回复/打赏通知，兼容展示</p>
+  <h1>消息页 · 大舞台互动通知 — 线框图（小程序）</h1>
+  <p>小程序 · 系统通知 · 在原有消息页基础上新增大舞台点赞/评论/回复/打赏通知，兼容展示</p>
 </div>
 
 <!-- 行 1：消息列表 -->
 <div class="row-label">消息列表</div>
 <div class="devices-row">
 
-  <!-- ① 有通知（含广场通知） -->
+  <!-- ① 有通知（含大舞台通知） -->
   <div class="device-wrapper">
-    <div class="device-label">消息页 · 有通知（含广场通知）</div>
+    <div class="device-label">消息页 · 有通知（含大舞台通知）</div>
     <div class="mp-device">
       <div class="mp-screen">
 
@@ -262,18 +262,18 @@
               <div class="unread-dot"></div>
             </div>
 
-            <!-- 打赏（广场，新增，逐条不合并） -->
+            <!-- 打赏（大舞台，新增，逐条不合并） -->
             <div class="notif-item">
               <div class="notif-icon reward">🎁</div>
               <div class="notif-body">
                 <div class="notif-header">
                   <div class="notif-name-group">
                     <span class="notif-name">小美</span>
-                    <span class="notif-source-tag">广场</span>
+                    <span class="notif-source-tag">大舞台</span>
                   </div>
                   <span class="notif-time">6分钟</span>
                 </div>
-                <div class="notif-text unread">打赏了你的广场动态 <span class="gift-name">🧸 玩偶</span> ×1</div>
+                <div class="notif-text unread">打赏了你的大舞台动态 <span class="gift-name">🧸 玩偶</span> ×1</div>
                 <div class="notif-meta">
                   <div class="notif-thumb"></div>
                 </div>
@@ -281,18 +281,18 @@
               <div class="unread-dot"></div>
             </div>
 
-            <!-- 评论（广场，新增，逐条不合并） -->
+            <!-- 评论（大舞台，新增，逐条不合并） -->
             <div class="notif-item">
               <div class="notif-icon comment">💬</div>
               <div class="notif-body">
                 <div class="notif-header">
                   <div class="notif-name-group">
                     <span class="notif-name">小美</span>
-                    <span class="notif-source-tag">广场</span>
+                    <span class="notif-source-tag">大舞台</span>
                   </div>
                   <span class="notif-time">15分钟</span>
                 </div>
-                <div class="notif-text unread">评论了你的广场动态：「饰品好好看，链接发一下」</div>
+                <div class="notif-text unread">评论了你的大舞台动态：「饰品好好看，链接发一下」</div>
                 <div class="notif-meta">
                   <div class="notif-thumb"></div>
                 </div>
@@ -300,14 +300,14 @@
               <div class="unread-dot"></div>
             </div>
 
-            <!-- 回复（广场，新增，朋友圈式 C 回复 B：回复了「你」的评论） -->
+            <!-- 回复（大舞台，新增，朋友圈式 C 回复 B：回复了「你」的评论） -->
             <div class="notif-item">
               <div class="notif-icon reply">↩️</div>
               <div class="notif-body">
                 <div class="notif-header">
                   <div class="notif-name-group">
                     <span class="notif-name">阿伟</span>
-                    <span class="notif-source-tag">广场</span>
+                    <span class="notif-source-tag">大舞台</span>
                   </div>
                   <span class="notif-time">32分钟</span>
                 </div>
@@ -316,18 +316,18 @@
               <div class="unread-dot"></div>
             </div>
 
-            <!-- 点赞（广场，新增，多人合并为一条） -->
+            <!-- 点赞（大舞台，新增，多人合并为一条） -->
             <div class="notif-item">
               <div class="notif-icon like">❤️</div>
               <div class="notif-body">
                 <div class="notif-header">
                   <div class="notif-name-group">
                     <span class="notif-name">小美、Lucy 等 127 人</span>
-                    <span class="notif-source-tag">广场</span>
+                    <span class="notif-source-tag">大舞台</span>
                   </div>
                   <span class="notif-time">1小时</span>
                 </div>
-                <div class="notif-text unread">赞了你的广场动态</div>
+                <div class="notif-text unread">赞了你的大舞台动态</div>
                 <div class="notif-meta">
                   <div class="notif-thumb"></div>
                 </div>
@@ -490,14 +490,14 @@
 </div><!-- /devices-row -->
 
 <div class="spec-panel" style="width:782px;">
-  <h3>SPEC · 消息页结构说明（系统通知模式，新增广场通知兼容）</h3>
+  <h3>SPEC · 消息页结构说明（系统通知模式，新增大舞台通知兼容）</h3>
   <div class="spec-row">
     <span class="spec-key">消息来源</span>
     <span class="spec-val">仅系统通知 · 无创作者/用户私信 · 无聊天功能</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">通知类型（新增）</span>
-    <span class="spec-val">广场 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">回复</span><span class="spec-badge">打赏</span>，以及交易类 <span class="spec-badge">打赏到账</span><span class="spec-badge">打赏扣款</span></span>
+    <span class="spec-val">大舞台 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">回复</span><span class="spec-badge">打赏</span>，以及交易类 <span class="spec-badge">打赏到账</span><span class="spec-badge">打赏扣款</span></span>
   </div>
   <div class="spec-row">
     <span class="spec-key">通知类型（原有，不变）</span>
@@ -505,11 +505,11 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">展示方式</span>
-    <span class="spec-val">与原有一致：单一列表，按日期分组（今天/昨天）+ 组内时间倒序；广场相关通知直接插入同一列表，不新增 Tab、不新增分组</span>
+    <span class="spec-val">与原有一致：单一列表，按日期分组（今天/昨天）+ 组内时间倒序；大舞台相关通知直接插入同一列表，不新增 Tab、不新增分组</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">来源标识</span>
-    <span class="spec-val">仅广场来源的互动通知在昵称右侧附加深色「广场」标签（复用话题页卡片来源角标样式）；图文/视频来源的互动通知不加标签，沿用原有约定</span>
+    <span class="spec-val">仅大舞台来源的互动通知在昵称右侧附加深色「大舞台」标签（复用话题页卡片来源角标样式）；图文/视频来源的互动通知不加标签，沿用原有约定</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">通知图标</span>
@@ -517,11 +517,11 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">打赏信息展示</span>
-    <span class="spec-val">礼物名称以 <span class="spec-badge">🧸 玩偶</span> 黄底徽标展示（与广场页/广场详情页 .gift-name 样式一致）+ 数量 ×N，互动类和交易类通知均展示同一形式，不展示价格数字</span>
+    <span class="spec-val">礼物名称以 <span class="spec-badge">🧸 玩偶</span> 黄底徽标展示（与大舞台页/详情页 .gift-name 样式一致）+ 数量 ×N，互动类和交易类通知均展示同一形式，不展示价格数字</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">是否合并</span>
-    <span class="spec-val">点赞合并为一条「XX、YY 等 N 人赞了你的广场动态」；评论/回复/打赏逐条展示，不合并——三者均带有独立的具体信息（内容预览/礼物/回复对象），合并会丢失信息</span>
+    <span class="spec-val">点赞合并为一条「XX、YY 等 N 人赞了你的大舞台动态」；评论/回复/打赏逐条展示，不合并——三者均带有独立的具体信息（内容预览/礼物/回复对象），合并会丢失信息</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">回复通知格式</span>
@@ -529,7 +529,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">跳转行为</span>
-    <span class="spec-val">点击广场点赞/评论/回复/打赏通知，进入对应广场动态详情页（square-detail-wireframe-mp.html）；点击打赏到账/扣款通知，进入打赏账单/流水页（本图未展开）</span>
+    <span class="spec-val">点击大舞台点赞/评论/回复/打赏通知，进入对应大舞台动态详情页（square-detail-wireframe-mp.html）；点击打赏到账/扣款通知，进入打赏账单/流水页（本图未展开）</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">未读状态</span>
