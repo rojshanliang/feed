@@ -95,19 +95,12 @@
   /* ─── Scrollable content ──────────────────────────────────── */
   .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
 
-  /* ─── 内容展示 · 头图【本次变更】───────────────────────────────
-     原先写死 4:3，与小程序内容页的 3:4 不一致；现统一为按原图比例
-     自适应并限定在 3:4 ~ 4:3 区间，容器高度由第一张图决定：
-     · 落在区间内 → 原比例完整展示   · 更竖 → 3:4 裁剪   · 更宽 → 4:3 裁剪
-     本例封面为竖图，故容器取 3:4 上界，与小程序内容页示例保持一致 ─── */
+  /* ─── 内容展示 · 头图 ─────────────────────────────────────── */
   .content-image {
-    width: 100%; aspect-ratio: 3/4; background: var(--wf-block);
+    width: 100%; aspect-ratio: 4/3; background: var(--wf-block);
     position: relative; display: flex; align-items: center; justify-content: center;
   }
-  .content-image.ratio-portrait  { aspect-ratio: 3/4; }
-  .content-image.ratio-square    { aspect-ratio: 1/1; }
-  .content-image.ratio-landscape { aspect-ratio: 4/3; }
-  .content-image::after { content: attr(data-ratio-label); font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  .content-image::after { content: '头图'; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
   .image-dots {
     position: absolute; bottom: 10px; left: 0; right: 0;
     display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -231,8 +224,8 @@
 
       <div class="page-scroll">
 
-        <!-- 内容展示 · 头图（比例规则同小程序内容页） -->
-        <div class="content-image ratio-portrait" data-ratio-label="头图 · 封面 3:4（竖图上界）">
+        <!-- 内容展示 · 头图 -->
+        <div class="content-image">
           <span class="image-count">1 / 4</span>
           <div class="image-dots">
             <span class="image-dot active"></span>
