@@ -133,12 +133,22 @@
   /* ─── Scroll content ────────────────────────────────────────── */
   .detail-scroll { flex: 1; overflow-y: auto; }
 
-  /* ─── 内容呈现 · 图片 ─────────────────────────────────────── */
+  /* ─── 内容呈现 · 图片【本次变更】─────────────────────────────
+     比例不再固定 3:4，改为按原图比例自适应并限定在 3:4 ~ 4:3 区间：
+     · 原图落在 3:4 与 4:3 之间 → 按原比例完整展示，不裁剪
+     · 比 3:4 更竖（如 9:16）   → 按 3:4 居中裁剪（.ratio-portrait）
+     · 比 4:3 更宽（如 16:9）   → 按 4:3 居中裁剪（.ratio-landscape）
+     多图轮播时容器高度由第一张图决定并保持固定，后续图片在容器内
+     居中完整展示、不足留白，避免滑动时容器跳高度 ─────────────── */
   .content-image {
     width: 100%; aspect-ratio: 3/4; background: var(--wf-block);
     position: relative; display: flex; align-items: center; justify-content: center;
   }
-  .content-image::after { content: '图片'; font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+  /* 三档比例：竖图上界 3:4、方图 1:1、横图下界 4:3 */
+  .content-image.ratio-portrait  { aspect-ratio: 3/4; }
+  .content-image.ratio-square    { aspect-ratio: 1/1; }
+  .content-image.ratio-landscape { aspect-ratio: 4/3; }
+  .content-image::after { content: attr(data-ratio-label); font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
   .image-dots {
     position: absolute; bottom: 12px; left: 0; right: 0;
     display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -377,8 +387,10 @@
 
         <div class="detail-scroll">
 
-          <!-- 内容呈现 · 图片（点击查看大图） -->
-          <div class="content-image" onclick="setState('viewer')">
+          <!-- 内容呈现 · 图片（点击查看大图）
+               本例封面为竖图，容器按 3:4 上界展示；封面若为方图/横图，
+               容器分别为 1:1 / 4:3（见 .ratio-square / .ratio-landscape） -->
+          <div class="content-image ratio-portrait" data-ratio-label="图片 · 封面 3:4（竖图上界）" onclick="setState('viewer')">
             <span class="image-count">1 / 6</span>
             <div class="image-dots">
               <span class="image-dot active"></span>
@@ -541,6 +553,10 @@
   <div class="spec-row">
     <span class="spec-key">内容呈现</span>
     <span class="spec-val">图片（多图带指示点，点击查看大图）· 标题 · 正文 · 话题标签（纯文字 # 标签，独立一行，仿小红书）· 发布时间</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片比例</span>
+    <span class="spec-val">按原图比例自适应，限定在 3:4（竖）～ 4:3（横）区间：落在区间内按原比例完整展示不裁剪；比 3:4 更竖按 3:4 居中裁剪；比 4:3 更宽按 4:3 居中裁剪。多图轮播容器高度由第一张图决定并固定，后续图片在容器内居中完整展示、不足留白</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">查看大图</span>
