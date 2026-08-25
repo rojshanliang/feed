@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>个人页 / 创作者页 — 线框图（小程序·改版）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Source+Sans+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #fafafa;
@@ -551,6 +550,79 @@
     padding: 1px 7px; border-radius: 3px; margin-right: 3px;
   }
   .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+
+  /* ─── 关系列表二级页 ──────────────────────────────────── */
+  .rel-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .rel-nav-back {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+  }
+  .rel-nav-tabs {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 20px;
+  }
+  .rel-nav-tab {
+    font-family: var(--font-display); font-size: 14px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative; padding-bottom: 6px;
+  }
+  .rel-nav-tab.active { color: var(--fg); font-weight: 600; }
+  .rel-nav-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--fg); border-radius: 1px;
+  }
+  .rel-nav-settings {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--muted);
+  }
+  .rel-search {
+    margin: 12px 16px; height: 36px; background: var(--border-soft);
+    border-radius: 18px; display: flex; align-items: center; padding: 0 14px; gap: 8px;
+  }
+  .rel-search-icon { font-size: 14px; color: var(--muted); }
+  .rel-search-text { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+  .rel-section-title {
+    padding: 8px 16px; font-family: var(--font-body); font-size: 12px; color: var(--muted);
+  }
+  .rel-list { flex: 1; display: flex; flex-direction: column; }
+  .rel-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border-soft);
+  }
+  .rel-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--wf-block-dark); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .rel-body { flex: 1; min-width: 0; }
+  .rel-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
+  .rel-bio { font-family: var(--font-body); font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rel-footer-note {
+    padding: 16px; text-align: center;
+    font-family: var(--font-body); font-size: 12px; color: var(--muted);
+  }
+  .rel-action-btn {
+    height: 28px; padding: 0 14px; flex-shrink: 0;
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer;
+  }
+  .rel-action-btn.followed {
+    background: var(--border-soft); color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .rel-action-btn.mutual {
+    background: var(--border-soft); color: var(--fg-2);
+    border: 1.5px solid var(--border);
+  }
+  .rel-action-btn.followback {
+    background: #ff4d6d; color: #ffffff;
+  }
+  .rel-panel { display: none; flex-direction: column; }
+  .rel-panel.active { display: flex; }
 </style>
 </head>
 <body>
@@ -563,6 +635,7 @@
 <div class="state-switcher" role="group">
   <button class="state-btn active" data-state="profile" onclick="setState('profile')">① 个人页</button>
   <button class="state-btn" data-state="creator" onclick="setState('creator')">② 创作者页</button>
+  <button class="state-btn" data-state="relations" onclick="setState('relations')">③ 关系列表</button>
 </div>
 
 <div class="devices-row">
@@ -594,21 +667,21 @@
             <div class="profile-handle">@username_unique</div>
             <div class="profile-bio">这里是个人简介，最多展示两行，超出截断显示…</div>
             <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">86</span><span class="stat-lbl">互关</span></div>
               <div class="stat-item"><span class="stat-num">128</span><span class="stat-lbl">关注</span></div>
               <div class="stat-item"><span class="stat-num">3,421</span><span class="stat-lbl">粉丝</span></div>
-              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
-              <div class="stat-item"><span class="stat-num">56</span><span class="stat-lbl">内容</span></div>
             </div>
 
             <!-- 打赏额度卡：点击展开/收起礼物明细 -->
             <div class="reward-card expanded" onclick="toggleRewardDetail(this)">
               <div class="reward-card-top">
                 <div class="reward-stat">
-                  <span class="reward-stat-lbl">七日打赏额度</span>
+                  <span class="reward-stat-lbl">七日被打赏额</span>
                   <span class="reward-stat-num"><span class="amt">86.00</span></span>
                 </div>
                 <div class="reward-stat">
-                  <span class="reward-stat-lbl">总打赏额度</span>
+                  <span class="reward-stat-lbl">总被打赏额</span>
                   <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
                 </div>
               </div>
@@ -862,21 +935,22 @@
             <div class="profile-handle">@creator_handle</div>
             <div class="profile-bio">创作者简介文字，最多展示两行，超出截断显示…</div>
             <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">120w</span><span class="stat-lbl">获赞</span></div>
               <div class="stat-item"><span class="stat-num">256</span><span class="stat-lbl">关注</span></div>
               <div class="stat-item"><span class="stat-num">8.6w</span><span class="stat-lbl">粉丝</span></div>
-              <div class="stat-item"><span class="stat-num">120w</span><span class="stat-lbl">获赞</span></div>
-              <div class="stat-item"><span class="stat-num">203</span><span class="stat-lbl">内容</span></div>
             </div>
 
-            <!-- 打赏额度卡（新增） -->
+            <!-- 打赏额度卡（左右结构，与个人页一致，无礼物明细） -->
             <div class="reward-card">
-              <div class="reward-stat">
-                <span class="reward-stat-lbl">七日打赏额度</span>
-                <span class="reward-stat-num"><span class="amt">3,280.00</span></span>
-              </div>
-              <div class="reward-stat">
-                <span class="reward-stat-lbl">总打赏额度</span>
-                <span class="reward-stat-num"><span class="amt">86,450.00</span></span>
+              <div class="reward-card-top">
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">七日打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">3,280.00</span></span>
+                </div>
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">总打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">86,450.00</span></span>
+                </div>
               </div>
             </div>
 
@@ -1038,6 +1112,194 @@
     </div>
   </div>
 
+  <!-- ③ 关系列表（互关/关注/粉丝二级页） -->
+  <div class="device-wrapper" id="state-relations">
+    <div class="device-label">③ 关系列表 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <!-- 顶部导航：返回 + 互关/关注/粉丝 Tab（无右侧设置按钮） -->
+        <div class="rel-nav">
+          <div class="rel-nav-back">‹</div>
+          <div class="rel-nav-tabs">
+            <div class="rel-nav-tab active" onclick="setRelTab('mutual')">互关</div>
+            <div class="rel-nav-tab" onclick="setRelTab('following')">关注</div>
+            <div class="rel-nav-tab" onclick="setRelTab('followers')">粉丝</div>
+          </div>
+          <div style="width:28px;flex-shrink:0;"></div>
+        </div>
+        <!-- 搜索框 -->
+        <div class="rel-search">
+          <span class="rel-search-icon">🔍</span>
+          <span class="rel-search-text">搜索用户备注或名字</span>
+        </div>
+        <!-- 互关列表 -->
+        <div class="profile-scroll rel-panel active" id="rel-mutual" style="flex:1;overflow-y:auto;">
+          <div class="rel-section-title">我的互关（6 人）</div>
+          <div class="rel-list">
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_01</div>
+                <div class="rel-bio">记录生活的点滴，分享每一天的小确幸</div>
+              </div>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_02</div>
+                <div class="rel-bio">摄影爱好者，用镜头捕捉世界的美好</div>
+              </div>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_03</div>
+                <div class="rel-bio">热爱美食和旅行，人生就是一场冒险</div>
+              </div>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_04</div>
+                <div class="rel-bio">做自己喜欢的事，过自己想要的生活</div>
+              </div>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_05</div>
+                <div class="rel-bio"></div>
+              </div>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_06</div>
+                <div class="rel-bio"></div>
+              </div>
+            </div>
+          </div>
+          <div class="rel-footer-note">仅展示与你互相关注的人</div>
+        </div>
+        <!-- 关注列表 -->
+        <div class="profile-scroll rel-panel" id="rel-following" style="flex:1;overflow-y:auto;display:none;">
+          <div class="rel-section-title">我的关注（128 人）</div>
+          <div class="rel-list">
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_07</div>
+                <div class="rel-bio">手工烘焙达人，每天都有新配方</div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_08</div>
+                <div class="rel-bio">健身教练，带你科学塑形</div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_09</div>
+                <div class="rel-bio"></div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_10</div>
+                <div class="rel-bio">日系穿搭分享，简约即是美</div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_11</div>
+                <div class="rel-bio">独立音乐人，用旋律讲故事</div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_12</div>
+                <div class="rel-bio"></div>
+              </div>
+              <button class="rel-action-btn followed">已关注</button>
+            </div>
+          </div>
+        </div>
+        <!-- 粉丝列表 -->
+        <div class="profile-scroll rel-panel" id="rel-followers" style="flex:1;overflow-y:auto;display:none;">
+          <div class="rel-section-title">我的粉丝（3,421 人）</div>
+          <div class="rel-list">
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_13</div>
+                <div class="rel-bio">喜欢画画和弹吉他</div>
+              </div>
+              <button class="rel-action-btn mutual">互相关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_14</div>
+                <div class="rel-bio">程序员的日常碎碎念</div>
+              </div>
+              <button class="rel-action-btn followback">回关</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_15</div>
+                <div class="rel-bio"></div>
+              </div>
+              <button class="rel-action-btn followback">回关</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_16</div>
+                <div class="rel-bio">爱读书爱电影爱生活</div>
+              </div>
+              <button class="rel-action-btn followback">回关</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_17</div>
+                <div class="rel-bio">减肥第 365 天打卡中</div>
+              </div>
+              <button class="rel-action-btn mutual">互相关注</button>
+            </div>
+            <div class="rel-item">
+              <div class="rel-avatar">👤</div>
+              <div class="rel-body">
+                <div class="rel-name">用户昵称_18</div>
+                <div class="rel-bio"></div>
+              </div>
+              <button class="rel-action-btn followback">回关</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /devices-row -->
 
 <!-- Spec panel -->
@@ -1128,7 +1390,19 @@
   function toggleRewardDetail(card) {
     card.classList.toggle('expanded');
   }
+
+  function setRelTab(tab) {
+    const screen = document.getElementById('state-relations').querySelector('.mp-screen');
+    screen.querySelectorAll('.rel-nav-tab').forEach(t => t.classList.remove('active'));
+    screen.querySelectorAll('.rel-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+    const tabMap = { mutual: 0, following: 1, followers: 2 };
+    screen.querySelectorAll('.rel-nav-tab')[tabMap[tab]].classList.add('active');
+    const panel = document.getElementById('rel-' + tab);
+    panel.classList.add('active');
+    panel.style.display = 'flex';
+  }
 </script>
 
-</body>
-</html>
+
+
+</body></html>

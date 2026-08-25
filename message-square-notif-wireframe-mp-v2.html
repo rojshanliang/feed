@@ -197,6 +197,32 @@
   .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
   .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
 
+  /* ─── 新关注我的列表 ─────────────────────────────────────── */
+  .follower-list { flex: 1; display: flex; flex-direction: column; }
+  .follower-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px; border-bottom: 1px solid var(--border-soft);
+  }
+  .follower-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--wf-block-dark); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .follower-body { flex: 1; min-width: 0; }
+  .follower-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
+  .follower-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .follow-back-btn {
+    height: 28px; padding: 0 14px; flex-shrink: 0;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer;
+  }
+  .follow-back-btn.followed {
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+
   /* ─── 互动消息筛选面板 ──────────────────────────────────── */
   .msg-nav-tabs {
     display: flex; align-items: center; justify-content: center; gap: 24px;
@@ -272,6 +298,7 @@
 <div class="state-switcher" role="group">
   <button class="state-btn active" data-state="filter-open" onclick="setMsgState('filter-open')">① 筛选展开</button>
   <button class="state-btn" data-state="filter-closed" onclick="setMsgState('filter-closed')">② 默认（筛选收起）</button>
+  <button class="state-btn" data-state="followers" onclick="setMsgState('followers')">③ 新关注我的</button>
 </div>
 
 <!-- 行 1：消息列表 -->
@@ -305,11 +332,9 @@
         <div class="filter-backdrop open" onclick="closeFilter()"></div>
         <div class="filter-panel open">
           <div class="filter-item selected" onclick="selectFilter(this)"><span class="fi-icon">💬</span><span class="fi-label">全部消息</span><span class="fi-check">✓</span></div>
-          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">❤️</span><span class="fi-label">赞与打赏</span><span class="fi-check">✓</span></div>
-          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">@</span><span class="fi-label">提及</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">❤️</span><span class="fi-label">赞与浏览</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">💭</span><span class="fi-label">收到的评论</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">✏️</span><span class="fi-label">发出的评论</span><span class="fi-check">✓</span></div>
-          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">↩️</span><span class="fi-label">收到的回复</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">🎁</span><span class="fi-label">收到的打赏</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">📣</span><span class="fi-label">平台官方</span><span class="fi-check">✓</span></div>
         </div>
@@ -349,6 +374,22 @@
                   <span class="notif-time">6分钟</span>
                 </div>
                 <div class="notif-text unread">打赏了你的大舞台动态 <span class="gift-name">🧸 玩偶</span> ×1</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 浏览（逐条展示，不合并） -->
+            <div class="notif-item">
+              <div class="notif-icon like">👁</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <span class="notif-name">用户昵称_10</span>
+                  <span class="notif-time">10分钟</span>
+                </div>
+                <div class="notif-text unread">浏览了你的视频</div>
                 <div class="notif-meta">
                   <div class="notif-thumb"></div>
                 </div>
@@ -506,6 +547,93 @@
             <div class="empty-icon">🔔</div>
             <div class="empty-title">暂无消息</div>
             <div class="empty-desc">点赞、评论、关注等互动通知会在这里显示</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 新关注我的 -->
+  <div class="device-wrapper">
+    <div class="device-label">新关注我的</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-spacer"></div>
+          <div class="msg-nav-tabs">
+            <div class="msg-nav-tab">互动消息<span class="tab-arrow">▼</span></div>
+            <div class="msg-nav-tab active">新关注我的</div>
+          </div>
+          <div class="nav-spacer"></div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="follower-list">
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_11</div>
+                <div class="follower-time">刚刚</div>
+              </div>
+              <button class="follow-back-btn">回关</button>
+            </div>
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_12</div>
+                <div class="follower-time">5分钟前</div>
+              </div>
+              <button class="follow-back-btn">回关</button>
+            </div>
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_13</div>
+                <div class="follower-time">20分钟前</div>
+              </div>
+              <button class="follow-back-btn followed">已关注</button>
+            </div>
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_14</div>
+                <div class="follower-time">1小时前</div>
+              </div>
+              <button class="follow-back-btn">回关</button>
+            </div>
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_15</div>
+                <div class="follower-time">2小时前</div>
+              </div>
+              <button class="follow-back-btn">回关</button>
+            </div>
+
+            <div class="follower-item">
+              <div class="follower-avatar">👤</div>
+              <div class="follower-body">
+                <div class="follower-name">用户昵称_16</div>
+                <div class="follower-time">3小时前</div>
+              </div>
+              <button class="follow-back-btn followed">已关注</button>
+            </div>
+
           </div>
         </div>
 

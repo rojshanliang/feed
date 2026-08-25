@@ -509,6 +509,16 @@
     font-family: var(--font-mono); font-size: 8px; font-weight: 700;
     flex-shrink: 0; line-height: 1;
   }
+  .article-badge {
+    display: none;
+    align-items: center; justify-content: center;
+    height: 14px; padding: 0 5px; border-radius: 3px;
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.25);
+    font-family: var(--font-mono); font-size: 8px; font-weight: 600;
+    flex-shrink: 0; line-height: 1;
+  }
+  .state-imagetext .article-badge { display: inline-flex; }
   .video-title-line {
     font-size: 13px;
     color: rgba(255,255,255,0.9);
@@ -837,6 +847,78 @@
   }
   .multiimg-bottom-info .mi-tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .multiimg-bottom-info .mi-tag { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7); }
+
+  /* State: textcard (纯文字卡片) */
+  .state-textcard .textcard-overlay { display: flex; }
+  .state-textcard .video-bg { display: none; }
+  .state-textcard .right-bar { display: none; }
+  .state-textcard .bottom-info { display: none; }
+  .state-textcard .feed-tabs { display: none; }
+
+  /* ─── 纯文字卡片全屏 ──────────────────────────────── */
+  .textcard-overlay {
+    position: absolute; inset: 0; z-index: 35;
+    display: none; flex-direction: column;
+    background: linear-gradient(180deg, #a8d4f0 0%, #7eb8e0 100%);
+  }
+  .textcard-content { flex: 1; position: relative; overflow: hidden; }
+  .textcard-bubble {
+    position: absolute; top: 40px; left: 20px; right: 80px;
+    background: #fffff0; border-radius: 16px;
+    padding: 28px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .textcard-bubble::after {
+    content: ''; position: absolute; bottom: -10px; left: 30px;
+    width: 20px; height: 20px; background: #fffff0;
+    transform: rotate(45deg); border-radius: 3px;
+  }
+  .textcard-text {
+    font-family: var(--font-body); font-size: 28px; font-weight: 700;
+    color: #1a1a2e; line-height: 1.4;
+  }
+  /* 右侧互动栏 */
+  .textcard-right-bar {
+    position: absolute; right: 12px; bottom: 80px;
+    display: flex; flex-direction: column; gap: 20px; align-items: center;
+    z-index: 2;
+  }
+  .textcard-right-bar .right-bar-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+  .textcard-right-bar .rb-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; font-size: 20px; line-height: 1;
+  }
+  .textcard-right-bar .rb-avatar .rb-icon { background: var(--wf-block-dark); border: 2px solid white; font-size: 18px; }
+  .textcard-right-bar .rb-avatar .rb-icon::after {
+    content: '+'; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 16px; background: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--accent-on);
+    border: 1.5px solid rgba(13,17,23,0.8); line-height: 14px; text-align: center;
+  }
+  .textcard-right-bar .rb-count { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 500; }
+  /* 底部信息 */
+  .textcard-bottom-info {
+    position: absolute; left: 12px; bottom: 8px; right: 68px; z-index: 2;
+  }
+  .textcard-bottom-info .creator-line {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+  .textcard-bottom-info .creator-line .cr-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0;
+  }
+  .textcard-bottom-info .creator-line .cr-name {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+  }
+  .textcard-bottom-info .creator-line .cr-type {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    background: rgba(0,0,0,0.08); padding: 1px 6px; border-radius: 3px;
+  }
+  .textcard-bottom-info .tc-text {
+    font-size: 13px; color: var(--fg-2); line-height: 1.4;
+    font-family: var(--font-body);
+  }
   /* State: share */
   .state-share .share-sheet { display: flex; }
   /* State: location (mini-program only) */
@@ -1630,20 +1712,21 @@
 
 <div class="page-header">
   <h1>Feed 首页 — 线框图</h1>
-  <p>小程序 · 九态交互 · TikTok 风格 · 底Bar：推荐/大舞台/发布/消息/我的 · 顶Tab：关注/推荐</p>
+  <p>小程序 · 十态交互 · TikTok 风格 · 底Bar：推荐/大舞台/发布/消息/我的 · 顶Tab：关注/推荐</p>
 </div>
 
 <!-- State switcher -->
 <div class="state-switcher" role="group" aria-label="切换状态">
   <button class="state-btn active" data-state="play" onclick="setState('play')">① 短视频播放</button>
   <button class="state-btn" data-state="pause" onclick="setState('pause')">② 暂停</button>
-  <button class="state-btn" data-state="imagetext" onclick="setState('imagetext')">③ 单图文</button>
-  <button class="state-btn" data-state="article" onclick="setState('article')">④ 单图文详情</button>
-  <button class="state-btn" data-state="multiimg" onclick="setState('multiimg')">⑤ 多图</button>
-  <button class="state-btn" data-state="comments" onclick="setState('comments')">⑥ 评论展开</button>
-  <button class="state-btn" data-state="share" onclick="setState('share')">⑦ 分享弹窗</button>
-  <button class="state-btn" data-state="reward" onclick="setState('reward')">⑧ 打赏面板</button>
-  <button class="state-btn" data-state="gift" onclick="setState('gift')">⑨ 选择礼物</button>
+  <button class="state-btn" data-state="imagetext" onclick="setState('imagetext')">③ 单图文多字</button>
+  <button class="state-btn" data-state="article" onclick="setState('article')">④ 单图文多字详情</button>
+  <button class="state-btn" data-state="textcard" onclick="setState('textcard')">⑤ 图文</button>
+  <button class="state-btn" data-state="multiimg" onclick="setState('multiimg')">⑥ 多图</button>
+  <button class="state-btn" data-state="comments" onclick="setState('comments')">⑦ 评论展开</button>
+  <button class="state-btn" data-state="share" onclick="setState('share')">⑧ 分享弹窗</button>
+  <button class="state-btn" data-state="reward" onclick="setState('reward')">⑨ 打赏面板</button>
+  <button class="state-btn" data-state="gift" onclick="setState('gift')">⑩ 选择礼物</button>
 </div>
 
 <!-- Two devices side by side -->
@@ -1852,8 +1935,8 @@
             </div>
           </div>
           <div class="bottom-info">
-            <div class="creator-name">@创作者昵称<span class="recommend-badge">荐</span></div>
-            <div class="video-title-line">视频标题文字展示区域，最多展示两行内容<span class="video-tag">#话题标签</span><span class="video-tag">#热门话题</span></div>
+            <div class="creator-name">@创作者昵称<span class="recommend-badge">荐</span><span class="article-badge">文章</span></div>
+            <div class="video-title-line"><span class="video-tag">#话题标签</span><span class="video-tag">#热门话题</span></div>
           </div>
           <div class="comments-drawer">
             <div class="drawer-handle"></div>
@@ -2122,6 +2205,39 @@
             </div>
           </div>
 
+          <!-- 纯文字卡片覆盖层 -->
+          <div class="textcard-overlay">
+            <div class="textcard-content">
+              <!-- 文字气泡卡片 -->
+              <div class="textcard-bubble">
+                <div class="textcard-text">北京交友滴滴，想谈个近的，能天天见面的</div>
+              </div>
+              <!-- 右侧互动栏 -->
+              <div class="textcard-right-bar">
+                <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+                <div class="right-bar-item"><div class="rb-icon">♡</div><span class="rb-count">323</span></div>
+                <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+                  <div class="rb-icon">💬</div><span class="rb-count">2,190</span>
+                </div>
+                <div class="right-bar-item" onclick="setState('reward')" style="cursor:pointer">
+                  <div class="rb-icon">🎁</div><span class="rb-count">¥69</span>
+                </div>
+                <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+                  <div class="rb-icon">↗</div><span class="rb-count">24</span>
+                </div>
+              </div>
+              <!-- 底部创作者+正文 -->
+              <div class="textcard-bottom-info">
+                <div class="creator-line">
+                  <div class="cr-avatar"></div>
+                  <span class="cr-name">@创作者昵称</span>
+                  <span class="cr-type">📝 图文</span>
+                </div>
+                <div class="tc-text">北京交友滴滴，想谈个近的，能天天见面的</div>
+              </div>
+            </div>
+          </div>
+
           <!-- 多图全屏覆盖层 -->
           <div class="multiimg-overlay">
             <div class="multiimg-content">
@@ -2350,7 +2466,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">状态切换栏（八态，单图文详情前移至④）</span>
-    <span class="spec-val">短视频播放 → 暂停 → 单图文 → 单图文详情 → 多图 → 评论展开 → 分享弹窗 → 打赏面板 → 选择礼物；单图文详情紧跟在单图文之后，与「阅读文章」的跳转关系保持一致，其余顺序不变</span>
+    <span class="spec-val">短视频播放 → 暂停 → 单图文 → 单图文详情 → 纯文字卡片 → 多图 → 评论展开 → 分享弹窗 → 打赏面板 → 选择礼物；单图文详情紧跟在单图文之后，与「阅读文章」的跳转关系保持一致，其余顺序不变</span>
   </div>
 </div>
 
@@ -2359,7 +2475,7 @@
 
   function setState(state) {
     const el = document.getElementById('mp-screen');
-    el.classList.remove('state-pause', 'state-comments', 'state-share', 'state-reward', 'state-gift', 'state-imagetext', 'state-article', 'state-multiimg', 'state-location',
+    el.classList.remove('state-pause', 'state-comments', 'state-share', 'state-reward', 'state-gift', 'state-imagetext', 'state-article', 'state-textcard', 'state-multiimg', 'state-location',
                         'state-ob-gender', 'state-ob-age', 'state-ob-tags');
     if (state !== 'play') el.classList.add('state-' + state);
     document.querySelectorAll('.state-btn').forEach(btn => {
