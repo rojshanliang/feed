@@ -1139,55 +1139,56 @@
     gap: 16px;
   }
   .reward-avatar-wall {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 8px;
+    justify-items: center;
   }
   .reward-avatar-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    width: 56px;
+    gap: 4px;
   }
   .reward-avatar {
-    width: 48px; height: 48px;
+    width: 36px; height: 36px;
     border-radius: 50%;
     background: var(--wf-block-dark);
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
+    font-size: 16px;
     position: relative;
   }
+  .reward-avatar-item:nth-child(even) .reward-avatar { background: #7a8290; }
   .reward-crown {
     position: absolute;
-    top: -6px; right: -4px;
-    width: 20px; height: 20px;
+    top: -4px; right: -3px;
+    width: 16px; height: 16px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 11px;
-    box-shadow: 0 0 0 2px rgba(20,22,28,0.9);
+    font-size: 9px;
+    box-shadow: 0 0 0 1.5px rgba(20,22,28,0.9);
   }
   .reward-crown.gold   { background: #fde047; }
   .reward-crown.silver { background: #e5e7eb; }
   .reward-crown.bronze { background: #f0b27a; }
   .reward-level {
     position: absolute;
-    bottom: -8px; left: 50%;
+    bottom: -6px; left: 50%;
     transform: translateX(-50%);
-    display: flex; align-items: center; gap: 2px;
-    height: 16px; padding: 0 6px;
-    border-radius: 8px;
+    display: flex; align-items: center; gap: 1px;
+    height: 13px; padding: 0 4px;
+    border-radius: 7px;
     background: linear-gradient(135deg, #a855f7, #7c3aed);
-    box-shadow: 0 0 0 2px rgba(20,22,28,0.9);
+    box-shadow: 0 0 0 1.5px rgba(20,22,28,0.9);
     white-space: nowrap;
   }
   .reward-level .ic { font-size: 9px; line-height: 1; }
   .reward-level .lv { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: #fde68a; line-height: 1; }
   .reward-avatar-name {
     font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
-    max-width: 56px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    max-width: 48px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .reward-divider { height: 1px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
@@ -1219,6 +1220,17 @@
     font-family: var(--font-mono); font-size: 14px; font-weight: 600;
     cursor: pointer;
   }
+  .reward-hidden { display: none !important; }
+  .reward-expand-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 32px; margin: 8px 0;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-md); color: rgba(255,255,255,0.7);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    cursor: pointer;
+  }
+  .reward-expand-btn:hover { background: rgba(255,255,255,0.12); }
+  .reward-expand-btn.exhausted { color: rgba(255,255,255,0.3); cursor: default; border-color: rgba(255,255,255,0.08); }
   .state-reward .reward-sheet { display: flex; }
 
   /* ─── Gift picker (打赏中态) sheet — 参考截图，浅色卡片 ───── */
@@ -2104,46 +2116,68 @@
           <div class="reward-sheet">
             <div class="drawer-handle"></div>
             <div class="drawer-header">
-              <div><div class="drawer-title">🎁 4 人打赏，共 ¥96</div></div>
+              <div><div class="drawer-title">🎁 32 人打赏，共 ¥1,280</div></div>
               <div class="drawer-close" onclick="setState('play')">×</div>
             </div>
             <div class="reward-body">
-              <div class="reward-avatar-wall">
-                <div class="reward-avatar-item">
-                  <div class="reward-avatar">👤
-                    <span class="reward-crown gold">👑</span>
-                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">45</span></span>
-                  </div>
-                  <span class="reward-avatar-name">Lucy</span>
-                </div>
-                <div class="reward-avatar-item">
-                  <div class="reward-avatar">👤
-                    <span class="reward-crown silver">👑</span>
-                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">33</span></span>
-                  </div>
-                  <span class="reward-avatar-name">阿伟</span>
-                </div>
-                <div class="reward-avatar-item">
-                  <div class="reward-avatar">👤
-                    <span class="reward-crown bronze">👑</span>
-                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">19</span></span>
-                  </div>
-                  <span class="reward-avatar-name">小美</span>
-                </div>
-                <div class="reward-avatar-item">
-                  <div class="reward-avatar">👤
-                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">8</span></span>
-                  </div>
-                  <span class="reward-avatar-name">你</span>
-                </div>
+              <!-- 打赏人头像墙（超过4行=24个时折叠，点击展开4行） -->
+              <div class="reward-avatar-wall reward-paged-wall" data-batch="20">
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-crown gold">👑</span><span class="reward-level"><span class="ic">🏆</span><span class="lv">45</span></span></div><span class="reward-avatar-name">Lucy</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-crown silver">👑</span><span class="reward-level"><span class="ic">🏆</span><span class="lv">33</span></span></div><span class="reward-avatar-name">阿伟</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-crown bronze">👑</span><span class="reward-level"><span class="ic">🏆</span><span class="lv">19</span></span></div><span class="reward-avatar-name">小美</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">8</span></span></div><span class="reward-avatar-name">你</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">12</span></span></div><span class="reward-avatar-name">用户A</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">6</span></span></div><span class="reward-avatar-name">用户B</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">5</span></span></div><span class="reward-avatar-name">用户C</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">3</span></span></div><span class="reward-avatar-name">用户D</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">2</span></span></div><span class="reward-avatar-name">用户E</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">2</span></span></div><span class="reward-avatar-name">用户F</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">15</span></span></div><span class="reward-avatar-name">用户G</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">11</span></span></div><span class="reward-avatar-name">用户H</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">9</span></span></div><span class="reward-avatar-name">用户I</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">7</span></span></div><span class="reward-avatar-name">用户J</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">22</span></span></div><span class="reward-avatar-name">用户K</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">4</span></span></div><span class="reward-avatar-name">用户L</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">18</span></span></div><span class="reward-avatar-name">用户M</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">6</span></span></div><span class="reward-avatar-name">用户N</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">13</span></span></div><span class="reward-avatar-name">用户O</span></div>
+                <div class="reward-avatar-item"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">3</span></span></div><span class="reward-avatar-name">用户P</span></div>
+                <!-- 以下超过20个（4行×5个/行），默认隐藏 -->
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">10</span></span></div><span class="reward-avatar-name">用户Q</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">8</span></span></div><span class="reward-avatar-name">用户R</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">16</span></span></div><span class="reward-avatar-name">用户S</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">5</span></span></div><span class="reward-avatar-name">用户T</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">14</span></span></div><span class="reward-avatar-name">用户U</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">7</span></span></div><span class="reward-avatar-name">用户V</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">20</span></span></div><span class="reward-avatar-name">用户W</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">2</span></span></div><span class="reward-avatar-name">用户X</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">11</span></span></div><span class="reward-avatar-name">用户Y</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">9</span></span></div><span class="reward-avatar-name">用户Z</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">4</span></span></div><span class="reward-avatar-name">用户AA</span></div>
+                <div class="reward-avatar-item reward-hidden"><div class="reward-avatar">👤<span class="reward-level"><span class="ic">🏆</span><span class="lv">6</span></span></div><span class="reward-avatar-name">用户AB</span></div>
               </div>
+              <button class="reward-expand-btn" onclick="expandRewardSection(this)">展开更多（4 行）</button>
               <div class="reward-divider"></div>
-              <div class="reward-gift-list">
-                <div class="reward-gift-chip"><span class="reward-gift-icon">👑</span><span class="reward-gift-name">皇冠</span><span class="reward-gift-count">×1</span></div>
-                <div class="reward-gift-chip"><span class="reward-gift-icon">🚀</span><span class="reward-gift-name">火箭</span><span class="reward-gift-count">×2</span></div>
-                <div class="reward-gift-chip"><span class="reward-gift-icon">🧸</span><span class="reward-gift-name">玩偶</span><span class="reward-gift-count">×1</span></div>
-                <div class="reward-gift-chip"><span class="reward-gift-icon">🎈</span><span class="reward-gift-name">气球</span><span class="reward-gift-count">×1</span></div>
+              <!-- 礼物聚合列表（超过4行折叠，同理） -->
+              <div class="reward-gift-list reward-paged-wall" data-batch="12">
+                <div class="reward-gift-chip"><span class="reward-gift-icon">👑</span><span class="reward-gift-name">皇冠</span><span class="reward-gift-count">×3</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🚀</span><span class="reward-gift-name">火箭</span><span class="reward-gift-count">×5</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🧸</span><span class="reward-gift-name">玩偶</span><span class="reward-gift-count">×4</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🎈</span><span class="reward-gift-name">气球</span><span class="reward-gift-count">×8</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🌹</span><span class="reward-gift-name">玫瑰</span><span class="reward-gift-count">×12</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🍰</span><span class="reward-gift-name">蛋糕</span><span class="reward-gift-count">×2</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">💎</span><span class="reward-gift-name">钻戒</span><span class="reward-gift-count">×1</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🏰</span><span class="reward-gift-name">城堡</span><span class="reward-gift-count">×1</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🎉</span><span class="reward-gift-name">派对</span><span class="reward-gift-count">×3</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🧧</span><span class="reward-gift-name">红包</span><span class="reward-gift-count">×6</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🎆</span><span class="reward-gift-name">烟花</span><span class="reward-gift-count">×2</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🎀</span><span class="reward-gift-name">彩带</span><span class="reward-gift-count">×4</span></div>
+                <!-- 以下超过4行，默认隐藏 -->
+                <div class="reward-gift-chip reward-hidden"><span class="reward-gift-icon">💐</span><span class="reward-gift-name">花束</span><span class="reward-gift-count">×2</span></div>
+                <div class="reward-gift-chip reward-hidden"><span class="reward-gift-icon">🎁</span><span class="reward-gift-name">礼盒</span><span class="reward-gift-count">×1</span></div>
+                <div class="reward-gift-chip reward-hidden"><span class="reward-gift-icon">🍭</span><span class="reward-gift-name">棒棒糖</span><span class="reward-gift-count">×5</span></div>
               </div>
+              <button class="reward-expand-btn" onclick="expandRewardSection(this)">展开更多（4 行）</button>
             </div>
             <div class="reward-footer">
               <button class="reward-confirm-btn" onclick="setState('gift')">打赏</button>
@@ -2672,6 +2706,26 @@
     cardEl.classList.add('selected');
     sheet.querySelector('#gift-confirm-icon').textContent = cardEl.querySelector('.gift-icon').textContent;
     sheet.querySelector('#gift-confirm-name').textContent = cardEl.querySelector('.gift-name').textContent;
+  }
+
+  function expandRewardSection(btn) {
+    const wall = btn.previousElementSibling;
+    if (wall.classList.contains('reward-divider')) return;
+    const hidden = wall.querySelectorAll('.reward-hidden');
+    const batch = parseInt(wall.dataset.batch) || 24;
+    let revealed = 0;
+    hidden.forEach(item => {
+      if (revealed < batch) {
+        item.classList.remove('reward-hidden');
+        revealed++;
+      }
+    });
+    const remaining = wall.querySelectorAll('.reward-hidden').length;
+    if (remaining === 0) {
+      btn.textContent = '已展开全部 ✓';
+      btn.classList.add('exhausted');
+      btn.onclick = null;
+    }
   }
 
   function copyFeedLink() {
