@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人页 / 创作者页 — 线框图（小程序·改版）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-pill: 9999px;
+    --motion-fast: 120ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 600; color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 13px; color: var(--muted); margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ─── State switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all var(--motion-fast) var(--ease-standard);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  /* ─── Device wrapper ──────────────────────────────────────── */
+  .device-wrapper {
+    display: none; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .device-wrapper.active { display: flex; }
+  .device-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px;
+    background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 24px 64px rgba(0,0,0,0.35),
+      0 8px 20px rgba(0,0,0,0.2);
+    position: relative; flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%;
+    background: #ffffff;
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; background: white; border-radius: 50%;
+  }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before {
+    content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0;
+  }
+  .battery-icon::after {
+    content: ''; position: absolute; top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px;
+  }
+
+  /* ─── Nav bar ─────────────────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .mp-nav-back {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+    padding-bottom: 1px;
+  }
+  .mp-nav-title {
+    flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+  .mp-nav-share {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--fg); cursor: pointer;
+    position: relative;
+  }
+
+  /* 消息入口未读角标【尝试，新增】：红色圆形数字角标，贴在个人页 NavBar 消息（✉）图标右上角，
+     提示当前有未读消息（示例值 12） */
+  .msg-unread-badge {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px;
+    background: #dc2626; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 700; line-height: 1;
+    box-shadow: 0 0 0 1.5px #ffffff;
+  }
+
+  /* ─── Scrollable profile content ─────────────────────────── */
+  .profile-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Cover + avatar header ───────────────────────────────── */
+  .profile-cover {
+    width: 100%; height: 120px;
+    background: var(--wf-block);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+  .profile-cover-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.05em;
+  }
+  .profile-avatar-wrap {
+    position: absolute;
+    bottom: -30px; left: 16px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    border: 3px solid #ffffff;
+    z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  /* ─── Profile info section ────────────────────────────────── */
+  .profile-info {
+    padding: 36px 16px 0;
+    background: #ffffff;
+  }
+  .profile-name {
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); margin-bottom: 2px;
+  }
+  .profile-handle {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .profile-bio {
+    font-size: 13px; color: var(--fg-2); line-height: 1.5;
+    margin-bottom: 14px; font-family: var(--font-body);
+  }
+
+  /* ─── Stats row ───────────────────────────────────────────── */
+  .stats-row {
+    display: flex;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+  .stat-item {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0;
+    border-right: 1px solid var(--border-soft);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+    color: var(--fg); line-height: 1;
+  }
+  .stat-lbl {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-top: 3px; letter-spacing: 0.02em;
+  }
+
+  /* ─── 打赏额度卡：七日/总打赏额度 ─────────────────────────── */
+  .reward-card {
+    margin: 14px 0 0;
+    padding: 12px 0;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex; flex-direction: column; align-items: stretch;
+  }
+  .reward-stat {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    border-right: 1px solid var(--border-soft);
+  }
+  .reward-stat:last-child { border-right: none; }
+  .reward-stat-lbl {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 0.02em; margin-bottom: 3px;
+  }
+  .reward-stat-num {
+    display: flex; align-items: baseline; gap: 3px; line-height: 1;
+  }
+  .reward-stat-num .amt {
+    font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+    color: var(--fg);
+  }
+
+  /* ─── 打赏额度卡展开态：点击卡片展开礼物明细 ─────────────── */
+  .reward-card { cursor: pointer; }
+  .reward-card-top { display: flex; align-items: center; width: 100%; }
+  .reward-card-toggle {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    text-align: center; padding: 6px 0 2px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .reward-card-toggle .arrow { font-size: 8px; transition: transform 150ms; }
+  .reward-card.expanded .reward-card-toggle .arrow { transform: rotate(180deg); }
+  .reward-detail-panel {
+    display: none; width: 100%; padding: 10px 14px 4px;
+    border-top: 1px solid var(--border-soft); margin-top: 8px;
+  }
+  .reward-card.expanded .reward-detail-panel { display: block; }
+  .reward-detail-title {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-bottom: 8px; letter-spacing: 0.02em;
+  }
+  .reward-detail-list {
+    display: flex; flex-wrap: wrap; gap: 10px 12px;
+    max-height: 96px; overflow-y: auto;
+  }
+  .reward-detail-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 11px; color: var(--fg-2);
+    background: var(--border-soft); border-radius: var(--radius-sm);
+    padding: 6px 10px 6px 6px;
+  }
+  .reward-detail-icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
+  .reward-detail-count { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 600; }
+  .reward-detail-name { display: none; }
+  .reward-detail-amount { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-left: 2px; }
+
+  /* ─── Action buttons ──────────────────────────────────────── */
+  .profile-actions {
+    padding: 14px 0 0;
+    display: flex; gap: 8px;
+  }
+  .btn-follow {
+    flex: 1; height: 36px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-md); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .btn-icon {
+    width: 36px; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ─── Divider between profile-info and content ────────────── */
+  .section-gap {
+    height: 8px; background: var(--border-soft); flex-shrink: 0;
+  }
+
+  /* ─── Content Tab (视频 / 图文) ────────────────────────────── */
+  .content-tabs {
+    display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .content-tab {
+    flex: 1; text-align: center; padding: 11px 0;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative;
+  }
+  .content-tab.active { color: var(--fg); font-weight: 600; }
+  .content-tab.active::after {
+    content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Content panels ──────────────────────────────────────── */
+  .content-panel { display: none; background: #ffffff; flex: 1; }
+  .content-panel.active { display: block; }
+
+  .content-section { padding: 14px 16px 16px; }
+  .content-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .content-title {
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.04em;
+  }
+  .content-count {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  }
+
+  /* 3-column video grid */
+  .video-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .video-thumb {
+    aspect-ratio: 9/16;
+    background: var(--wf-block);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .video-thumb::after {
+    content: '';
+  }
+  .video-thumb:nth-child(3n+2) { background: #c8ccd2; }
+
+  /* ─── 缩略图类型角标：区分视频(▶)和图文(📖) ──────────── */
+  .thumb-type-icon {
+    position: absolute; bottom: 4px; right: 4px;
+    font-size: 10px; color: #ffffff;
+    background: rgba(13,17,23,0.6); padding: 1px 4px;
+    border-radius: 3px; line-height: 1.3;
+    z-index: 2;
+  }
+  .thumb-type-icon.img-icon { font-size: 9px; }
+  .thumb-pin-icon {
+    position: absolute; top: 4px; left: 4px;
+    font-size: 9px; line-height: 1;
+    background: rgba(13,17,23,0.6); color: #fff;
+    padding: 2px 4px; border-radius: 3px; z-index: 2;
+  }
+
+  .video-thumb:nth-child(3n+3) { background: #b8bcc4; }
+
+  /* ─── 大舞台 Tab：仿照微信「相册时光轴」方式展示（见参考图 image-16.png）——
+       顶部按年份分组吸顶标题 + 左侧日期角标 + 小尺寸缩略图 + 右侧截断文字，整条整行可点击，
+       点击后跳转至动态详情页（另一独立页面，本图未展示）；
+       不展示头像/昵称/点赞评论打赏摘要/「···」菜单，全部移至动态详情页展示 ────── */
+  .moment-list { display: flex; flex-direction: column; }
+
+  /* 年份分组标题：吸顶展示「YYYY年 ⌄」，跨年时新起一组，与参考图一致 */
+  .moment-year-header {
+    display: flex; align-items: center; gap: 4px;
+    padding: 10px 16px; background: var(--border-soft);
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg-2);
+  }
+  .moment-year-header .caret { font-size: 10px; color: var(--muted); }
+
+  .moment-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px; border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+  }
+  .moment-item:last-child { border-bottom: none; }
+
+  /* 左侧日期角标：日期数字大字号 + 月份小字号上标，仿参考图排版；
+     同一天连续发布多条时，第 2 条起日期角标留空占位、不重复展示日期数字（与参考图一致） */
+  .moment-date-badge {
+    flex-shrink: 0; width: 40px;
+    display: flex; align-items: baseline; justify-content: flex-start; gap: 1px;
+    font-family: var(--font-display); color: var(--fg);
+  }
+  .moment-date-badge .day { font-size: 22px; font-weight: 700; line-height: 1; }
+  .moment-date-badge .month { font-size: 11px; font-weight: 500; color: var(--muted); }
+  .moment-item.same-day .moment-date-badge { visibility: hidden; }
+
+  /* 缩略图：正方形小图，纯文字动态无缩略图时该位不占位；
+     单图/单视频为单格填满；多图（2~9 张，图片最多 9 张）按大方块切分规则拆成对应数量的小方块，
+     而非仅叠加数字角标——切分规则见下方 .moment-thumb.imgs-N */
+  .moment-thumb {
+    flex-shrink: 0; width: 64px; height: 64px; border-radius: 4px;
+    background: var(--wf-block);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .moment-thumb.video::after { content: '▶'; font-size: 15px; color: rgba(255,255,255,0.6); }
+  /* 时长角标：仅用于单视频缩略图右下角，多图缩略图改用下方方块拆分展示数量，不再叠加数字角标 */
+  .moment-thumb-badge {
+    position: absolute; bottom: 2px; right: 2px;
+    background: rgba(13,17,23,0.6); color: #fff;
+    font-family: var(--font-mono); font-size: 8px; font-weight: 500;
+    padding: 1px 4px; border-radius: 3px; line-height: 1.3;
+  }
+
+  /* 多图缩略图拆分（见参考图 image-17.png 的 9 图铺满示例、image-20.png 的 6 图示例）——
+     把 64×64 的大方块按数量拆成对应的小方块，而非等比例缩略图拼贴：
+     2 张：左右两栅等分；3 张：左侧 1 张竖图占满整高，右侧 2 张上下堆叠；
+     4 张：四宫格平分；5 张：2 行 × 3 列网格（末位留空）；
+     6 张：左侧 1 张大图占满左上 2×2，右上 2 张小图上下堆叠，底部 3 张小图横排一行（与参考图一致，非等分网格）；
+     7～9 张：3 行 × 3 列网格（不足按顺序填充，9 张时铺满，与参考图一致），以此类推 */
+  .moment-thumb.imgs-2,
+  .moment-thumb.imgs-3,
+  .moment-thumb.imgs-4,
+  .moment-thumb.imgs-5,
+  .moment-thumb.imgs-6,
+  .moment-thumb.imgs-7,
+  .moment-thumb.imgs-8,
+  .moment-thumb.imgs-9 {
+    display: grid; align-items: stretch; justify-content: stretch;
+    gap: 1px; background: var(--border-soft);
+  }
+  .moment-thumb.imgs-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+  .moment-thumb.imgs-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .moment-thumb.imgs-3 .thumb-cell:first-child { grid-row: 1 / 3; }
+  .moment-thumb.imgs-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  /* 5~6张：大图占左上2×2 + 小图环绕，风格趋同 */
+  .moment-thumb.imgs-5,
+  .moment-thumb.imgs-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+  .moment-thumb.imgs-5 .thumb-cell:nth-child(1),
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; }
+  .moment-thumb.imgs-5 .thumb-cell:nth-child(2),
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+  .moment-thumb.imgs-5 .thumb-cell:nth-child(3),
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 2; }
+  .moment-thumb.imgs-5 .thumb-cell:nth-child(4),
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+  .moment-thumb.imgs-5 .thumb-cell:nth-child(5),
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(5) { grid-column: 2; grid-row: 3; }
+  .moment-thumb.imgs-6 .thumb-cell:nth-child(6) { grid-column: 3; grid-row: 3; }
+  /* 7张：左侧2张竖图（各跨2行），右侧+底部5个小格 —— 3列×3行 */
+  .moment-thumb.imgs-7 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(1) { grid-column: 1; grid-row: 1 / 3; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(2) { grid-column: 2; grid-row: 1 / 3; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 1; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(4) { grid-column: 3; grid-row: 2; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(5) { grid-column: 1; grid-row: 3; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(6) { grid-column: 2; grid-row: 3; }
+  .moment-thumb.imgs-7 .thumb-cell:nth-child(7) { grid-column: 3; grid-row: 3; }
+  /* 8张：左侧1张竖图（跨2行），其余7个小格填充 —— 3列×3行 */
+  .moment-thumb.imgs-8 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(1) { grid-column: 1; grid-row: 1 / 3; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(2) { grid-column: 2; grid-row: 1; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 1; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(4) { grid-column: 2; grid-row: 2; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(5) { grid-column: 3; grid-row: 2; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(6) { grid-column: 1; grid-row: 3; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(7) { grid-column: 2; grid-row: 3; }
+  .moment-thumb.imgs-8 .thumb-cell:nth-child(8) { grid-column: 3; grid-row: 3; }
+  /* 9张：纯3×3均分铺满 */
+  .moment-thumb.imgs-9 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+  .thumb-cell { background: var(--wf-block); }
+  .thumb-cell:nth-child(even) { background: var(--wf-block-dark); }
+
+  .moment-body { flex: 1; min-width: 0; display: flex; align-items: center; }
+  .moment-text {
+    font-size: 13px; color: var(--fg); line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px 18px;
+  }
+  .spec-panel h3 {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em;
+  }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge {
+    display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent);
+    color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    padding: 1px 7px; border-radius: 3px; margin-right: 3px;
+  }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>个人页 / 创作者页 — 打赏额度模块线框图</h1>
+  <p>小程序 · 新增打赏额度卡（七日 / 总打赏额度）· 去除编辑个人资料按钮 · 去除分享入口 · 大舞台 Tab 仿照微信「相册时光轴」方式展示（日期角标 + 缩略图 + 截断文字），点击卡片跳转至动态详情页（另一页面，本图未展示）· 个人页消息入口常驻未读角标</p>
+</div>
+
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="profile" onclick="setState('profile')">① 个人页</button>
+  <button class="state-btn" data-state="creator" onclick="setState('creator')">② 创作者页</button>
+</div>
+
+<div class="devices-row">
+
+  <!-- 个人页 · 小程序 -->
+  <div class="device-wrapper active" id="state-profile">
+    <div class="device-label">① 个人页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">我的</div>
+          <div style="width:28px;height:28px;flex-shrink:0;"></div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">个人页头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">用户昵称</div>
+            <div class="profile-handle">@username_unique</div>
+            <div class="profile-bio">这里是个人简介，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">128</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">3,421</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">56</span><span class="stat-lbl">内容</span></div>
+            </div>
+
+            <!-- 打赏额度卡：点击展开/收起礼物明细 -->
+            <div class="reward-card expanded" onclick="toggleRewardDetail(this)">
+              <div class="reward-card-top">
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">七日打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">86.00</span></span>
+                </div>
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">总打赏额度</span>
+                  <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
+                </div>
+              </div>
+              <div class="reward-card-toggle"><span>礼物明细</span><span class="arrow">▾</span></div>
+              <div class="reward-detail-panel">
+                <div class="reward-detail-list">
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🌹</span>
+                    <span class="reward-detail-name">玫瑰</span>
+                    <span class="reward-detail-count">×32</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎈</span>
+                    <span class="reward-detail-name">气球</span>
+                    <span class="reward-detail-count">×18</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧸</span>
+                    <span class="reward-detail-name">玩偶</span>
+                    <span class="reward-detail-count">×8</span>
+                    <span class="reward-detail-amount">¥40</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🚀</span>
+                    <span class="reward-detail-name">火箭</span>
+                    <span class="reward-detail-count">×3</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">👑</span>
+                    <span class="reward-detail-name">皇冠</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥52</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🍰</span>
+                    <span class="reward-detail-name">蛋糕</span>
+                    <span class="reward-detail-count">×5</span>
+                    <span class="reward-detail-amount">¥30</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🏰</span>
+                    <span class="reward-detail-name">城堡</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥99</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">💎</span>
+                    <span class="reward-detail-name">钻戒</span>
+                    <span class="reward-detail-count">×2</span>
+                    <span class="reward-detail-amount">¥56</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎉</span>
+                    <span class="reward-detail-name">派对</span>
+                    <span class="reward-detail-count">×4</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧧</span>
+                    <span class="reward-detail-name">红包</span>
+                    <span class="reward-detail-count">×6</span>
+                    <span class="reward-detail-amount">¥90</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+
+          <!-- 内容 Tab：默认停在「大舞台」，方便直接查看仿朋友圈样式改版 -->
+          <div class="content-tabs">
+            <div class="content-tab" data-target="profile-content" onclick="setContentTab(this, 'profile')">内容</div>
+            <div class="content-tab active" data-target="profile-square" onclick="setContentTab(this, 'profile')">大舞台</div>
+          </div>
+
+          <!-- 内容面板（视频+图文混合，用 icon 区分类型） -->
+          <div class="content-panel" id="profile-content">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">全部内容</span><span class="content-count">共 56 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-pin-icon">📌</span><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 大舞台面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
+               点击后跳转至动态详情页（另一独立页面，本图未展示）；
+               示例覆盖：纯文字 / 单图 / 多图（最多 9 张）/ 单视频 四种内容形式，
+               外加同一天发布多条（日期角标不重复）、跨月、跨年三种时间场景 -->
+          <div class="content-panel active" id="profile-square">
+            <div class="moment-list">
+
+              <div class="moment-year-header">2026年<span class="caret">⌄</span></div>
+
+              <!-- 同一天发布的第 1 条：纯文字，无缩略图 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">25</span><span class="month">7月</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情</div>
+                </div>
+              </div>
+
+              <!-- 同一天发布的第 2 条：单图+文字，日期角标留空（不重复展示 25 7月） -->
+              <div class="moment-item same-day" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">25</span><span class="month">7月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">摆摊收摊后拍的夜景，今天人挺多</div>
+                </div>
+              </div>
+
+              <!-- 2 张图：大方块左右两栅等分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">20</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-2"><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">两张对比图，装修前后差别挺大</div>
+                </div>
+              </div>
+
+              <!-- 3 张图：左侧 1 张竖图占满整高，右侧 2 张上下堆叠 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">18</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-3"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末爬山拍的三张，山顶风景真不错</div>
+                </div>
+              </div>
+
+              <!-- 4 张图：四宫格平分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">16</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-4"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末拍的一组图，分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 5 张图：2 行 × 3 列网格，最后一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">14</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-5"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">路边随手拍的五张小景</div>
+                </div>
+              </div>
+
+              <!-- 6 张图：2 行 × 3 列网格，正好铺满 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">12</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-6"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">今天摆摊的六张现场照片</div>
+                </div>
+              </div>
+
+              <!-- 7 张图：3 行 × 3 列网格，末尾两格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">10</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-7"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">这周拍的七张随手照</div>
+                </div>
+              </div>
+
+              <!-- 8 张图：3 行 × 3 列网格，末尾一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">09</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-8"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">摆摊一天拍了八张记录</div>
+                </div>
+              </div>
+
+              <!-- 跨月：从 7 月回退到 6 月，仍在 2026 年内 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">15</span><span class="month">6月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末拍的一张图，分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 单视频，带时长角标 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">08</span><span class="month">6月</span></div>
+                <div class="moment-thumb video"><span class="moment-thumb-badge">00:32</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">随手拍的一个小视频</div>
+                </div>
+              </div>
+
+              <!-- 跨年：新起一个「2025年」分组标题，与上方「2026年」区隔；9 张图（数量上限）：3 行 × 3 列铺满 -->
+              <div class="moment-year-header">2025年<span class="caret">⌄</span></div>
+
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">31</span><span class="month">12月</span></div>
+                <div class="moment-thumb imgs-9"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">跨年夜的最后一条动态，九张图记录这一年</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 创作者页 · 小程序 -->
+  <div class="device-wrapper" id="state-creator">
+    <div class="device-label">② 创作者页 · 小程序</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <div class="mp-nav-back">‹</div>
+          <div class="mp-nav-title">创作者</div>
+          <div style="width:28px;height:28px;flex-shrink:0;"></div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">创作者头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">创作者昵称</div>
+            <div class="profile-handle">@creator_handle</div>
+            <div class="profile-bio">创作者简介文字，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">256</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">8.6w</span><span class="stat-lbl">粉丝</span></div>
+              <div class="stat-item"><span class="stat-num">120w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">203</span><span class="stat-lbl">内容</span></div>
+            </div>
+
+            <!-- 打赏额度卡（新增） -->
+            <div class="reward-card">
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">七日打赏额度</span>
+                <span class="reward-stat-num"><span class="amt">3,280.00</span></span>
+              </div>
+              <div class="reward-stat">
+                <span class="reward-stat-lbl">总打赏额度</span>
+                <span class="reward-stat-num"><span class="amt">86,450.00</span></span>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="btn-follow">+ 关注</button>
+            </div>
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+
+          <!-- 内容 Tab：默认停在「大舞台」，方便直接查看仿朋友圈样式改版 -->
+          <div class="content-tabs">
+            <div class="content-tab" data-target="creator-content" onclick="setContentTab(this, 'creator')">内容</div>
+            <div class="content-tab active" data-target="creator-square" onclick="setContentTab(this, 'creator')">大舞台</div>
+          </div>
+
+          <!-- 内容面板（视频+图文混合，用 icon 区分类型） -->
+          <div class="content-panel" id="creator-content">
+            <div class="content-section">
+              <div class="content-header"><span class="content-title">全部内容</span><span class="content-count">共 203 条</span></div>
+              <div class="video-grid">
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 大舞台面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
+               点击后跳转至动态详情页（另一独立页面，本图未展示）；
+               示例覆盖：纯文字 / 单图 / 多图（最多 9 张）/ 单视频 四种内容形式，
+               外加同一天发布多条（日期角标不重复）、跨月、跨年三种时间场景 -->
+          <div class="content-panel active" id="creator-square">
+            <div class="moment-list">
+
+              <div class="moment-year-header">2026年<span class="caret">⌄</span></div>
+
+              <!-- 同一天发布的第 1 条：纯文字，无缩略图 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">24</span><span class="month">7月</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">感谢大家一路支持，新一期内容正在准备中，敬请期待</div>
+                </div>
+              </div>
+
+              <!-- 同一天发布的第 2 条：单图+文字，日期角标留空（不重复展示 24 7月） -->
+              <div class="moment-item same-day" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">24</span><span class="month">7月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">今天直播加更，感谢大家陪伴</div>
+                </div>
+              </div>
+
+              <!-- 2 张图：大方块左右两栅等分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">01</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-2"><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">直播间改版前后对比</div>
+                </div>
+              </div>
+
+              <!-- 3 张图：左侧 1 张竖图占满整高，右侧 2 张上下堆叠 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">28</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-3"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">这次线下见面会花絮三连拍</div>
+                </div>
+              </div>
+
+              <!-- 4 张图：四宫格平分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">26</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-4"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">幕后花絮分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 5 张图：2 行 × 3 列网格，最后一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">15</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-5"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">直播间布置花絮五连拍</div>
+                </div>
+              </div>
+
+              <!-- 6 张图：2 行 × 3 列网格，正好铺满 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">13</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-6"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">这次活动现场六张实拍</div>
+                </div>
+              </div>
+
+              <!-- 7 张图：3 行 × 3 列网格，末尾两格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">11</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-7"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">签售会花絮七张合集</div>
+                </div>
+              </div>
+
+              <!-- 8 张图：3 行 × 3 列网格，末尾一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">05</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-8"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">拍摄花絮八张连发</div>
+                </div>
+              </div>
+
+              <!-- 跨月：从 7 月回退到 6 月，仍在 2026 年内 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">23</span><span class="month">6月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">幕后花絮分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 单视频，带时长角标 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">20</span><span class="month">6月</span></div>
+                <div class="moment-thumb video"><span class="moment-thumb-badge">01:05</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">拍摄花絮小片段</div>
+                </div>
+              </div>
+
+              <!-- 跨年：新起一个「2025年」分组标题，与上方「2026年」区隔；9 张图（数量上限）：3 行 × 3 列铺满 -->
+              <div class="moment-year-header">2025年<span class="caret">⌄</span></div>
+
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">31</span><span class="month">12月</span></div>
+                <div class="moment-thumb imgs-9"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">2025 年最后一场直播回顾，感谢全年陪伴</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec panel -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 打赏额度模块结构说明（个人页 / 创作者页）</h3>
+  <div class="spec-row">
+    <span class="spec-key">打赏额度卡</span>
+    <span class="spec-val">位于数据四格（关注/粉丝/获赞/内容）下方、操作按钮上方 · 独立卡片，1px 描边 + 6px 圆角</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">数据展示</span>
+    <span class="spec-val"><span class="spec-badge">七日打赏额度</span><span class="spec-badge">总打赏额度</span> 两项并列，金额用等宽数字（IBM Plex Mono），不带货币符号（打赏为虚拟礼物，非真实货币）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">不重复展示</span>
+    <span class="spec-val">页面本身已展示头像与昵称，打赏卡内不再重复出现创作者信息</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">适用范围</span>
+    <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，数值随粉丝量级同比放大</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">与原页面差异</span>
+    <span class="spec-val">在 profile-content-tab-wireframe-mp.html 基础上新增本模块，其余结构保持一致；个人页移除「编辑个人资料」按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">分享入口（已移除）</span>
+    <span class="spec-val">个人页 NavBar 右上角、创作者页 NavBar 右上角、创作者页「+关注」按钮旁均移除原有分享（↗）图标；个人页保留消息（✉）与设置（⚙）入口，创作者页 NavBar 右侧改为等宽占位以保持标题居中</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">消息入口未读角标</span>
+    <span class="spec-val">个人页 NavBar 消息（✉）图标右上角常驻叠加红色圆形数字角标，提示未读消息数（示例值 12）；角标随未读数增减实时更新，全部查看后消失；已直接采纳进①态，不再单独拆分状态验证</span>
+  </div>
+</div>
+
+<!-- Spec panel · 大舞台 Tab -->
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 大舞台 Tab 结构说明（个人页 / 创作者页）</h3>
+  <div class="spec-row">
+    <span class="spec-key">Tab 位置</span>
+    <span class="spec-val">内容 Tab 由「视频 / 图文」扩展为「视频 / 图文 / 大舞台」三个 Tab，大舞台为第三项</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">卡片样式（仿照微信「相册时光轴」，本次核心变更）</span>
+    <span class="spec-val">改为单列时光轴样式：左侧日期角标（日期大字号 + 月份小字号）+ 中间小尺寸缩略图（纯文字动态无缩略图）+ 右侧纯文案摘要（最多 3 行截断，仅展示动态正文，不展示点赞/打赏/评论数量）；不再展示头像、昵称、图片九宫格、视频竖版大图、「···」互动菜单、点赞打赏评论摘要信息条、右侧指向箭头</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">动态形式</span>
+    <span class="spec-val"><span class="spec-badge">纯文字</span><span class="spec-badge">单图+文字</span><span class="spec-badge">多图+文字</span><span class="spec-badge">视频+文字</span> 四种形式共用同一时光轴卡片结构，单列时间倒序排列；纯文字无缩略图，单图/视频缩略图为单格填满（视频右下角叠加时长角标）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">多图缩略图拆分规则（见参考图 image-17.png / image-20.png）</span>
+    <span class="spec-val">同一个 64×64 缩略图大方块按图片数量（2~9 张，9 张为上限）拆分成对应的小方块拼贴，而非单张缩略图+数字角标：<span class="spec-badge">2 张</span>左右两栅等分；<span class="spec-badge">3 张</span>左侧 1 张竖图占满整高 + 右侧 2 张上下堆叠；<span class="spec-badge">4 张</span>四宫格平分；<span class="spec-badge">5 张</span>2 行×3 列网格，末位 1 格留空；<span class="spec-badge">6 张</span>左侧 1 张大图占满左上 2×2 + 右上 2 张小图上下堆叠 + 底部 3 张小图横排一行（非等分网格，与参考图一致）；<span class="spec-badge">7 张</span>3 行×3 列网格，末位 2 格留空；<span class="spec-badge">8 张</span>3 行×3 列网格，末位 1 格留空；<span class="spec-badge">9 张</span>3 行×3 列网格，恰好铺满</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">卡片点击行为</span>
+    <span class="spec-val">整条动态卡片可点击，点击后跳转至独立的动态详情页（square-detail-wireframe-mp.html，本图未展示），在详情页内查看完整正文、图片/视频、点赞头像墙、打赏明细、评论列表及回复、点赞/评论/打赏操作入口；列表页卡片内不再提供任何互动操作，也不再就地展开完整互动信息</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">适用范围</span>
+    <span class="spec-val"><span class="spec-badge dark">个人页</span><span class="spec-badge dark">创作者页</span> 均展示，样式完全一致，仅摘要文字与数据量级不同</span>
+  </div>
+</div>
+
+<script>
+  function setState(state) {
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      w.classList.toggle('active', w.id === 'state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
+  function setContentTab(el, scope) {
+    const container = el.closest('.profile-scroll');
+    container.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    container.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+    container.querySelector('#' + el.dataset.target).classList.add('active');
+  }
+
+  /* 仿照微信「相册时光轴」方式展示：点击整条动态卡片跳转至动态详情页（另一独立页面，本图未展示） */
+  function goToMomentDetail(el) {
+    console.log('跳转至动态详情页 square-detail-wireframe-mp.html');
+  }
+
+  function toggleRewardDetail(card) {
+    card.classList.toggle('expanded');
+  }
+</script>
+
+</body>
+</html>

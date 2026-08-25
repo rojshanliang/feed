@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消息页 · 筛选能力 — 线框图（小程序）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── Row label ───────────────────────────────────────────── */
+  .row-label {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+    letter-spacing: 0.02em; display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 830px;
+  }
+  .row-label::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  /* ─── Devices row ─────────────────────────────────────────── */
+  .devices-row { display: flex; gap: 32px; align-items: flex-start; }
+  .device-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ─── Device frame ────────────────────────────────────────── */
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── NavBar ──────────────────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-spacer { width: 28px; }
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+
+
+  /* ─── Notification items ──────────────────────────────────── */
+  .notif-list { flex: 1; display: flex; flex-direction: column; }
+  .notif-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 16px; border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+  }
+  .notif-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .notif-icon.system   { background: #eff6ff; }
+  .notif-icon.like     { background: #fef2f2; }
+  .notif-icon.follow   { background: #f0fdf4; }
+  .notif-icon.comment  { background: #fefce8; }
+  .notif-icon.announce { background: var(--surface-warm); }
+  .notif-icon.reply    { background: #f5f3ff; }
+  .notif-icon.reward   { background: var(--surface-warm); }
+
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-header {
+    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;
+  }
+  .notif-name-group { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .notif-name { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .notif-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); flex-shrink: 0; }
+  .notif-text {
+    font-size: 12px; color: var(--fg-2); line-height: 1.5; font-family: var(--font-body);
+  }
+  .notif-text.unread { color: var(--fg); }
+  .notif-meta {
+    margin-top: 6px; display: flex; align-items: center; gap: 8px;
+  }
+  .notif-thumb {
+    width: 44px; height: 44px; border-radius: 4px;
+    background: var(--wf-block); flex-shrink: 0;
+  }
+  .notif-action {
+    height: 26px; padding: 0 12px; border-radius: 13px;
+    border: 1.5px solid var(--border); background: #fff;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--fg);
+    display: flex; align-items: center; cursor: pointer;
+  }
+  .unread-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #dc2626; flex-shrink: 0; margin-top: 4px;
+  }
+
+  /* 来源标签：区分大舞台互动通知与图文/视频互动通知（后者不加标签，沿用原有约定），
+     样式复用话题页卡片角标（.post-type-tag/.source-tag）既有约定 ── */
+  .notif-source-tag {
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: #fff;
+    background: rgba(13,17,23,0.7); padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+  }
+
+  .notif-source-tag.official { background: #1d9bf0; }
+
+  /* 打赏礼物标签：与大舞台页/详情页 .gift-name 样式一致 */
+  .gift-name {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
+    background: var(--surface-warm); padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* ─── Section divider ─────────────────────────────────────── */
+  .notif-date-divider {
+    padding: 8px 16px; font-family: var(--font-mono); font-size: 10px;
+    color: var(--muted); background: var(--border-soft);
+  }
+
+  /* ─── Empty state ─────────────────────────────────────────── */
+  .empty-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; padding: 40px 24px;
+  }
+  .empty-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .empty-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .empty-desc { font-family: var(--font-body); font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; max-width: 220px; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+
+  /* ─── 互动消息筛选面板 ──────────────────────────────────── */
+  .msg-nav-tabs {
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+    flex: 1;
+  }
+  .msg-nav-tab {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--muted); cursor: pointer; position: relative;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .msg-nav-tab.active { color: var(--fg); }
+  .msg-nav-tab.active::after {
+    content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--fg); border-radius: 1px;
+  }
+  .msg-nav-tab .tab-arrow { font-size: 8px; color: var(--muted); }
+  .msg-nav-tab.active .tab-arrow { color: var(--fg); }
+
+  /* 筛选下拉面板 */
+  .filter-panel {
+    position: absolute; top: 88px; left: 0; right: 0;
+    background: var(--fg); z-index: 50;
+    display: none; flex-direction: column;
+    padding: 8px 0 16px;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .filter-panel.open { display: flex; }
+  .filter-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px; cursor: pointer;
+  }
+  .filter-item:hover { background: rgba(255,255,255,0.05); }
+  .filter-item .fi-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .filter-item .fi-label {
+    flex: 1; font-family: var(--font-body); font-size: 14px; color: rgba(255,255,255,0.85);
+  }
+  .filter-item .fi-check { font-size: 16px; color: #ff4d6d; flex-shrink: 0; display: none; }
+  .filter-item.selected .fi-check { display: block; }
+
+  /* 筛选遮罩 */
+  .filter-backdrop {
+    position: absolute; inset: 0; z-index: 45;
+    background: rgba(0,0,0,0.4);
+    display: none;
+  }
+  .filter-backdrop.open { display: block; }
+
+  /* 状态切换 */
+  .state-switcher {
+    display: flex; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>消息页 · 筛选能力 — 线框图（小程序）</h1>
+  <p>小程序 · 互动消息筛选面板 · 分类过滤通知类型 · 有筛选展开态和默认态</p>
+</div>
+
+<!-- State switcher -->
+<div class="state-switcher" role="group">
+  <button class="state-btn active" data-state="filter-open" onclick="setMsgState('filter-open')">① 筛选展开</button>
+  <button class="state-btn" data-state="filter-closed" onclick="setMsgState('filter-closed')">② 默认（筛选收起）</button>
+</div>
+
+<!-- 行 1：消息列表 -->
+<div class="row-label">消息列表</div>
+<div class="devices-row">
+
+  <!-- ① 有通知（含大舞台通知） -->
+  <div class="device-wrapper">
+    <div class="device-label">消息页 · 筛选展开态</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-spacer"></div>
+          <div class="msg-nav-tabs">
+            <div class="msg-nav-tab active" onclick="toggleFilter()">互动消息<span class="tab-arrow">▲</span></div>
+            <div class="msg-nav-tab">新关注我的</div>
+          </div>
+          <div class="nav-spacer"></div>
+        </div>
+
+        <!-- 筛选下拉面板 -->
+        <div class="filter-backdrop open" onclick="closeFilter()"></div>
+        <div class="filter-panel open">
+          <div class="filter-item selected" onclick="selectFilter(this)"><span class="fi-icon">💬</span><span class="fi-label">全部消息</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">❤️</span><span class="fi-label">赞与打赏</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">@</span><span class="fi-label">提及</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">💭</span><span class="fi-label">收到的评论</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">✏️</span><span class="fi-label">发出的评论</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">↩️</span><span class="fi-label">收到的回复</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">🎁</span><span class="fi-label">收到的打赏</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">📣</span><span class="fi-label">平台官方</span><span class="fi-check">✓</span></div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="notif-list">
+
+            <div class="notif-date-divider">今天</div>
+
+
+
+            <!-- 官方动态（大舞台官方信息，来源标签为"官方"） -->
+            <div class="notif-item">
+              <div class="notif-icon announce">📣</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">平台官方</span>
+                    <span class="notif-source-tag official">官方</span>
+                  </div>
+                  <span class="notif-time">3分钟</span>
+                </div>
+                <div class="notif-text unread">大舞台本周精选创作者已上线，快去看看有没有你关注的朋友入选～</div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 打赏（大舞台，新增，逐条不合并） -->
+            <div class="notif-item">
+              <div class="notif-icon reward">🎁</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">小美</span>
+                    <span class="notif-source-tag">大舞台</span>
+                  </div>
+                  <span class="notif-time">6分钟</span>
+                </div>
+                <div class="notif-text unread">打赏了你的大舞台动态 <span class="gift-name">🧸 玩偶</span> ×1</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 评论（大舞台，新增，逐条不合并） -->
+            <div class="notif-item">
+              <div class="notif-icon comment">💬</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">小美</span>
+                    <span class="notif-source-tag">大舞台</span>
+                  </div>
+                  <span class="notif-time">15分钟</span>
+                </div>
+                <div class="notif-text unread">评论了你的大舞台动态：「饰品好好看，链接发一下」</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 回复（大舞台，新增，朋友圈式 C 回复 B：回复了「你」的评论） -->
+            <div class="notif-item">
+              <div class="notif-icon reply">↩️</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">阿伟</span>
+                    <span class="notif-source-tag">大舞台</span>
+                  </div>
+                  <span class="notif-time">32分钟</span>
+                </div>
+                <div class="notif-text unread">回复了你的评论：「山顶信号很差，发朋友圈等了半天才发出去」</div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 点赞（大舞台，新增，多人合并为一条） -->
+            <div class="notif-item">
+              <div class="notif-icon like">❤️</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <div class="notif-name-group">
+                    <span class="notif-name">小美、Lucy 等 127 人</span>
+                    <span class="notif-source-tag">大舞台</span>
+                  </div>
+                  <span class="notif-time">1小时</span>
+                </div>
+                <div class="notif-text unread">赞了你的大舞台动态</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 点赞（视频，原有，逐条） -->
+            <div class="notif-item">
+              <div class="notif-icon like">❤️</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <span class="notif-name">用户昵称_08</span>
+                  <span class="notif-time">2小时</span>
+                </div>
+                <div class="notif-text unread">点赞了你的视频《视频标题文字展示区…》</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 新粉丝（原有，逐条） -->
+            <div class="notif-item">
+              <div class="notif-icon follow">👥</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <span class="notif-name">用户昵称_06</span>
+                  <span class="notif-time">3小时</span>
+                </div>
+                <div class="notif-text unread">关注了你</div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <!-- 评论（视频，原有，逐条） -->
+            <div class="notif-item">
+              <div class="notif-icon comment">💬</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <span class="notif-name">用户昵称_04</span>
+                  <span class="notif-time">4小时</span>
+                </div>
+                <div class="notif-text unread">评论了你的视频：这个内容太好了，正是我想要的！</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+              <div class="unread-dot"></div>
+            </div>
+
+            <div class="notif-date-divider">昨天</div>
+
+
+            <!-- @提及（原有，逐条） -->
+            <div class="notif-item">
+              <div class="notif-icon comment">🔖</div>
+              <div class="notif-body">
+                <div class="notif-header">
+                  <span class="notif-name">用户昵称_02</span>
+                  <span class="notif-time">昨天</span>
+                </div>
+                <div class="notif-text">在评论中 @ 了你</div>
+                <div class="notif-meta">
+                  <div class="notif-thumb"></div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div><!-- /page-scroll -->
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 空状态（原有，不变） -->
+  <div class="device-wrapper">
+    <div class="device-label">消息页 · 空状态</div>
+    <div class="mp-device">
+      <div class="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <div class="mp-nav">
+          <div class="nav-spacer"></div>
+          <div class="nav-title">消息</div>
+          <div class="nav-spacer"></div>
+        </div>
+
+        <div class="page-scroll">
+          <div class="empty-state">
+            <div class="empty-icon">🔔</div>
+            <div class="empty-title">暂无消息</div>
+            <div class="empty-desc">点赞、评论、关注等互动通知会在这里显示</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /devices-row -->
+
+<div class="spec-panel" style="width:782px;">
+  <h3>SPEC · 消息页结构说明（互动消息筛选模式）</h3>
+  <div class="spec-row">
+    <span class="spec-key">消息来源</span>
+    <span class="spec-val">互动消息 · 无创作者/用户私信 · 无聊天功能</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">通知类型（新增）</span>
+    <span class="spec-val">大舞台 <span class="spec-badge">点赞</span><span class="spec-badge">评论</span><span class="spec-badge">回复</span><span class="spec-badge">打赏</span></span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">通知类型（原有，不变）</span>
+    <span class="spec-val">点赞（逐条）· 新增关注（逐条）· 评论（逐条）· @提及</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">展示方式</span>
+    <span class="spec-val">与原有一致：单一列表，按日期分组（今天/昨天）+ 组内时间倒序；大舞台相关通知直接插入同一列表，不新增 Tab、不新增分组</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">来源标识</span>
+    <span class="spec-val">仅大舞台来源的互动通知在昵称右侧附加深色「大舞台」标签（复用话题页卡片来源角标样式）；图文/视频来源的互动通知不加标签，沿用原有约定</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">通知图标</span>
+    <span class="spec-val">按类型区分背景色圆角块：蓝（系统）红（点赞）绿（关注）黄（评论/提及）暖（公告/打赏）紫（回复），新增类型延续原有配色逻辑</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">打赏信息展示</span>
+    <span class="spec-val">礼物名称以 <span class="spec-badge">🧸 玩偶</span> 黄底徽标展示（与大舞台页/详情页 .gift-name 样式一致）+ 数量 ×N，互动类和交易类通知均展示同一形式，不展示价格数字</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">是否合并</span>
+    <span class="spec-val">点赞合并为一条「XX、YY 等 N 人赞了你的大舞台动态」；评论/回复/打赏逐条展示，不合并——三者均带有独立的具体信息（内容预览/礼物/回复对象），合并会丢失信息</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">回复通知格式</span>
+    <span class="spec-val">朋友圈式 C 回复 B：文案为「XX 回复了你的评论：「回复内容」」，与评论通知同规格的单行文字展示，不额外增加引用区块</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">跳转行为</span>
+    <span class="spec-val">点击大舞台点赞/评论/回复/打赏通知，进入对应大舞台动态详情页（square-detail-wireframe-mp.html）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">未读状态</span>
+    <span class="spec-val">右侧红点 · 文字加重，与原有约定一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">缩略图</span>
+    <span class="spec-val">与内容相关的通知（点赞/评论/打赏）展示对应动态缩略图占位；回复/系统类通知不展示缩略图</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">空状态</span>
+    <span class="spec-val">铃铛图标 + 「暂无消息」+ 说明文字，与原有一致</span>
+  </div>
+</div>
+
+
+<script>
+  function toggleFilter() {
+    const panel = document.querySelector('.filter-panel');
+    const backdrop = document.querySelector('.filter-backdrop');
+    panel.classList.toggle('open');
+    backdrop.classList.toggle('open');
+  }
+  function closeFilter() {
+    document.querySelector('.filter-panel').classList.remove('open');
+    document.querySelector('.filter-backdrop').classList.remove('open');
+  }
+  function selectFilter(el) {
+    document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    closeFilter();
+  }
+  function setMsgState(state) {
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+    const panel = document.querySelector('.filter-panel');
+    const backdrop = document.querySelector('.filter-backdrop');
+    if (state === 'filter-open') {
+      panel.classList.add('open');
+      backdrop.classList.add('open');
+    } else {
+      panel.classList.remove('open');
+      backdrop.classList.remove('open');
+    }
+  }
+</script>
+</body>
+</html>

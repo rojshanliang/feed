@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed 首页线框图 — 小程序（底Bar改版）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Source+Sans+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  /* ─── HF Design System Tokens ─────────────────────────────── */
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --warn: #f59e0b;
+    --danger: #dc2626;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    /* ─── Wireframe-specific overrides ─── */
+    --wf-block: #d1d5db;       /* placeholder fill */
+    --wf-block-dark: #9ca3af;  /* darker placeholder */
+    --wf-line: #e5e7eb;        /* divider */
+    --wf-overlay: rgba(13,17,23,0.45); /* video overlay */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    gap: 48px;
+  }
+
+  /* ─── Page Header ─────────────────────────────────────────── */
+  .page-header {
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ─── State Switcher ──────────────────────────────────────── */
+  .state-switcher {
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-standard);
+    white-space: nowrap;
+  }
+  .state-btn.active {
+    background: var(--accent);
+    color: var(--accent-on);
+  }
+  .state-btn:hover:not(.active) {
+    background: var(--border-soft);
+    color: var(--fg);
+  }
+
+  /* ─── Device Wrapper ──────────────────────────────────────── */
+  .device-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .device-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── Mini-program Device Frame ──────────────────────────── */
+  .mp-device {
+    width: 375px;
+    height: 780px;
+    background: var(--fg);
+    border-radius: 36px;
+    padding: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.1),
+      0 24px 64px rgba(0,0,0,0.35),
+      0 8px 20px rgba(0,0,0,0.2);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--fg);
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status Bar (mini-program inside WeChat) ────────────── */
+  .mp-status-bar {
+    height: 44px;
+    background: var(--fg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 0 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+  .mp-status-time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .mp-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .mp-status-icons .icon-bar {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  .mp-status-icons .bar {
+    width: 3px;
+    background: #ffffff;
+    border-radius: 1px;
+  }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon {
+    width: 14px;
+    height: 10px;
+    position: relative;
+  }
+  .wifi-icon::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    background: white;
+    border-radius: 50%;
+  }
+  .battery-icon {
+    width: 22px;
+    height: 11px;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-radius: 2px;
+    position: relative;
+  }
+  .battery-icon::before {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 5px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-icon::after {
+    content: '';
+    position: absolute;
+    top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px);
+    background: white;
+    border-radius: 1px;
+  }
+
+  /* ─── Mini-program Nav Bar ────────────────────────────────── */
+  .mp-nav {
+    height: 44px;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mp-nav-back {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    visibility: hidden; /* 主 Feed 是根页面，不需要返回箭头；宽度仍保留占位以保持标题居中 */
+  }
+  .state-article .mp-nav-back { visibility: visible; cursor: pointer; }
+  .mp-nav-back::before {
+    content: '‹';
+    color: white;
+    font-size: 18px;
+    font-weight: 300;
+    margin-top: -1px;
+  }
+  .mp-nav-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.02em;
+  }
+  .mp-nav-more {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    gap: 2px;
+  }
+  .mp-nav-more span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: white;
+    display: block;
+  }
+
+  /* ─── Content area (takes up remaining space) ─────────────── */
+  .mp-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Top Tabs ────────────────────────────────────────────── */
+  .feed-tabs {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 0 8px;
+    background: linear-gradient(to bottom, rgba(13,17,23,0.7) 0%, transparent 100%);
+  }
+  .feed-tab {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    position: relative;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+  .feed-tab.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .feed-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  /* ─── Video placeholder ───────────────────────────────────── */
+  .video-bg {
+    position: absolute;
+    inset: 0;
+    background: #1a1d23;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .video-placeholder-inner {
+    text-align: center;
+    opacity: 0.3;
+  }
+  .video-placeholder-inner .vp-icon {
+    width: 64px;
+    height: 40px;
+    border: 2px solid white;
+    border-radius: 4px;
+    margin: 0 auto 8px;
+    position: relative;
+  }
+  .video-placeholder-inner .vp-icon::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-40%, -50%);
+    border-left: 16px solid white;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+  .video-placeholder-inner p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: white;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── Pause overlay ───────────────────────────────────────── */
+  .pause-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    background: rgba(0,0,0,0.25);
+  }
+  .pause-overlay .pause-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .pause-btn-bars {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .pause-btn-bars span {
+    width: 5px;
+    height: 22px;
+    background: white;
+    border-radius: 2px;
+    display: block;
+  }
+
+  /* ─── Progress bar (shown in pause state) ─────────────────── */
+  .video-progress {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.25);
+    z-index: 25;
+    display: none;
+  }
+  .video-progress-fill {
+    height: 100%;
+    width: 38%;
+    background: var(--accent);
+    border-radius: 1px;
+    position: relative;
+  }
+  .video-progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ─── Right interaction bar ───────────────────────────────── */
+  .right-bar {
+    position: absolute;
+    right: 12px;
+    bottom: 80px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  .right-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .rb-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 20px;
+    line-height: 1;
+  }
+  /* Avatar */
+  .rb-avatar .rb-icon {
+    background: var(--wf-block-dark);
+    border: 2px solid white;
+    font-size: 18px;
+  }
+  .rb-avatar .rb-icon::after {
+    content: '+';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-on);
+    border: 1.5px solid rgba(13,17,23,0.8);
+    line-height: 14px;
+    text-align: center;
+  }
+  .rb-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }
+
+  /* ─── Bottom content info ─────────────────────────────────── */
+  .bottom-info {
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
+    right: 68px;
+    z-index: 20;
+  }
+  .creator-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .creator-name::before {
+    content: '';
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .recommend-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; border-radius: 3px;
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+    flex-shrink: 0; line-height: 1;
+  }
+  .video-title-line {
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.4;
+    font-family: var(--font-body);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .video-tag {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    margin-left: 6px;
+  }
+  .video-tag:first-child { margin-left: 0; }
+
+  /* ─── Bottom tab bar ──────────────────────────────────────── */
+  .mp-tabbar {
+    height: 56px;
+    background: rgba(13,17,23,0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 30;
+    padding-bottom: 4px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    cursor: pointer;
+  }
+  .tab-icon {
+    font-size: 20px;
+    line-height: 1;
+    color: rgba(255,255,255,0.45);
+  }
+  .tab-item.active .tab-icon {
+    color: var(--accent);
+  }
+  .tab-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.01em;
+  }
+  .tab-item.active .tab-label {
+    color: var(--accent);
+  }
+  /* Publish button */
+  .tab-publish .tab-icon {
+    font-size: 22px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ─── Comments drawer ─────────────────────────────────────── */
+  .comments-drawer {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 70%;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .drawer-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  .drawer-header {
+    padding: 10px 16px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .drawer-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .drawer-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .drawer-close {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+  .comments-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .comment-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .comment-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    flex-shrink: 0;
+  }
+  .comment-body {
+    flex: 1;
+  }
+  .comment-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 3px;
+  }
+  .comment-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.45;
+    font-family: var(--font-body);
+  }
+  .comment-text.placeholder {
+    height: 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 6px;
+    width: 80%;
+  }
+  .comment-text.placeholder.short {
+    width: 55%;
+  }
+  .comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  .comment-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+  }
+  .comment-reply-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+  }
+  .comment-votes {
+    display: flex; align-items: center; gap: 10px;
+    margin-left: auto;
+  }
+  .comment-vote {
+    display: flex; align-items: center; gap: 3px;
+    cursor: pointer;
+  }
+  .comment-vote .vote-icon {
+    font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1;
+  }
+  .comment-vote .vote-icon.liked { color: #ff4d6d; }
+  .comment-vote .vote-icon.disliked { color: rgba(255,255,255,0.7); }
+  .comment-vote .vote-count {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4);
+    min-width: 10px;
+  }
+  .replies-list {
+    margin-top: 12px;
+    padding-left: 14px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .reply-item.more { display: none; }
+  .replies-list.expanded .reply-item.more { display: flex; }
+  .reply-item { display: flex; gap: 8px; align-items: flex-start; }
+  .reply-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--wf-block-dark); flex-shrink: 0;
+  }
+  .reply-body { flex: 1; }
+  .reply-name { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+  .reply-text { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4; font-family: var(--font-body); }
+  .reply-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+  .reply-time { font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.3); }
+  .expand-replies-btn {
+    margin-top: 12px; padding-left: 14px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    color: var(--accent); cursor: pointer;
+  }
+  .drawer-input {
+    padding: 10px 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .input-field {
+    flex: 1;
+    height: 36px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+  }
+  .input-placeholder {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ─── State visibility ────────────────────────────────────── */
+  /* State: play (default) — nothing extra shown */
+  /* State: pause */
+  .state-pause .pause-overlay   { display: flex; }
+  .state-pause .video-progress  { display: block; }
+  .state-pause .rb-music        { }
+  .state-pause .rb-music .rb-icon { animation-play-state: paused; }
+  /* State: comments */
+  .state-comments .comments-drawer { display: flex; }
+
+  /* State: multiimg (多图) */
+  .state-multiimg .multiimg-overlay { display: flex; }
+  .state-multiimg .video-bg { display: none; }
+  .state-multiimg .right-bar { display: none; }
+  .state-multiimg .bottom-info { display: none; }
+  .state-multiimg .feed-tabs { display: none; }
+
+  /* ─── Multiimg overlay (多图全屏：图片铺满整屏，互动栏/底部信息浮在图片上) ── */
+  .multiimg-overlay {
+    position: absolute; inset: 0; z-index: 35;
+    display: none; flex-direction: column;
+  }
+  .multiimg-content { flex: 1; position: relative; overflow: hidden; }
+  /* 图片铺满整个内容区（跟短视频播放的 .video-bg 完全一致的全屏铺底） */
+  .multiimg-image {
+    position: absolute; inset: 0;
+    background: var(--wf-block);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.4);
+  }
+  /* 分段进度条：位于话题标签下方、底部Tab Bar上方（全宽），每一段=一张图，当前段高亮 */
+  .multiimg-progress {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; gap: 3px; z-index: 2;
+    padding: 0 12px 4px;
+  }
+  .multiimg-seg {
+    flex: 1; height: 2px; border-radius: 1px;
+    background: rgba(255,255,255,0.3);
+  }
+  .multiimg-seg.active { background: #ffffff; }
+  /* 右侧互动栏：浮在图片右侧（跟短视频播放的 .right-bar 位置一致） */
+  .multiimg-right-bar {
+    position: absolute; right: 12px; bottom: 80px;
+    display: flex; flex-direction: column; gap: 20px; align-items: center;
+    z-index: 2;
+  }
+  .multiimg-right-bar .right-bar-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+  .multiimg-right-bar .rb-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; font-size: 20px; line-height: 1;
+  }
+  .multiimg-right-bar .rb-avatar .rb-icon { background: var(--wf-block-dark); border: 2px solid white; font-size: 18px; }
+  .multiimg-right-bar .rb-avatar .rb-icon::after {
+    content: '+'; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 16px; background: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--accent-on);
+    border: 1.5px solid rgba(13,17,23,0.8); line-height: 14px; text-align: center;
+  }
+  .multiimg-right-bar .rb-count { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+  /* 底部信息：浮在图片底部，进度条在其下方紧贴底边 */
+  .multiimg-bottom-info {
+    position: absolute; left: 12px; bottom: 14px; right: 68px; z-index: 2;
+  }
+  .multiimg-bottom-info .creator-line {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+  .multiimg-bottom-info .creator-line .cr-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0;
+  }
+  .multiimg-bottom-info .creator-line .cr-name {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: white;
+  }
+  .multiimg-bottom-info .creator-line .cr-type {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px;
+  }
+  .multiimg-bottom-info .mi-title {
+    font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.4;
+    margin-bottom: 4px; font-family: var(--font-body);
+  }
+  .multiimg-bottom-info .mi-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .multiimg-bottom-info .mi-tag { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7); }
+  /* State: share */
+  .state-share .share-sheet { display: flex; }
+  /* State: location (mini-program only) */
+  .state-location .location-sheet { display: flex; }
+  .state-location .video-bg { filter: brightness(0.45); }
+  /* 同城 tab 高亮，推荐 tab 取消高亮 */
+  .state-location .feed-tab.active { color: rgba(255,255,255,0.6); font-weight: 500; }
+  .state-location .feed-tab.active::after { display: none; }
+  .state-location .feed-tab:last-child { color: #ffffff; font-weight: 600; }
+  .state-location .feed-tab:last-child::after {
+    content: ''; position: absolute; bottom: -4px;
+    left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px;
+    background: var(--accent); border-radius: 1px;
+  }
+
+  /* ─── Location picker sheet ───────────────────────────────── */
+  .location-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(20,22,28,0.98);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px 20px 0 0;
+    z-index: 50; display: none; flex-direction: column;
+    padding: 12px 20px 24px;
+    backdrop-filter: blur(16px);
+  }
+  .loc-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0; }
+  .loc-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; text-align: center; margin-bottom: 6px; }
+  .loc-hint { font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 18px; line-height: 1.5; }
+  .loc-hint .loc-reason { display: block; color: rgba(255,255,255,0.25); font-size: 11px; margin-top: 3px; font-family: var(--font-mono); }
+  .loc-selectors { display: flex; gap: 10px; margin-bottom: 20px; }
+  .loc-select-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .loc-select-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.04em; }
+  .loc-select {
+    height: 42px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-md);
+    padding: 0 12px;
+    font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.75);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .loc-select .arrow { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .loc-confirm {
+    width: 100%; height: 46px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: 23px; border: none;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── Share sheet ─────────────────────────────────────────── */
+  .share-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .share-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  .share-header {
+    padding: 10px 16px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .share-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .share-subtitle {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+  }
+  .share-close {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  /* H5 link block */
+  .share-link-block {
+    margin: 14px 16px 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .share-link-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+  }
+  .share-link-url {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    word-break: break-all;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .share-link-url em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .share-copy-btn {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 12px;
+    background: var(--accent);
+    color: var(--accent-on);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .share-copy-btn.copied {
+    background: var(--success);
+    color: white;
+  }
+
+  /* ─── Share copy-link panel ───────────────────────────────── */
+  .share-copy-panel {
+    padding: 20px 16px 24px;
+  }
+  .share-dislike-row {
+    display: flex; justify-content: flex-start; margin-bottom: 18px;
+  }
+  .share-dislike-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; cursor: pointer;
+    font-size: 20px; line-height: 1;
+  }
+  .share-dislike-label {
+    font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.6);
+  }
+  .share-copy-row {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .share-copy-url {
+    flex: 1; min-width: 0;
+    font-family: var(--font-mono); font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .share-copy-btn-main {
+    flex-shrink: 0; height: 32px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-sm); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .share-copy-btn-main.copied { background: var(--success); color: white; }
+  .share-copy-toast {
+    position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: rgba(13,17,23,0.9); color: #fff;
+    font-family: var(--font-mono); font-size: 12px;
+    padding: 8px 16px; border-radius: var(--radius-pill);
+    display: none; z-index: 60; white-space: nowrap;
+  }
+  .share-copy-toast.visible { display: block; }
+
+  /* ─── Reward (打赏) sheet ──────────────────────────────────── */
+  .reward-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    max-height: 78%;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px 14px 0 0;
+    z-index: 40;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .reward-body {
+    padding: 14px 16px 4px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .reward-avatar-wall {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .reward-avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 56px;
+  }
+  .reward-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    position: relative;
+  }
+  .reward-crown {
+    position: absolute;
+    top: -6px; right: -4px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    box-shadow: 0 0 0 2px rgba(20,22,28,0.9);
+  }
+  .reward-crown.gold   { background: #fde047; }
+  .reward-crown.silver { background: #e5e7eb; }
+  .reward-crown.bronze { background: #f0b27a; }
+  .reward-level {
+    position: absolute;
+    bottom: -8px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px;
+    height: 16px; padding: 0 6px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    box-shadow: 0 0 0 2px rgba(20,22,28,0.9);
+    white-space: nowrap;
+  }
+  .reward-level .ic { font-size: 9px; line-height: 1; }
+  .reward-level .lv { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: #fde68a; line-height: 1; }
+  .reward-avatar-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    max-width: 56px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .reward-divider { height: 1px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+  .reward-gift-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+  .reward-gift-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .reward-gift-icon { font-size: 18px; line-height: 1; }
+  .reward-gift-name { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.85); }
+  .reward-gift-count { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .reward-footer {
+    padding: 12px 16px 18px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .reward-confirm-btn {
+    width: 100%; height: 46px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: 23px;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+  .state-reward .reward-sheet { display: flex; }
+
+  /* ─── Gift picker (打赏中态) sheet — 参考截图，浅色卡片 ───── */
+  .giftpanel-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    max-height: 82%;
+    background: rgba(20,22,28,0.97);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px 16px 0 0;
+    z-index: 45;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+  }
+  .state-gift .giftpanel-sheet { display: flex; }
+  .giftpanel-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  .giftpanel-head {
+    text-align: center;
+    padding: 12px 24px 0;
+    flex-shrink: 0;
+  }
+  .giftpanel-title {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 600;
+    color: rgba(255,255,255,0.92);
+  }
+  .giftpanel-sub {
+    font-family: var(--font-body);
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    margin-top: 6px; line-height: 1.5;
+  }
+  .giftpanel-tabs {
+    display: flex;
+    padding: 14px 20px 0;
+    gap: 24px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .giftpanel-tab {
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,0.4);
+    padding: 0 0 10px;
+    position: relative;
+    cursor: pointer;
+  }
+  .giftpanel-tab.active { color: #ffffff; font-weight: 600; }
+  .giftpanel-tab.active::after {
+    content: ''; position: absolute; bottom: -1px; left: 0;
+    width: 100%; height: 2px; background: var(--accent); border-radius: 1px;
+  }
+  .giftpanel-wrap { position: relative; padding: 14px 16px 0; flex: 1; min-height: 0; }
+  .giftpanel-scroll {
+    max-height: 266px;
+    overflow-y: auto;
+  }
+  .giftpanel-fade {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(20,22,28,0), rgba(20,22,28,1));
+    pointer-events: none;
+  }
+  .giftpanel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding-bottom: 14px;
+  }
+  .giftpanel-grid.hidden { display: none; }
+  .gift-card {
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 14px 6px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .gift-card.selected {
+    border-color: var(--accent);
+    background: rgba(255,210,30,0.12);
+  }
+  .gift-icon { font-size: 26px; line-height: 1; }
+  .gift-name { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); }
+  .gift-price { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.4); }
+  .giftpanel-footer {
+    padding: 14px 16px 20px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .giftpanel-confirm {
+    width: 100%; height: 48px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: 24px;
+    font-family: var(--font-display); font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+
+  /* ─── Devices row (side by side) ─────────────────────────── */
+  .devices-row {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  .diff-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent-on);
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── WeChat Browser Address Bar (H5 only) ────────────────── */
+  .h5-browser-bar {
+    height: 46px;
+    background: #1c1e26;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .h5-browser-back {
+    font-size: 22px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    line-height: 1;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .h5-address-bar {
+    flex: 1;
+    height: 30px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 5px;
+    min-width: 0;
+  }
+  .h5-address-lock { font-size: 11px; flex-shrink: 0; }
+  .h5-address-url {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.65);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .h5-address-url em { font-style: normal; color: var(--accent); }
+  .h5-browser-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .h5-action-btn {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+
+  /* ─── Annotation layer ────────────────────────────────────── */
+  .annotation {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(13,17,23,0.85);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+  .annotation-line {
+    position: absolute;
+    background: rgba(255,210,30,0.4);
+    z-index: 49;
+    pointer-events: none;
+  }
+
+  /* ─── Legend / spec panel ─────────────────────────────────── */
+  .spec-panel {
+    width: 375px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+  }
+  .spec-panel h3 {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .spec-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .spec-badge {
+    display: inline-block;
+    background: var(--surface-warm);
+    border: 1px solid var(--accent);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 3px;
+  }
+
+  /* ─── Onboarding overlay ──────────────────────────────────── */
+  .ob-overlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: #ffffff; display: none; flex-direction: column;
+  }
+  .state-ob-gender .ob-overlay,
+  .state-ob-age .ob-overlay,
+  .state-ob-tags .ob-overlay { display: flex; }
+
+  .ob-status-bar {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .ob-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg); }
+  .ob-status-icons { display: flex; align-items: center; gap: 5px; }
+  .ob-icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .ob-bar { width: 3px; background: var(--fg); border-radius: 1px; }
+  .ob-bar:nth-child(1) { height: 4px; }
+  .ob-bar:nth-child(2) { height: 6px; }
+  .ob-bar:nth-child(3) { height: 8px; }
+  .ob-bar:nth-child(4) { height: 10px; }
+  .ob-wifi { width: 14px; height: 10px; position: relative; }
+  .ob-wifi::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%; }
+  .ob-battery { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.6); border-radius: 2px; position: relative; }
+  .ob-battery::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.6); border-radius: 0 1px 1px 0; }
+  .ob-battery::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px; }
+
+  .ob-topbar { height: 40px; display: flex; align-items: center; justify-content: flex-end; padding: 0 20px; flex-shrink: 0; }
+  .ob-skip { font-family: var(--font-mono); font-size: 12px; color: var(--muted); cursor: pointer; }
+  .ob-content { flex: 1; overflow-y: auto; padding: 24px 24px 16px; display: flex; flex-direction: column; }
+
+  .ob-dots { display: flex; gap: 8px; margin-bottom: 28px; }
+  .ob-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--border); }
+  .state-ob-gender .ob-dot:nth-child(1) { background: var(--accent); }
+  .state-ob-age .ob-dot:nth-child(1) { background: var(--fg-2); }
+  .state-ob-age .ob-dot:nth-child(2) { background: var(--accent); }
+  .state-ob-tags .ob-dot:nth-child(1), .state-ob-tags .ob-dot:nth-child(2) { background: var(--fg-2); }
+  .state-ob-tags .ob-dot:nth-child(3) { background: var(--accent); }
+
+  .ob-step { display: none; flex-direction: column; flex: 1; }
+  .state-ob-gender .ob-step[data-step="gender"],
+  .state-ob-age .ob-step[data-step="age"],
+  .state-ob-tags .ob-step[data-step="tags"] { display: flex; }
+
+  .ob-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--fg); line-height: 1.25; margin-bottom: 8px; }
+  .ob-subtitle { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 24px; }
+
+  .gender-cards { display: flex; flex-direction: column; gap: 12px; }
+  .gender-card { border: 2px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .gender-card.selected { border-color: var(--fg); background: var(--border-soft); }
+  .gender-card-icon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+  .gender-card-label { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .gender-card-sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+  .gender-radio { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .gender-card.selected .gender-radio { background: var(--accent); border-color: var(--accent); }
+  .gender-card.selected .gender-radio::after { content: '✓'; font-size: 11px; font-weight: 700; color: var(--accent-on); }
+
+  .age-options { display: flex; flex-direction: column; gap: 10px; }
+  .age-option { border: 2px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .age-option.selected { border-color: var(--fg); background: var(--border-soft); }
+  .age-option-label { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  .age-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .age-option.selected .age-radio { background: var(--accent); border-color: var(--accent); }
+  .age-option.selected .age-radio::after { content: '✓'; font-size: 11px; font-weight: 700; color: var(--accent-on); }
+
+  .ob-tag-hint { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .ob-tag-hint em { font-style: normal; font-weight: 600; color: var(--accent-on); background: var(--accent); padding: 1px 6px; border-radius: 3px; }
+  .tags-grid { display: flex; flex-wrap: wrap; gap: 9px; }
+  .tag-pill { display: flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 9999px; border: 1.5px solid var(--border); background: #fff; cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--fg); }
+  .tag-pill.selected { background: var(--fg); border-color: var(--fg); color: #fff; }
+  .tag-pill-emoji { font-size: 15px; line-height: 1; }
+  .tag-pill.selected .tag-pill-emoji { display: none; }
+  .tag-pill-check { display: none; font-size: 11px; font-weight: 700; }
+  .tag-pill.selected .tag-pill-check { display: inline; }
+
+  .ob-footer { padding: 12px 24px 20px; flex-shrink: 0; border-top: 1px solid var(--border-soft); }
+  .ob-next-btn { width: 100%; height: 48px; background: var(--fg); color: #fff; border: none; border-radius: 24px; font-family: var(--font-display); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .state-ob-tags .ob-next-btn { background: var(--accent); color: var(--accent-on); }
+
+  /* ─── 图文态：全屏暗色底 + 文字从下往上自动滚动 ──────────── */
+  .state-imagetext .video-bg { background: #0d1117; }
+  .state-imagetext .video-placeholder-inner { display: none; }
+  .state-imagetext .video-progress { display: none; }
+  .state-imagetext .pause-overlay { display: none; }
+  /* 可播放（滚动）区域是独立于按钮的固定视口：上边在「推荐」Tab 下方，下边在
+     「阅读文章」按钮上方，overflow:hidden 只裁切这个视口自身，文字滚动时
+     绝不会越过视口下边界去到按钮 / 创作者信息 / 底Bar 那一块。 */
+  .imagetext-scroll-content {
+    position: absolute;
+    top: 52px; left: 16px; right: 72px; bottom: 136px;
+    z-index: 5;
+    display: none; overflow: hidden;
+  }
+  .state-imagetext .imagetext-scroll-content { display: block; }
+  .imagetext-scroll-inner {
+    position: absolute; top: 0; left: 0; right: 0;
+    animation: imagetext-scroll-up var(--scroll-duration, 30s) linear forwards;
+  }
+  @keyframes imagetext-scroll-up {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(var(--scroll-end, -300px)); }
+  }
+  .imagetext-scroll-inner .imagetext-title {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700; color: #ffffff;
+    line-height: 1.4; margin-bottom: 14px;
+    letter-spacing: 0.01em;
+  }
+  .imagetext-scroll-inner p {
+    font-family: var(--font-body); font-size: 16px; color: rgba(255,255,255,0.92);
+    line-height: 1.8; margin-bottom: 20px;
+  }
+  .imagetext-scroll-inner .emoji-line {
+    font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 20px;
+  }
+  /* 按钮固定在视口下方、创作者信息上方，不再随文字一起被 transform，永不被滚动内容压住。
+     left/right 与 .imagetext-scroll-content 保持一致，靠 margin:0 auto 在滚动区域内左右居中——
+     不是整屏居中（整屏居中会偏右，因为视口右侧多留了给右侧互动栏的 72px） */
+  .imagetext-read-btn {
+    position: absolute; left: 16px; right: 72px; bottom: 84px; z-index: 6;
+    width: 200px; margin: 0 auto;
+    display: none; height: 40px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px; color: rgba(255,255,255,0.9);
+    font-family: var(--font-body); font-size: 14px; font-weight: 500;
+    cursor: pointer;
+  }
+  .state-imagetext .imagetext-read-btn { display: block; }
+
+  /* ─── 单图文详情覆盖层：点击「阅读文章」后展示，形式仿照 imagetext-detail-wireframe-mp.html 的结构，
+       但配色改为深色基准，与短视频播放 / 单图文态的暗色主题统一（不展示创作者头像和关注按钮） ── */
+  .ad-overlay {
+    position: absolute; inset: 0; z-index: 200;
+    background: var(--fg); display: none; flex-direction: column;
+  }
+  .state-article .ad-overlay { display: flex; }
+  /* 详情页是子页面，不展示底部Tab Bar；隐藏后 mp-content 会自动撐满剩余高度，覆盖层同步撐满 */
+  .state-article .mp-tabbar { display: none; }
+
+  .ad-scroll { flex: 1; overflow-y: auto; }
+
+  /* 只保留单图，不展示页码/指示点（无多图）；深色占位，与视频背景色一致 */
+  .ad-image {
+    width: 100%; aspect-ratio: 3/4; background: #1a1d23;
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .ad-image::after { content: '图片'; font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.05em; }
+
+  /* 不展示创作者头像和关注按钮：正文紧跟在图片下方，与单图文详情页原有 creator-row 位置不同 */
+  .ad-body { padding: 16px 16px 0; }
+  .ad-title {
+    font-family: var(--font-display); font-size: 17px; font-weight: 600;
+    color: #ffffff; line-height: 1.4; margin-bottom: 10px;
+  }
+  .ad-text {
+    font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.65;
+    font-family: var(--font-body); margin-bottom: 12px;
+  }
+  .ad-topics { font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+  .ad-topic { color: var(--accent); font-weight: 500; }
+  .ad-time-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 14px; border-bottom: 8px solid rgba(255,255,255,0.06);
+  }
+  .ad-time { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.4); }
+  .ad-dislike-btn {
+    display: flex; align-items: center; gap: 4px;
+    font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.18); border-radius: 9999px;
+    padding: 4px 10px; cursor: pointer; background: rgba(255,255,255,0.06);
+  }
+  .ad-dislike-btn .dislike-icon { font-size: 13px; line-height: 1; filter: grayscale(1) opacity(0.45); }
+  .ad-dislike-btn.active { color: #ffffff; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.15); }
+  .ad-dislike-btn.active .dislike-icon { filter: none; }
+
+  .ad-comments { padding: 14px 16px 24px; }
+  .ad-comments-heading {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600;
+    color: #ffffff; letter-spacing: 0.03em; margin-bottom: 12px;
+  }
+  .ad-compose { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .ad-compose .my-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .ad-compose .compose-input {
+    flex: 1; height: 36px; background: rgba(255,255,255,0.08); border-radius: 9999px;
+    display: flex; align-items: center; padding: 0 14px;
+    font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.35);
+    cursor: pointer;
+  }
+  .ad-comment-item { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-start; }
+  .ad-comment-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; }
+  .ad-comment-body { flex: 1; min-width: 0; }
+  .ad-comment-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+  .ad-comment-text { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5; font-family: var(--font-body); }
+  .ad-comment-meta { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+  .ad-comment-time { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.3); }
+  .ad-reply-btn { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.45); cursor: pointer; }
+  .ad-votes { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .ad-vote { display: flex; align-items: center; gap: 3px; cursor: pointer; }
+  .ad-vote .vote-icon { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1; }
+  .ad-vote .vote-icon.liked { color: #ff4d6d; }
+  .ad-vote .vote-icon.dislike { filter: grayscale(1) opacity(0.45); }
+  .ad-vote .vote-icon.dislike.disliked { filter: none; }
+  .ad-vote .vote-count { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.4); min-width: 8px; }
+
+  .ad-replies {
+    margin-top: 10px; padding-left: 12px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .ad-reply-item.more { display: none; }
+  .ad-replies.expanded .ad-reply-item.more { display: flex; }
+  .ad-reply-item { display: flex; gap: 8px; align-items: flex-start; }
+  .ad-reply-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0; }
+  .ad-reply-body { flex: 1; min-width: 0; }
+  .ad-reply-name { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+  .ad-reply-text { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.45; font-family: var(--font-body); }
+  .ad-reply-meta { display: flex; align-items: center; gap: 10px; margin-top: 3px; }
+  .ad-reply-time { font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.3); }
+  .ad-expand-replies {
+    margin-top: 10px; padding-left: 12px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    color: var(--accent); cursor: pointer;
+  }
+
+  .ad-interaction-bar {
+    height: 56px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(20,22,28,0.98);
+    display: flex; align-items: center; padding: 0 14px; gap: 10px; flex-shrink: 0;
+  }
+  .ad-comment-input {
+    flex: 1; height: 36px; background: rgba(255,255,255,0.08); border-radius: 9999px;
+    display: flex; align-items: center; padding: 0 14px;
+    font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.3);
+    cursor: pointer;
+  }
+  .ad-interaction-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; flex-shrink: 0; min-width: 40px;
+  }
+  .ad-interaction-icon { font-size: 21px; line-height: 1; color: rgba(255,255,255,0.85); }
+  .ad-interaction-icon.liked { color: #ff4d6d; }
+  .ad-interaction-count { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.6); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Feed 首页 — 线框图</h1>
+  <p>小程序 · 九态交互 · TikTok 风格 · 底Bar：推荐/大舞台/发布/消息/我的 · 顶Tab：关注/推荐</p>
+</div>
+
+<!-- State switcher -->
+<div class="state-switcher" role="group" aria-label="切换状态">
+  <button class="state-btn active" data-state="play" onclick="setState('play')">① 短视频播放</button>
+  <button class="state-btn" data-state="pause" onclick="setState('pause')">② 暂停</button>
+  <button class="state-btn" data-state="imagetext" onclick="setState('imagetext')">③ 单图文</button>
+  <button class="state-btn" data-state="article" onclick="setState('article')">④ 单图文详情</button>
+  <button class="state-btn" data-state="multiimg" onclick="setState('multiimg')">⑤ 多图</button>
+  <button class="state-btn" data-state="comments" onclick="setState('comments')">⑥ 评论展开</button>
+  <button class="state-btn" data-state="share" onclick="setState('share')">⑦ 分享弹窗</button>
+  <button class="state-btn" data-state="reward" onclick="setState('reward')">⑧ 打赏面板</button>
+  <button class="state-btn" data-state="gift" onclick="setState('gift')">⑨ 选择礼物</button>
+</div>
+
+<!-- Two devices side by side -->
+<div class="devices-row">
+
+  <!-- ① 小程序 -->
+  <div class="device-wrapper">
+    <div class="device-label">iPhone in WeChat Mini-Program</div>
+
+    <div class="mp-device">
+      <div class="mp-screen" id="mp-screen">
+
+        <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar">
+              <span class="bar"></span><span class="bar"></span>
+              <span class="bar"></span><span class="bar"></span>
+            </div>
+            <div class="wifi-icon"></div>
+            <div class="battery-icon"></div>
+          </div>
+        </div>
+
+        <!-- 小程序 NavBar：单图文详情态下复用同一根 NavBar 当详情页导航——左侧变返回箭头，
+             标题换成文章标题，右侧「•••」保持不变，不再另外叠加一套悬浮状态栏/胶囊 -->
+        <div class="mp-nav">
+          <div class="mp-nav-back" id="mp-nav-back" onclick="setState('imagetext')"></div>
+          <div class="mp-nav-title" id="mp-nav-title">Feed</div>
+          <div class="mp-nav-more"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="mp-content">
+          <div class="video-bg">
+            <div class="video-placeholder-inner">
+              <div class="vp-icon"></div>
+              <p>VIDEO CONTENT</p>
+            </div>
+          </div>
+          <div class="imagetext-scroll-content">
+            <div class="imagetext-scroll-inner">
+              <div class="imagetext-title">写给不将就的你</div>
+              <p>可以聊理想、聊人性，聊那些不被世俗理解的细碎感受；</p>
+              <p>也可以落地烟火人间，接纳柴米油盐的琐碎，一起看山川草木，感受平凡日子里的细碎闪光。</p>
+              <p>我们不必时时刻刻都轰轰烈烈，普通的晚饭、随手一句晚安，也可以是深情的模样。</p>
+              <p>精神同频是底色，真诚是前提，专一为底线。</p>
+              <p>不需要完美的人设，只需要真实的靠近——你可以脆弱，可以偶尔情绪化，我都愿意接住。</p>
+              <p>拒绝快餐式的好感，拒绝短暂上头的冲动。</p>
+              <p>感情从来不是一见钟情的烟花，而是细水长流的陪伴，是吵架后依然愿意坐下来说清楚的耐心。</p>
+              <p>我愿意慢慢了解，慢慢靠近，慢慢交付。</p>
+              <p>慢慢地，把彼此的习惯、脆弱、过去都摆在桌面上，不评判，只理解。</p>
+              <p>愿我们看懂彼此的灵魂，也接纳彼此现实里全部的不完美。</p>
+              <p>一起变老不是终点，而是每天都重新选择彼此的过程——柴米油盐里藏着的，其实是最深的浪漫。</p>
+              <p>在这喧嚣浮躁的时代，遇见一份不被敷衍的真心。</p>
+              <p>我期待的不是轰轰烈烈的偶像剧，而是柴米油盐里也能被认真对待的日常。</p>
+              <p>早晨的一句「今天想吃什么」，深夜加班后留的一盏灯，都是我理解的浪漫。</p>
+              <p>我们会有分歧，会有意见不一致的时候，但争吵之后，我更希望我们能坦诚沟通，而不是冷战逃避。</p>
+              <p>我愿意在你情绪低落的时候，先收起自己的评判，认真听你说完，再一起想办法。</p>
+              <p>亲密关系里最珍贵的，从来不是完美契合，而是愿意为对方调整、为彼此磨合的耐心。</p>
+              <p>我不会用消失来惩罚分歧，也不希望你用冷漠来逃避矛盾——遇到问题，一起解决，而不是各自沉默。</p>
+              <p>我尊重你的社交、你的爱好、你和朋友家人的关系，同样也希望被尊重和信任。</p>
+              <p>独立空间很重要，我们可以有各自热爱的事情，不必时刻黏在一起才算亲密。</p>
+              <p>我也期待有共同的兴趣，一起追一部剧，一起做一顿饭，一起计划一场说走就走的旅行。</p>
+              <p>遇到困难的时候，我希望我们是彼此的队友，而不是互相指责的对手。</p>
+              <p>对家人的态度、对未来的规划，我们可以慢慢磨合，但基本的价值观需要同频。</p>
+              <p>我期待的未来，不是轰动一时的惊喜，而是很多年后依然愿意为对方留一份耐心的平淡日子。</p>
+              <p>如果有一天遇到分歧，希望我们都能先冷静下来，而不是把情绪都发泄在最亲近的人身上。</p>
+              <p>我愿意为这份关系持续地努力和经营，而不是把「合适」当作理所当然。</p>
+              <p>感情需要经营，需要沟通，需要在琐碎的日常里持续投入心力，而不是只靠最初的心动维持。</p>
+              <p>希望我们能一起变得更好，而不是在这段关系里停滞不前或互相消耗。</p>
+              <p>我不害怕平淡，害怕的是两个人在平淡里渐渐失去了沟通的意愿。</p>
+              <p>愿我们在彼此最真实的样子里，依然选择靠近，而不是转身离开。</p>
+              <p class="emoji-line">🌿 不将就，不仓促，静待同频之人。</p>
+            </div>
+          </div>
+          <button class="imagetext-read-btn" onclick="setState('article')">阅读文章</button>
+
+          <!-- 单图文详情覆盖层：点击「阅读文章」后展示，形式仿照 imagetext-detail-wireframe-mp.html，
+               但不展示创作者头像和关注按钮。导航复用外层 mp-nav（返回箭头+标题+更多），
+               此处不再叠加另一套悬浮状态栏/胶囊，只覆盖 mp-content（图片起始）区域 -->
+          <div class="ad-overlay">
+            <div class="ad-scroll">
+              <div class="ad-image"></div>
+
+              <!-- 不展示创作者头像和关注按钮，正文直接紧跟在图片下方 -->
+              <div class="ad-body">
+                <div class="ad-title">写给不将就的你</div>
+                <div class="ad-text">这里是图文内容的正文文字展示区域，用于呈现创作者撰写的详细内容，支持较长篇幅的文字描述，最多可展示若干行，具体行数不做限制，超出部分保持完整展示</div>
+                <div class="ad-topics"><span class="ad-topic">#话题标签</span> <span class="ad-topic">#热门话题</span> <span class="ad-topic">#生活记录</span></div>
+              </div>
+              <div class="ad-time-row">
+                <span class="ad-time">2026-07-10</span>
+                <div class="ad-dislike-btn" id="ad-dislike-btn" onclick="adToggleContentDislike()"><span class="dislike-icon">😑</span>不喜欢</div>
+              </div>
+
+              <div class="ad-comments">
+                <div class="ad-comments-heading">共 342 条评论</div>
+
+                <div class="ad-compose">
+                  <div class="my-avatar">👤</div>
+                  <div class="compose-input" id="ad-compose-input">留下你的想法吧…</div>
+                </div>
+
+                <div class="ad-comment-item">
+                  <div class="ad-comment-avatar"></div>
+                  <div class="ad-comment-body">
+                    <div class="ad-comment-name">用户昵称_01</div>
+                    <div class="ad-comment-text">这个内容太好了，正是我想要的！</div>
+                    <div class="ad-comment-meta">
+                      <span class="ad-comment-time">2小时前</span><span class="ad-reply-btn" onclick="adToggleReplyTarget(this)">回复</span>
+                      <div class="ad-votes">
+                        <div class="ad-vote" onclick="adToggleCommentLike(this)"><span class="vote-icon like liked">❤</span><span class="vote-count">128</span></div>
+                        <div class="ad-vote" onclick="adToggleCommentDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                      </div>
+                    </div>
+                    <div class="ad-replies">
+                      <div class="ad-reply-item">
+                        <div class="ad-reply-avatar"></div>
+                        <div class="ad-reply-body">
+                          <div class="ad-reply-name">用户昵称_05</div>
+                          <div class="ad-reply-text">同感，太真实了</div>
+                          <div class="ad-reply-meta">
+                            <span class="ad-reply-time">1小时前</span><span class="ad-reply-btn">回复</span>
+                            <div class="ad-votes">
+                              <div class="ad-vote" onclick="adToggleCommentLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">6</span></div>
+                              <div class="ad-vote" onclick="adToggleCommentDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ad-reply-item more">
+                        <div class="ad-reply-avatar"></div>
+                        <div class="ad-reply-body">
+                          <div class="ad-reply-name">用户昵称_06</div>
+                          <div class="ad-reply-text">哈哈哈哈是的</div>
+                          <div class="ad-reply-meta">
+                            <span class="ad-reply-time">50分钟前</span><span class="ad-reply-btn">回复</span>
+                            <div class="ad-votes">
+                              <div class="ad-vote" onclick="adToggleCommentLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">2</span></div>
+                              <div class="ad-vote" onclick="adToggleCommentDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ad-expand-replies" onclick="adExpandReplies(this)">展开 1 条回复</div>
+                  </div>
+                </div>
+
+                <div class="ad-comment-item">
+                  <div class="ad-comment-avatar"></div>
+                  <div class="ad-comment-body">
+                    <div class="ad-comment-name">用户昵称_02</div>
+                    <div class="ad-comment-text">真的很实用，学到了！</div>
+                    <div class="ad-comment-meta">
+                      <span class="ad-comment-time">4小时前</span><span class="ad-reply-btn" onclick="adToggleReplyTarget(this)">回复</span>
+                      <div class="ad-votes">
+                        <div class="ad-vote" onclick="adToggleCommentLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">14</span></div>
+                        <div class="ad-vote" onclick="adToggleCommentDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /ad-scroll -->
+
+            <div class="ad-interaction-bar">
+              <div class="ad-comment-input">说点什么…</div>
+              <div class="ad-interaction-item" onclick="adToggleMainLike()">
+                <div class="ad-interaction-icon" id="ad-like-icon">♡</div>
+                <span class="ad-interaction-count" id="ad-like-count">1.2w</span>
+              </div>
+              <div class="ad-interaction-item">
+                <div class="ad-interaction-icon">💬</div>
+                <span class="ad-interaction-count">342</span>
+              </div>
+              <div class="ad-interaction-item">
+                <div class="ad-interaction-icon">🎁</div>
+                <span class="ad-interaction-count">¥128</span>
+              </div>
+              <div class="ad-interaction-item">
+                <div class="ad-interaction-icon">↗</div>
+                <span class="ad-interaction-count">89</span>
+              </div>
+            </div>
+          </div><!-- /ad-overlay -->
+          <div class="feed-tabs">
+            <span class="feed-tab">关注</span>
+            <span class="feed-tab active">推荐</span>
+          </div>
+          <div class="pause-overlay">
+            <div class="pause-btn"><div class="pause-btn-bars"><span></span><span></span></div></div>
+          </div>
+          <div class="video-progress"><div class="video-progress-fill"></div></div>
+          <div class="right-bar">
+            <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+            <div class="right-bar-item"><div class="rb-icon">♡</div><span class="rb-count">14.2w</span></div>
+            <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+              <div class="rb-icon">💬</div><span class="rb-count">3,421</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('reward')" style="cursor:pointer">
+              <div class="rb-icon">🎁</div><span class="rb-count">¥128</span>
+            </div>
+            <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+              <div class="rb-icon">↗</div><span class="rb-count">分享</span>
+            </div>
+          </div>
+          <div class="bottom-info">
+            <div class="creator-name">@创作者昵称<span class="recommend-badge">荐</span></div>
+            <div class="video-title-line">视频标题文字展示区域，最多展示两行内容<span class="video-tag">#话题标签</span><span class="video-tag">#热门话题</span></div>
+          </div>
+          <div class="comments-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">评论</div><div class="drawer-count">3,421 条评论</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="comments-list">
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_01</div>
+                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-meta">
+                    <span class="comment-time">2小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like liked">❤</span><span class="vote-count">128</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
+                  <div class="replies-list">
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_05</div>
+                        <div class="reply-text">同感，太真实了</div>
+                        <div class="reply-meta">
+                          <span class="reply-time">1小时前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">6</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_06</div>
+                        <div class="reply-text">哈哈哈哈是的</div>
+                        <div class="reply-meta">
+                          <span class="reply-time">50分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">2</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="reply-item">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_07</div>
+                        <div class="reply-text">已经关注了创作者</div>
+                        <div class="reply-meta">
+                          <span class="reply-time">30分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">0</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="reply-item more">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_08</div>
+                        <div class="reply-text">路过点个赞</div>
+                        <div class="reply-meta">
+                          <span class="reply-time">20分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">1</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="reply-item more">
+                      <div class="reply-avatar"></div>
+                      <div class="reply-body">
+                        <div class="reply-name">用户昵称_09</div>
+                        <div class="reply-text">学到了，感谢分享</div>
+                        <div class="reply-meta">
+                          <span class="reply-time">5分钟前</span><span class="comment-reply-btn">回复</span>
+                          <div class="comment-votes">
+                            <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">0</span></div>
+                            <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="expand-replies-btn" onclick="expandReplies(this)">展开 2 条回复</div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_02</div>
+                  <div class="comment-text">真的很实用，收藏了！</div>
+                  <div class="comment-text placeholder"></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">4小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">14</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_03</div>
+                  <div class="comment-text placeholder short"></div>
+                  <div class="comment-meta">
+                    <span class="comment-time">6小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">3</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="comment-item">
+                <div class="comment-avatar"></div>
+                <div class="comment-body">
+                  <div class="comment-name">用户昵称_04</div>
+                  <div class="comment-text">强烈推荐给每一个人看</div>
+                  <div class="comment-meta">
+                    <span class="comment-time">昨天</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
+                    <div class="comment-votes">
+                      <div class="comment-vote" onclick="toggleLike(this)"><span class="vote-icon like">❤</span><span class="vote-count">42</span></div>
+                      <div class="comment-vote" onclick="toggleDislike(this)"><span class="vote-icon dislike">💔</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="drawer-input">
+              <div class="input-field"><span class="input-placeholder">说点什么…</span></div>
+            </div>
+          </div>
+          <div class="share-sheet">
+            <div class="share-handle"></div>
+            <div class="share-header">
+              <div>
+                <div class="share-title">分享到</div>
+              </div>
+              <div class="share-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="share-copy-panel">
+              <div class="share-dislike-row">
+                <div class="share-dislike-btn">😑<span class="share-dislike-label">不喜欢</span></div>
+              </div>
+              <div class="share-copy-row">
+                <span class="share-copy-url">h5.example.com/share/<em>video_id_123456</em></span>
+                <button class="share-copy-btn-main" id="feed-copy-btn" onclick="copyFeedLink()">复制链接</button>
+              </div>
+            </div>
+          </div>
+          <div class="share-copy-toast" id="feed-copy-toast">链接已复制</div>
+
+          <!-- 打赏面板：点击右侧🎁按钮弹出，展示打赏榜 + 礼物聚合，底部打赏按钮 -->
+          <div class="reward-sheet">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+              <div><div class="drawer-title">🎁 4 人打赏，共 ¥96</div></div>
+              <div class="drawer-close" onclick="setState('play')">×</div>
+            </div>
+            <div class="reward-body">
+              <div class="reward-avatar-wall">
+                <div class="reward-avatar-item">
+                  <div class="reward-avatar">👤
+                    <span class="reward-crown gold">👑</span>
+                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">45</span></span>
+                  </div>
+                  <span class="reward-avatar-name">Lucy</span>
+                </div>
+                <div class="reward-avatar-item">
+                  <div class="reward-avatar">👤
+                    <span class="reward-crown silver">👑</span>
+                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">33</span></span>
+                  </div>
+                  <span class="reward-avatar-name">阿伟</span>
+                </div>
+                <div class="reward-avatar-item">
+                  <div class="reward-avatar">👤
+                    <span class="reward-crown bronze">👑</span>
+                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">19</span></span>
+                  </div>
+                  <span class="reward-avatar-name">小美</span>
+                </div>
+                <div class="reward-avatar-item">
+                  <div class="reward-avatar">👤
+                    <span class="reward-level"><span class="ic">🏆</span><span class="lv">8</span></span>
+                  </div>
+                  <span class="reward-avatar-name">你</span>
+                </div>
+              </div>
+              <div class="reward-divider"></div>
+              <div class="reward-gift-list">
+                <div class="reward-gift-chip"><span class="reward-gift-icon">👑</span><span class="reward-gift-name">皇冠</span><span class="reward-gift-count">×1</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🚀</span><span class="reward-gift-name">火箭</span><span class="reward-gift-count">×2</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🧸</span><span class="reward-gift-name">玩偶</span><span class="reward-gift-count">×1</span></div>
+                <div class="reward-gift-chip"><span class="reward-gift-icon">🎈</span><span class="reward-gift-name">气球</span><span class="reward-gift-count">×1</span></div>
+              </div>
+            </div>
+            <div class="reward-footer">
+              <button class="reward-confirm-btn" onclick="setState('gift')">打赏</button>
+            </div>
+          </div>
+
+          <!-- 选择礼物面板：点击打赏面板底部「打赏」按钮后展示，浅色卡片，参考截图 -->
+          <div class="giftpanel-sheet">
+            <div class="giftpanel-handle"></div>
+            <div class="giftpanel-head">
+              <div class="giftpanel-title">打赏给 阿伟</div>
+              <div class="giftpanel-sub">选择一款虚拟礼物打赏，对方会收到礼物提醒</div>
+            </div>
+            <div class="giftpanel-tabs">
+              <div class="giftpanel-tab active" onclick="setGiftCategory(this, 'popular')">推荐</div>
+              <div class="giftpanel-tab" onclick="setGiftCategory(this, 'luxury')">奢华</div>
+              <div class="giftpanel-tab" onclick="setGiftCategory(this, 'festival')">节日</div>
+            </div>
+            <div class="giftpanel-wrap">
+              <div class="giftpanel-scroll">
+                <div class="giftpanel-grid" data-cat="popular">
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🌹</span><span class="gift-name">玫瑰</span><span class="gift-price">¥1</span></div>
+                  <div class="gift-card selected" onclick="selectGift(this)"><span class="gift-icon">🎈</span><span class="gift-name">气球</span><span class="gift-price">¥3</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🧸</span><span class="gift-name">玩偶</span><span class="gift-price">¥5</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🍰</span><span class="gift-name">蛋糕</span><span class="gift-price">¥6</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎉</span><span class="gift-name">派对</span><span class="gift-price">¥8</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎊</span><span class="gift-name">彩带</span><span class="gift-price">¥12</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🧧</span><span class="gift-name">红包</span><span class="gift-price">¥15</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🚀</span><span class="gift-name">火箭</span><span class="gift-price">¥18</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">💐</span><span class="gift-name">花束</span><span class="gift-price">¥16</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎁</span><span class="gift-name">礼盒</span><span class="gift-price">¥9</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🍭</span><span class="gift-name">棒棒糖</span><span class="gift-price">¥2</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🧁</span><span class="gift-name">纸杯蛋糕</span><span class="gift-price">¥4</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎆</span><span class="gift-name">烟花</span><span class="gift-price">¥38</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎀</span><span class="gift-name">丝带</span><span class="gift-price">¥22</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🌈</span><span class="gift-name">彩虹</span><span class="gift-price">¥45</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">⭐</span><span class="gift-name">星星</span><span class="gift-price">¥68</span></div>
+                </div>
+                <div class="giftpanel-grid hidden" data-cat="luxury">
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🚀</span><span class="gift-name">火箭</span><span class="gift-price">¥18</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span></div>
+                </div>
+                <div class="giftpanel-grid hidden" data-cat="festival">
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎉</span><span class="gift-name">派对</span><span class="gift-price">¥8</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🧧</span><span class="gift-name">红包</span><span class="gift-price">¥15</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎊</span><span class="gift-name">彩带</span><span class="gift-price">¥12</span></div>
+                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎆</span><span class="gift-name">烟花</span><span class="gift-price">¥38</span></div>
+                </div>
+              </div>
+              <div class="giftpanel-fade"></div>
+            </div>
+            <div class="giftpanel-footer">
+              <button class="giftpanel-confirm" onclick="setState('play')"><span>打赏</span><span id="gift-confirm-icon">🎈</span><span id="gift-confirm-name">气球</span></button>
+            </div>
+          </div>
+
+          <!-- 多图全屏覆盖层 -->
+          <div class="multiimg-overlay">
+            <div class="multiimg-content">
+              <!-- 多图主体 -->
+              <div class="multiimg-image">图片 1 / 6</div>
+              <!-- 顶部分段进度条：每一段代表一张图，当前图高亮 -->
+              <div class="multiimg-progress">
+                <span class="multiimg-seg active"></span>
+                <span class="multiimg-seg"></span>
+                <span class="multiimg-seg"></span>
+                <span class="multiimg-seg"></span>
+                <span class="multiimg-seg"></span>
+                <span class="multiimg-seg"></span>
+              </div>
+              <!-- 右侧互动栏（与短视频播放一致） -->
+              <div class="multiimg-right-bar">
+                <div class="right-bar-item rb-avatar"><div class="rb-icon">👤</div></div>
+                <div class="right-bar-item"><div class="rb-icon">♡</div><span class="rb-count">338</span></div>
+                <div class="right-bar-item" onclick="setState('comments')" style="cursor:pointer">
+                  <div class="rb-icon">💬</div><span class="rb-count">9</span>
+                </div>
+                <div class="right-bar-item" onclick="setState('reward')" style="cursor:pointer">
+                  <div class="rb-icon">🎁</div><span class="rb-count">¥31</span>
+                </div>
+                <div class="right-bar-item" onclick="setState('share')" style="cursor:pointer">
+                  <div class="rb-icon">↗</div><span class="rb-count">38</span>
+                </div>
+              </div>
+              <!-- 底部创作者+标题+话题（与短视频播放一致） -->
+              <div class="multiimg-bottom-info">
+                <div class="creator-line">
+                  <div class="cr-avatar"></div>
+                  <span class="cr-name">@创作者昵称</span>
+                  <span class="cr-type">📖 图文</span>
+                </div>
+                <div class="mi-title">手工刺绣 | Baby Dodds</div>
+                <div class="mi-tags">
+                  <span class="mi-tag">#手工刺绣</span>
+                  <span class="mi-tag">#Vintage</span>
+                  <span class="mi-tag">#爵士乐</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 同城定位失败 — 选择所属地区（仅小程序） -->
+          <div class="location-sheet">
+            <div class="loc-handle"></div>
+            <div class="loc-title">无法获取您的位置</div>
+            <div class="loc-hint">
+              请手动选择所属地区，以查看同城内容
+              <span class="loc-reason">GPS 或 IP 定位失败，请检查权限设置</span>
+            </div>
+            <div class="loc-selectors">
+              <div class="loc-select-wrap">
+                <span class="loc-select-label">国家 / 地区</span>
+                <div class="loc-select"><span>中国</span><span class="arrow">›</span></div>
+              </div>
+              <div class="loc-select-wrap">
+                <span class="loc-select-label">省市 / 地区</span>
+                <div class="loc-select"><span>请选择</span><span class="arrow">›</span></div>
+              </div>
+            </div>
+            <button class="loc-confirm" onclick="setState('play')">确认</button>
+          </div>
+
+          <!-- 新手引导覆盖层 -->
+          <div class="ob-overlay">
+            <!-- 状态栏 -->
+            <div class="ob-status-bar">
+              <span class="ob-status-time">9:41</span>
+              <div class="ob-status-icons">
+                <div class="ob-icon-bar"><span class="ob-bar"></span><span class="ob-bar"></span><span class="ob-bar"></span><span class="ob-bar"></span></div>
+                <div class="ob-wifi"></div>
+                <div class="ob-battery"></div>
+              </div>
+            </div>
+            <!-- 跳过 -->
+            <div class="ob-topbar">
+              <span class="ob-skip" onclick="setState('play')">跳过</span>
+            </div>
+            <!-- 内容 -->
+            <div class="ob-content">
+              <!-- 进度条 -->
+              <div class="ob-dots">
+                <div class="ob-dot"></div>
+                <div class="ob-dot"></div>
+                <div class="ob-dot"></div>
+              </div>
+
+              <!-- 步骤①：性别 -->
+              <div class="ob-step" data-step="gender">
+                <div class="ob-title">你的性别是？</div>
+                <div class="ob-subtitle">帮助我们推荐更贴合你的内容</div>
+                <div class="gender-cards">
+                  <div class="gender-card selected">
+                    <span class="gender-card-icon">👨</span>
+                    <div><div class="gender-card-label">男性</div><div class="gender-card-sub">Male</div></div>
+                    <div class="gender-radio"></div>
+                  </div>
+                  <div class="gender-card">
+                    <span class="gender-card-icon">👩</span>
+                    <div><div class="gender-card-label">女性</div><div class="gender-card-sub">Female</div></div>
+                    <div class="gender-radio"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 步骤②：年龄 -->
+              <div class="ob-step" data-step="age">
+                <div class="ob-title">你的年龄段？</div>
+                <div class="ob-subtitle">了解你的生活阶段，帮助推荐更合适的内容</div>
+                <div class="age-options">
+                  <div class="age-option"><span class="age-option-label">18 岁以下</span><div class="age-radio"></div></div>
+                  <div class="age-option selected"><span class="age-option-label">18 — 24 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">25 — 30 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">31 — 40 岁</span><div class="age-radio"></div></div>
+                  <div class="age-option"><span class="age-option-label">40 岁以上</span><div class="age-radio"></div></div>
+                </div>
+              </div>
+
+              <!-- 步骤③：兴趣标签 -->
+              <div class="ob-step" data-step="tags">
+                <div class="ob-title">选择你的兴趣</div>
+                <div class="ob-subtitle">选择 3 个或更多，获取个性化内容推荐</div>
+                <div class="ob-tag-hint">已选 <em>3</em> 个 · 至少选 3 个</div>
+                <div class="tags-grid">
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎬</span><span class="tag-pill-check">✓</span>剧情</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">⭐</span><span class="tag-pill-check">✓</span>明星</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎪</span><span class="tag-pill-check">✓</span>综艺</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎥</span><span class="tag-pill-check">✓</span>电影</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">📺</span><span class="tag-pill-check">✓</span>电视剧</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎵</span><span class="tag-pill-check">✓</span>音乐</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🌙</span><span class="tag-pill-check">✓</span>二次元</div>
+                  <div class="tag-pill selected"><span class="tag-pill-emoji">🎮</span><span class="tag-pill-check">✓</span>游戏</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📰</span><span class="tag-pill-check">✓</span>社会时政</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">❤️</span><span class="tag-pill-check">✓</span>公益</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📷</span><span class="tag-pill-check">✓</span>随拍</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💃</span><span class="tag-pill-check">✓</span>舞蹈</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🐾</span><span class="tag-pill-check">✓</span>动物</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🌾</span><span class="tag-pill-check">✓</span>三农</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🚀</span><span class="tag-pill-check">✓</span>科技</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📊</span><span class="tag-pill-check">✓</span>财经</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">👶</span><span class="tag-pill-check">✓</span>母婴</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎠</span><span class="tag-pill-check">✓</span>亲子</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏠</span><span class="tag-pill-check">✓</span>生活家居</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📖</span><span class="tag-pill-check">✓</span>法律</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💊</span><span class="tag-pill-check">✓</span>医疗健康</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🔬</span><span class="tag-pill-check">✓</span>科普</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💛</span><span class="tag-pill-check">✓</span>情感</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📚</span><span class="tag-pill-check">✓</span>传统文化</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🤝</span><span class="tag-pill-check">✓</span>职场</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎓</span><span class="tag-pill-check">✓</span>教育校园</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📸</span><span class="tag-pill-check">✓</span>摄影摄像</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🍖</span><span class="tag-pill-check">✓</span>美食</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏖️</span><span class="tag-pill-check">✓</span>旅行</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">👜</span><span class="tag-pill-check">✓</span>时尚</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🎨</span><span class="tag-pill-check">✓</span>艺术</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🏀</span><span class="tag-pill-check">✓</span>体育</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🍹</span><span class="tag-pill-check">✓</span>休闲娱乐</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🚗</span><span class="tag-pill-check">✓</span>汽车</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">📒</span><span class="tag-pill-check">✓</span>生活记录</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">🌍</span><span class="tag-pill-check">✓</span>人文社科</div>
+                  <div class="tag-pill"><span class="tag-pill-emoji">💕</span><span class="tag-pill-check">✓</span>颜值</div>
+                </div>
+              </div>
+
+            </div><!-- /ob-content -->
+            <!-- 底部按钮 -->
+            <div class="ob-footer">
+              <button class="ob-next-btn" onclick="obNext()">下一步</button>
+            </div>
+          </div><!-- /ob-overlay -->
+
+        </div><!-- /mp-content -->
+
+        <div class="mp-tabbar">
+          <div class="tab-item active"><div class="tab-icon">▶</div><span class="tab-label">推荐</span></div>
+          <div class="tab-item"><div class="tab-icon">▦</div><span class="tab-label">大舞台</span></div>
+          <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">发布</span></div>
+          <div class="tab-item"><div class="tab-icon">✉</div><span class="tab-label">消息</span></div>
+          <div class="tab-item"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+        </div>
+
+      </div><!-- /mp-screen -->
+    </div><!-- /mp-device -->
+  </div>
+
+</div><!-- /devices-row -->
+
+
+<!-- Diff callout -->
+<div class="spec-panel" style="width:375px;">
+  <h3>SPEC · 结构说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">顶部导航</span>
+    <span class="spec-val">小程序 NavBar 44px · 返回 / Feed 标题 / 更多</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">顶 Tab</span>
+    <span class="spec-val"><span class="spec-badge">关注</span> <span class="spec-badge">推荐</span></span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">底 Bar</span>
+    <span class="spec-val">两者相同：视频 / 图文 / 发布 / 消息 / 我的</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">分享弹窗</span>
+    <span class="spec-val">展示小程序路径；仅 H5 版展示 H5 链接 + 复制按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">打赏面板</span>
+    <span class="spec-val">点击右侧🎁按钮弹出底部sheet：打赏榜（头像+金/银/铜皇冠+等级徽章）+ 礼物聚合（图标+名称+数量）+ 底部打赏按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">选择礼物面板</span>
+    <span class="spec-val">点击打赏面板底部「打赏」按钮弹出浅色卡片：标题「打赏给 阿伟」+ 推荐/奢华/节日类目Tab + 礼物网格（图标+名称+¥价格，选中态黄框）+ 底部固定「打赏 [礼物]」按钮</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图文态</span>
+    <span class="spec-val">暗色全屏背景 + 可播放文字区域是独立固定视口（上边界在「推荐」Tab下方，下边界在「阅读文章」按钮上方），文字从标题开头匀速滚到文末、贴住视口下边界停住，绝不会越界压到按钮/创作者信息/底Bar · 「阅读文章」按钮固定在视口下方、创作者信息上方 · 右侧互动栏与短视频播放一致</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">单图文详情</span>
+    <span class="spec-val">单图文态点击「阅读文章」进入，形式仿照 imagetext-detail-wireframe-mp.html：复用外层 NavBar（返回箭头+文章标题+更多）+ 单图（无多图指示点）+ 标题/正文/话题 + 发布时间/不喜欢 + 评论区（本人输入框+评论+二级回复）+ 底部点赞/评论/打赏/分享交互条 · 不展示创作者头像和关注按钮 · 配色改为深色基准，与短视频播放/单图文态的暗色主题统一（不再用白底）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">状态切换栏（八态，单图文详情前移至④）</span>
+    <span class="spec-val">短视频播放 → 暂停 → 单图文 → 单图文详情 → 多图 → 评论展开 → 分享弹窗 → 打赏面板 → 选择礼物；单图文详情紧跟在单图文之后，与「阅读文章」的跳转关系保持一致，其余顺序不变</span>
+  </div>
+</div>
+
+<script>
+  const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
+
+  function setState(state) {
+    const el = document.getElementById('mp-screen');
+    el.classList.remove('state-pause', 'state-comments', 'state-share', 'state-reward', 'state-gift', 'state-imagetext', 'state-article', 'state-multiimg', 'state-location',
+                        'state-ob-gender', 'state-ob-age', 'state-ob-tags');
+    if (state !== 'play') el.classList.add('state-' + state);
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+    // update next-btn label
+    const nextBtn = el.querySelector('.ob-next-btn');
+    if (nextBtn) nextBtn.textContent = state === 'ob-tags' ? '完成' : '下一步';
+
+    if (state === 'imagetext') {
+      requestAnimationFrame(playImagetextScroll);
+    }
+
+    // 单图文详情态：NavBar 标题换成文章标题，返回箭头出现；离开该态时还原为「Feed」
+    const navTitle = document.getElementById('mp-nav-title');
+    if (navTitle) navTitle.textContent = state === 'article' ? '写给不将就的你' : 'Feed';
+  }
+
+  // 图文态：文字从标题顶部（贴着「推荐」Tab 下方）一直匀速播到正文结尾，
+  // 结尾正好停在可播放视口的下边界（视口本身已固定在「阅读文章」按钮上方，
+  // 按钮和创作者信息都在视口外，滚动内容永远不会越界压住它们）。
+  // 用视口高度 vs 正文实际高度算出滚动距离和时长，文章再改长也自动适配。
+  function playImagetextScroll() {
+    const screen = document.getElementById('mp-screen');
+    if (!screen) return;
+    const viewport = screen.querySelector('.imagetext-scroll-content');
+    const inner = screen.querySelector('.imagetext-scroll-inner');
+    if (!viewport || !inner) return;
+
+    // 先归零，测量视口高度与正文实际高度
+    inner.style.animation = 'none';
+    inner.style.transform = 'translateY(0)';
+    void inner.offsetHeight; // 强制重排
+
+    const viewportHeight = viewport.clientHeight;
+    const contentHeight = inner.scrollHeight;
+    const distance = Math.max(0, contentHeight - viewportHeight);
+
+    const pxPerSecond = 26; // 匀速慢读的速度
+    const duration = Math.min(60, Math.max(18, distance / pxPerSecond));
+
+    inner.style.setProperty('--scroll-end', (-distance) + 'px');
+    inner.style.setProperty('--scroll-duration', duration + 's');
+
+    // 重新触发动画，从头（标题）滚到尾
+    inner.style.transform = '';
+    inner.style.animation = 'none';
+    void inner.offsetHeight;
+    inner.style.animation = '';
+  }
+
+  // ─── 单图文详情覆盖层交互（前缀 ad- 避免与评论展开态的同名函数冲突）───
+  let adLiked = false;
+  const AD_BASE_LIKES = 12000;
+
+  function adFormatCount(n) {
+    return n >= 10000 ? (n / 10000).toFixed(1).replace(/\.0$/, '') + 'w' : n.toLocaleString();
+  }
+
+  function adToggleMainLike() {
+    adLiked = !adLiked;
+    const icon = document.getElementById('ad-like-icon');
+    const count = document.getElementById('ad-like-count');
+    icon.textContent = adLiked ? '❤' : '♡';
+    icon.classList.toggle('liked', adLiked);
+    count.textContent = adFormatCount(adLiked ? AD_BASE_LIKES + 1 : AD_BASE_LIKES);
+  }
+
+  function adToggleContentDislike() {
+    document.getElementById('ad-dislike-btn').classList.toggle('active');
+  }
+
+  function adExpandReplies(btn) {
+    const list = btn.previousElementSibling;
+    list.classList.add('expanded');
+    btn.style.display = 'none';
+  }
+
+  function adToggleReplyTarget(btn) {
+    const commentBody = btn.closest('.ad-comment-body');
+    const name = commentBody.querySelector('.ad-comment-name').textContent;
+    const input = document.getElementById('ad-compose-input');
+    input.textContent = '回复 @' + name + '…';
+  }
+
+  function adToggleCommentLike(voteEl) {
+    const meta = voteEl.closest('.ad-comment-meta, .ad-reply-meta');
+    const likeIcon = voteEl.querySelector('.vote-icon.like');
+    const countEl = voteEl.querySelector('.vote-count');
+    const dislikeIcon = meta.querySelector('.vote-icon.dislike');
+    let count = parseInt(countEl.textContent, 10) || 0;
+
+    const wasLiked = likeIcon.classList.contains('liked');
+    if (wasLiked) {
+      likeIcon.classList.remove('liked');
+      countEl.textContent = Math.max(0, count - 1);
+    } else {
+      likeIcon.classList.add('liked');
+      countEl.textContent = count + 1;
+      if (dislikeIcon.classList.contains('disliked')) dislikeIcon.classList.remove('disliked');
+    }
+  }
+
+  function adToggleCommentDislike(voteEl) {
+    const meta = voteEl.closest('.ad-comment-meta, .ad-reply-meta');
+    const dislikeIcon = voteEl.querySelector('.vote-icon.dislike');
+    const likeIcon = meta.querySelector('.vote-icon.like');
+    const likeCountEl = meta.querySelector('.vote-count');
+
+    const wasDisliked = dislikeIcon.classList.contains('disliked');
+    dislikeIcon.classList.toggle('disliked', !wasDisliked);
+    if (!wasDisliked && likeIcon.classList.contains('liked')) {
+      likeIcon.classList.remove('liked');
+      let count = parseInt(likeCountEl.textContent, 10) || 0;
+      likeCountEl.textContent = Math.max(0, count - 1);
+    }
+  }
+
+  function obNext() {
+    const el = document.getElementById('mp-screen');
+    const cur = OB_STATES.find(s => el.classList.contains('state-' + s));
+    if (!cur) return;
+    const idx = OB_STATES.indexOf(cur);
+    if (idx < OB_STATES.length - 1) {
+      setState(OB_STATES[idx + 1]);
+    } else {
+      setState('play'); // 完成 → 进入 Feed
+    }
+  }
+
+  function copyLink() {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1800);
+  }
+
+  function expandReplies(btn) {
+    const list = btn.previousElementSibling;
+    list.classList.add('expanded');
+    btn.style.display = 'none';
+  }
+
+  function toggleReplies(btn) {
+    const commentBody = btn.closest('.comment-body');
+    const name = commentBody.querySelector('.comment-name').textContent;
+    const input = commentBody.closest('.comments-drawer').querySelector('.input-placeholder');
+    input.textContent = '回复 @' + name + '…';
+  }
+
+  function toggleLike(voteEl) {
+    const meta = voteEl.closest('.comment-meta, .reply-meta');
+    const likeIcon = voteEl.querySelector('.vote-icon.like');
+    const countEl = voteEl.querySelector('.vote-count');
+    const dislikeIcon = meta.querySelector('.vote-icon.dislike');
+    let count = parseInt(countEl.textContent, 10) || 0;
+
+    const wasLiked = likeIcon.classList.contains('liked');
+    if (wasLiked) {
+      likeIcon.classList.remove('liked');
+      countEl.textContent = Math.max(0, count - 1);
+    } else {
+      likeIcon.classList.add('liked');
+      countEl.textContent = count + 1;
+      if (dislikeIcon.classList.contains('disliked')) dislikeIcon.classList.remove('disliked');
+    }
+  }
+
+  function toggleDislike(voteEl) {
+    const meta = voteEl.closest('.comment-meta, .reply-meta');
+    const dislikeIcon = voteEl.querySelector('.vote-icon.dislike');
+    const likeIcon = meta.querySelector('.vote-icon.like');
+    const likeCountEl = meta.querySelector('.vote-count');
+
+    const wasDisliked = dislikeIcon.classList.contains('disliked');
+    dislikeIcon.classList.toggle('disliked', !wasDisliked);
+    if (!wasDisliked && likeIcon.classList.contains('liked')) {
+      likeIcon.classList.remove('liked');
+      let count = parseInt(likeCountEl.textContent, 10) || 0;
+      likeCountEl.textContent = Math.max(0, count - 1);
+    }
+  }
+
+  function setGiftCategory(tabEl, cat) {
+    const sheet = tabEl.closest('.giftpanel-sheet');
+    sheet.querySelectorAll('.giftpanel-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    sheet.querySelectorAll('.giftpanel-grid').forEach(g => g.classList.toggle('hidden', g.dataset.cat !== cat));
+  }
+
+  function selectGift(cardEl) {
+    const sheet = cardEl.closest('.giftpanel-sheet');
+    sheet.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+    sheet.querySelector('#gift-confirm-icon').textContent = cardEl.querySelector('.gift-icon').textContent;
+    sheet.querySelector('#gift-confirm-name').textContent = cardEl.querySelector('.gift-name').textContent;
+  }
+
+  function copyFeedLink() {
+    const btn = document.getElementById('feed-copy-btn');
+    const toast = document.getElementById('feed-copy-toast');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    toast.classList.add('visible');
+    setTimeout(() => {
+      btn.textContent = '复制链接';
+      btn.classList.remove('copied');
+      toast.classList.remove('visible');
+    }, 1800);
+  }
+</script>
+
+
+
+</body></html>
