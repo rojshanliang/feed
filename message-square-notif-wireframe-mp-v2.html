@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>消息页 · 筛选能力 — 线框图（小程序）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Source+Sans+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #fafafa;
@@ -332,11 +331,11 @@
         <div class="filter-backdrop open" onclick="closeFilter()"></div>
         <div class="filter-panel open">
           <div class="filter-item selected" onclick="selectFilter(this)"><span class="fi-icon">💬</span><span class="fi-label">全部消息</span><span class="fi-check">✓</span></div>
+          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">📣</span><span class="fi-label">平台官方</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">❤️</span><span class="fi-label">赞与浏览</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">💭</span><span class="fi-label">收到的评论</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">✏️</span><span class="fi-label">发出的评论</span><span class="fi-check">✓</span></div>
           <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">🎁</span><span class="fi-label">收到的打赏</span><span class="fi-check">✓</span></div>
-          <div class="filter-item" onclick="selectFilter(this)"><span class="fi-icon">📣</span><span class="fi-label">平台官方</span><span class="fi-check">✓</span></div>
         </div>
 
         <div class="page-scroll">
@@ -438,7 +437,7 @@
               <div class="notif-body">
                 <div class="notif-header">
                   <div class="notif-name-group">
-                    <span class="notif-name">小美、Lucy 等 127 人</span>
+                    <span class="notif-name">Lucy</span>
                     <span class="notif-source-tag">大舞台</span>
                   </div>
                   <span class="notif-time">1小时</span>
@@ -731,5 +730,6 @@
     }
   }
 </script>
-</body>
-</html>
+
+
+</body></html>
