@@ -1,0 +1,3048 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发布器线框图 — 小程序</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Source+Sans+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-pill: 9999px;
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 40px 24px 60px; gap: 40px;
+  }
+
+  /* ─── Page header ─────────────────────────────────────────── */
+  .page-header { text-align: center; }
+  .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
+
+  /* ─── State switcher（切换 纯文字/图文/视频/上传中 状态，避免平铺） ── */
+  .state-switcher {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 4px;
+  }
+  .state-btn {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .state-btn.active { background: var(--accent); color: var(--accent-on); }
+  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+
+  /* ─── Device ──────────────────────────────────────────────── */
+  .device-wrapper { display: none; flex-direction: column; align-items: center; gap: 12px; }
+  .device-wrapper.active { display: flex; }
+  .device-label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .mp-device {
+    width: 375px; height: 780px; background: var(--fg);
+    border-radius: 36px; padding: 2px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .mp-screen {
+    width: 100%; height: 100%; background: #ffffff;
+    border-radius: 34px; overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Status bar ──────────────────────────────────────────── */
+  .mp-status-bar {
+    height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0;
+  }
+  .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff; }
+  .mp-status-icons { display: flex; align-items: center; gap: 5px; }
+  .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px; }
+  .mp-status-icons .bar:nth-child(1) { height: 4px; }
+  .mp-status-icons .bar:nth-child(2) { height: 6px; }
+  .mp-status-icons .bar:nth-child(3) { height: 8px; }
+  .mp-status-icons .bar:nth-child(4) { height: 10px; }
+  .wifi-icon { width: 14px; height: 10px; position: relative; }
+  .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
+  .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative; }
+  .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0; }
+  .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px; }
+
+  /* ─── Mini-program NavBar ─────────────────────────────────── */
+  .mp-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-back { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1; }
+  .nav-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .nav-publish-btn {
+    height: 28px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .nav-publish-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  
+
+  /* ─── Page scroll ─────────────────────────────────────────── */
+  .page-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+  /* ─── 正文输入：像朋友圈一样，大段文字输入在最上面 ─────────── */
+  .square-text-wrap { padding: 16px 16px 4px; }
+  .square-textarea {
+    width: 100%; min-height: 96px;
+    font-family: var(--font-body); font-size: 15px; color: var(--muted);
+    line-height: 1.6; border: none;
+  }
+  .square-textarea.filled { color: var(--fg); }
+  .square-textarea .inline-topic { color: #2563eb; font-weight: 600; }
+  .square-textarea .caret {
+    display: inline-block; width: 1px; height: 15px; background: var(--fg);
+    margin-left: 1px; vertical-align: middle;
+    animation: caret-blink 1s step-end infinite;
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+  .square-char-count { font-family: var(--font-mono); font-size: 10px; color: rgba(0,0,0,0.3); text-align: right; padding: 0 16px 6px; }
+  .square-char-count.filled { color: var(--fg); }
+
+  /* ─── 文字工具行：发表情按钮，紧贴正文输入框右下方 ──────────── */
+  .text-toolbar { display: flex; justify-content: flex-end; padding: 0 16px 6px; }
+  .text-emoji-btn {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+  }
+  .text-emoji-btn.active { background: var(--border-soft); }
+
+  /* ─── 表情面板：点击表情按钮后，在正文下方展开 ─────────────── */
+  .emoji-panel {
+    background: #f0f1f3; margin: 0 16px 14px; border-radius: var(--radius-md);
+    display: grid; grid-template-columns: repeat(8, 1fr);
+    align-content: flex-start; gap: 4px;
+    padding: 12px 8px;
+  }
+  .emoji-panel .emoji-item {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border-radius: 4px; cursor: pointer;
+  }
+
+  /* ─── 媒体动作行：图片 / 视频，二选一（与朋友圈一致，不能同时发） ── */
+  .media-actions { display: flex; gap: 10px; padding: 4px 16px 14px; }
+  .media-action-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: var(--radius-pill);
+    border: 1px solid var(--border); background: #ffffff;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg-2);
+    cursor: pointer;
+  }
+  .media-action-btn .ic { font-size: 14px; }
+  .media-action-btn.active { border-color: var(--accent); background: var(--surface-warm); color: var(--fg); }
+  .media-action-btn.disabled { color: var(--border); border-color: var(--border-soft); cursor: not-allowed; }
+
+  /* ─── 图文 · 图片多选宫格 ──────────────────────────────────── */
+  .image-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 0 16px 14px;
+  }
+  .image-slot {
+    aspect-ratio: 1/1; border-radius: var(--radius-md);
+    position: relative; overflow: hidden;
+  }
+  .image-slot.add {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer;
+  }
+  .image-slot.add .u-icon { font-size: 22px; color: var(--muted); line-height: 1; }
+  .image-slot.add .u-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .image-slot.bgm {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer; position: relative;
+    transition: all 120ms cubic-bezier(0.2,0,0,1);
+  }
+  .image-slot.bgm:hover { background: var(--surface-warm); border-color: var(--accent); }
+  .image-slot.bgm .bgm-icon { font-size: 22px; line-height: 1; }
+  .image-slot.bgm .bgm-text { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: var(--fg); text-align: center; }
+  .image-slot.bgm.selected {
+    background: #fffdf5; border: 1.5px solid var(--accent);
+  }
+  .image-slot.bgm.selected .bgm-text { color: var(--fg); font-size: 10px; line-height: 1.3; padding: 0 4px; }
+  .image-slot.bgm.selected::after {
+    content: '✓'; position: absolute; top: 4px; right: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+
+  /* ─── BGM 半弹层 (Music Drawer / Sheet) ───────────────────────── */
+  .music-sheet-overlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .music-sheet {
+    background: #ffffff;
+    border-radius: 16px 16px 0 0;
+    height: 70%; display: flex; flex-direction: column;
+    overflow: hidden; box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+  }
+  .music-sheet-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 8px auto 6px; flex-shrink: 0;
+  }
+  .music-sheet-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 16px 10px; border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .music-sheet-title {
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    color: var(--fg); letter-spacing: -0.01em;
+  }
+  .music-sheet-close {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--border-soft); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--muted); cursor: pointer; line-height: 1;
+  }
+  .music-sheet-search {
+    padding: 10px 16px 8px; flex-shrink: 0;
+  }
+  .music-search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: #f3f4f6; border-radius: var(--radius-pill);
+    padding: 7px 14px; font-size: 12px; color: var(--muted);
+    border: 1px solid transparent;
+  }
+  .music-search-icon { font-size: 13px; color: var(--muted); }
+  .music-search-input {
+    border: none; background: transparent; outline: none;
+    font-family: var(--font-body); font-size: 12px; color: var(--fg);
+    width: 100%;
+  }
+  .music-sheet-tabs {
+    display: flex; padding: 0 16px; border-bottom: 1px solid var(--border-soft);
+    gap: 18px; flex-shrink: 0;
+  }
+  .music-tab-item {
+    padding: 8px 0; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative;
+    white-space: nowrap;
+  }
+  .music-tab-item.active {
+    color: var(--fg); font-weight: 600;
+  }
+  .music-tab-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent); border-radius: 1px;
+  }
+  .music-list {
+    flex: 1; overflow-y: auto; padding: 6px 16px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .music-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 8px; border-radius: var(--radius-md);
+    cursor: pointer; transition: background 120ms ease;
+  }
+  .music-item:hover { background: var(--border-soft); }
+  .music-item.active { background: var(--surface-warm); }
+  .music-item-left {
+    display: flex; align-items: center; gap: 10px; min-width: 0;
+  }
+  .music-cover {
+    width: 36px; height: 36px; border-radius: 4px;
+    background: var(--fg); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .music-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .music-name {
+    font-family: var(--font-body); font-size: 13px; font-weight: 600;
+    color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .music-author {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .music-item-right {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .music-duration {
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  }
+  .music-use-btn {
+    padding: 3px 10px; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    border: none; cursor: pointer;
+  }
+  .music-use-btn.used {
+    background: var(--fg); color: #fff;
+  }
+  .image-slot.filled { background: var(--wf-block); }
+  .image-slot.filled::after { content: '图'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.55); }
+  .image-slot-remove {
+    position: absolute; top: 3px; right: 3px; z-index: 2;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(13,17,23,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1;
+  }
+  .image-slot.uploading {
+    background: repeating-linear-gradient(135deg, #1e2128 0px, #1e2128 8px, #22252e 8px, #22252e 16px);
+  }
+  .image-slot.uploading .upload-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .image-slot.uploading .upload-spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .image-slot.uploading .upload-pct { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #ffffff; }
+  .image-slot.uploading .upload-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.2); z-index: 2; }
+  .image-slot.uploading .upload-progress-fill { height: 100%; background: var(--accent); }
+
+  /* ─── 视频 · 竖版单条上传 ──────────────────────────────────── */
+  .video-wrap { padding: 0 16px 14px; display: flex; justify-content: flex-start; }
+  .video-portrait {
+    width: 130px; aspect-ratio: 9/16;
+    border-radius: var(--radius-md); position: relative; overflow: hidden;
+  }
+  .video-portrait.empty {
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+  .video-portrait.empty .u-icon { font-size: 20px; color: var(--muted); }
+  .video-portrait.empty .u-text { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-align: center; }
+  .video-portrait.uploading { background: #1a1d23; display: flex; align-items: center; justify-content: center; }
+  .video-portrait .uploading-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  .video-portrait .uploading-spinner {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  .video-portrait .uploading-pct { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #ffffff; }
+  .video-portrait .upload-progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.2); }
+  .video-portrait .upload-progress-fill { height: 100%; background: var(--accent); }
+  .video-portrait.done { background: #1a1d23; }
+  .video-portrait.done .done-thumb-bg {
+    position: absolute; inset: 0; background: linear-gradient(135deg, #2a2d35 0%, #1a1d23 100%);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; color: rgba(255,255,255,0.3);
+  }
+  .video-portrait .done-duration {
+    position: absolute; bottom: 6px; right: 6px;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    color: #ffffff; background: rgba(0,0,0,0.6); padding: 2px 5px; border-radius: 3px;
+  }
+  .video-portrait .video-remove {
+    position: absolute; top: 4px; right: 4px; z-index: 2;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(13,17,23,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; line-height: 1;
+  }
+
+  
+  /* 视频卡槽加号入口（与图文九宫格加号视觉统一） */
+  .video-slot-add {
+    width: 104px; height: 104px; border-radius: var(--radius-md);
+    background: var(--border-soft); border: 1.5px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer; transition: all 120ms ease;
+  }
+  .video-slot-add:hover { background: var(--surface-warm); border-color: var(--accent); }
+  .video-slot-add .v-icon { font-size: 24px; color: var(--muted); line-height: 1; }
+  .video-slot-add .v-text { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: var(--fg); }
+  .video-slot-add .v-sub { font-family: var(--font-mono); font-size: 9px; color: var(--muted); }
+
+  /* 视频自研选择器网格特定时长徽标 */
+  .picker-item-duration {
+    position: absolute; bottom: 4px; right: 4px;
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(2px);
+    color: #ffffff; font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    padding: 1px 4px; border-radius: 2px;
+  }
+  .picker-item-play-icon {
+    font-size: 20px; color: rgba(255, 255, 255, 0.85);
+  }
+
+  
+  /* ─── 视频预览与编辑全功能主态 (Video Preview View) ───────────── */
+  .vp-screen {
+    background: #000000; color: #ffffff;
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .vp-nav {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0; z-index: 20;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+  }
+  .vp-back {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: #ffffff; line-height: 1; cursor: pointer;
+  }
+  .vp-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #ffffff;
+  }
+  .vp-btn-done {
+    padding: 5px 14px; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    cursor: pointer; border: none;
+  }
+
+  /* 视频播放主体视口 */
+  .vp-viewport {
+    flex: 1; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: #08090c;
+  }
+  .vp-video-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: filter 200ms ease;
+  }
+  .vp-video-poster {
+    font-size: 72px; opacity: 0.9;
+  }
+  .vp-video-title {
+    font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.7);
+    margin-top: 8px;
+  }
+  .vp-play-center {
+    position: absolute; width: 50px; height: 50px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #ffffff; cursor: pointer;
+    z-index: 10;
+  }
+  .vp-timeline-overlay {
+    position: absolute; bottom: 8px; left: 16px; right: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.75);
+    z-index: 10;
+  }
+  .vp-timeline-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,0.2); z-index: 10;
+  }
+  .vp-timeline-fill {
+    height: 100%; width: 45%; background: var(--accent);
+  }
+
+  /* 右侧悬浮快捷操作组 */
+  .vp-right-actions {
+    position: absolute; right: 12px; top: 60px;
+    display: flex; flex-direction: column; gap: 14px;
+    z-index: 20;
+  }
+  .vp-action-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer;
+  }
+  .vp-action-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(20,22,28,0.65); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #ffffff;
+    transition: all 120ms ease;
+  }
+  .vp-action-circle:hover, .vp-action-circle.active {
+    background: rgba(255,210,30,0.2); border-color: var(--accent); color: var(--accent);
+  }
+  .vp-action-label {
+    font-family: var(--font-body); font-size: 10px; color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+
+  /* 底部调节抽屉（由右侧悬浮工具触发呼出，移除与右侧重叠的常驻工具条） */
+  .vp-bottom-panel {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(20, 23, 31, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px 16px 0 0;
+    display: none; flex-direction: column;
+    z-index: 40; backdrop-filter: blur(16px);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.7);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    animation: sheetSlideUp 200ms cubic-bezier(0.2, 0, 0, 1) forwards;
+  }
+  .vp-bottom-panel.visible {
+    display: flex;
+  }
+
+  /* 扩展子面板（内嵌在底部面板中切换展示） */
+  .vp-subpanel {
+    padding: 12px 16px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    background: #0f1117;
+  }
+  .vp-subpanel-header {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .vp-subpanel-title {
+    font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--accent);
+  }
+  .vp-subpanel-close {
+    font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer;
+  }
+
+  /* 滤镜水平滑动列表 */
+  .vp-filter-strip {
+    display: flex; gap: 10px; overflow-x: auto; padding: 2px 0 6px;
+  }
+  .vp-filter-item {
+    width: 52px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer;
+  }
+  .vp-filter-thumb {
+    width: 48px; height: 48px; border-radius: 6px;
+    background: #252832; border: 1.5px solid transparent;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .vp-filter-item.active .vp-filter-thumb {
+    border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent);
+  }
+  .vp-filter-name {
+    font-family: var(--font-body); font-size: 10px; color: rgba(255,255,255,0.7);
+  }
+  .vp-filter-item.active .vp-filter-name {
+    color: var(--accent); font-weight: 600;
+  }
+
+  /* 音量双轨混音调节滑条 */
+  .vp-volume-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .vp-volume-label {
+    width: 60px; font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.75);
+    flex-shrink: 0;
+  }
+  .vp-volume-track {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.18);
+    border-radius: 2px; position: relative; cursor: pointer;
+  }
+  .vp-volume-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+  }
+  .vp-volume-thumb {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 14px; height: 14px; border-radius: 50%; background: #ffffff;
+  }
+  .vp-volume-val {
+    width: 28px; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: var(--accent); text-align: right; flex-shrink: 0;
+  }
+
+  /* 视频剪辑选段滑轨 */
+  .vp-trim-container {
+    background: #1e222d; border-radius: 8px; padding: 8px 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .vp-trim-track {
+    height: 42px; background: #2b3140; border-radius: 4px;
+    position: relative; display: flex; align-items: center;
+    overflow: hidden;
+  }
+  .vp-trim-frames {
+    display: flex; width: 100%; height: 100%; opacity: 0.6;
+    justify-content: space-between; align-items: center; font-size: 18px;
+  }
+  .vp-trim-selection {
+    position: absolute; left: 15%; right: 20%; top: 0; bottom: 0;
+    border: 2px solid var(--accent); background: rgba(255,210,30,0.1);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .vp-trim-handle {
+    width: 10px; height: 100%; background: var(--accent);
+    cursor: ew-resize; display: flex; align-items: center; justify-content: center;
+  }
+  .vp-trim-handle::after {
+    content: ''; width: 2px; height: 16px; background: #000; border-radius: 1px;
+  }
+  .vp-trim-info {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.65);
+  }
+
+  /* ─── Bottom bar ──────────────────────────────────────────── */
+  .bottom-bar {
+    height: 64px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .pub-btn {
+    flex: 1; height: 44px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .pub-btn.inactive { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .pub-btn.uploading-btn { background: var(--border-soft); color: var(--muted); cursor: not-allowed; font-size: 12px; }
+
+  /* ─── Spec panel ──────────────────────────────────────────── */
+  .spec-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; width: 375px; }
+  .spec-panel h3 { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border-soft); }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
+  .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
+  .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+  .spec-badge.dark { background: var(--fg); border-color: var(--fg); color: #fff; }
+
+  /* ─── 自研相册选择照片 (Photo Picker) ─────────────────────────── */
+  .picker-nav {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .picker-cancel {
+    font-family: var(--font-body); font-size: 14px; color: var(--fg-2);
+    cursor: pointer; width: 36px;
+  }
+  .picker-album-dropdown {
+    display: flex; align-items: center; gap: 4px;
+    font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg);
+    cursor: pointer;
+  }
+  .picker-dropdown-arrow {
+    font-size: 10px; color: var(--muted); transition: transform 120ms ease;
+  }
+  .picker-nav-spacer { width: 36px; }
+
+  .picker-grid-wrap {
+    flex: 1; overflow-y: auto; background: #ffffff;
+    padding: 2px;
+  }
+  .picker-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+  .picker-item {
+    aspect-ratio: 1/1; position: relative;
+    background: var(--wf-block); cursor: pointer;
+    overflow: hidden;
+  }
+
+  .picker-item-thumb {
+    width: 100%; height: 100%; object-fit: cover;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: rgba(255,255,255,0.7);
+    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+  }
+  .picker-item:nth-child(2) .picker-item-thumb { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%); }
+  .picker-item:nth-child(3) .picker-item-thumb { background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%); }
+  .picker-item:nth-child(4) .picker-item-thumb { background: linear-gradient(135deg, #86efac 0%, #22c55e 100%); }
+  .picker-item:nth-child(5) .picker-item-thumb { background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); }
+  .picker-item:nth-child(6) .picker-item-thumb { background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%); }
+  .picker-item:nth-child(7) .picker-item-thumb { background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%); }
+  .picker-item:nth-child(8) .picker-item-thumb { background: linear-gradient(135deg, #fdba74 0%, #f97316 100%); }
+  .picker-item:nth-child(9) .picker-item-thumb { background: linear-gradient(135deg, #a7f3d0 0%, #10b981 100%); }
+  .picker-item:nth-child(10) .picker-item-thumb { background: linear-gradient(135deg, #bae6fd 0%, #0284c7 100%); }
+  .picker-item:nth-child(11) .picker-item-thumb { background: linear-gradient(135deg, #e2e8f0 0%, #64748b 100%); }
+  .picker-item:nth-child(12) .picker-item-thumb { background: linear-gradient(135deg, #ddd6fe 0%, #7c3aed 100%); }
+
+  .picker-checkbox {
+    position: absolute; top: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.9);
+    background: rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: all 120ms ease;
+  }
+  .picker-item.selected .picker-checkbox {
+    background: var(--accent); border-color: var(--accent);
+    color: var(--accent-on);
+  }
+  .picker-item.selected::after {
+    content: ''; position: absolute; inset: 0;
+    border: 2px solid var(--accent); pointer-events: none;
+  }
+
+  /* ─── 已选照片预览托盘 (Tray) ─────────────────────────────── */
+  .picker-tray {
+    height: 64px; background: #fafafa;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center;
+    padding: 0 12px; gap: 8px; flex-shrink: 0;
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .picker-tray-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--muted); flex-shrink: 0; margin-right: 4px;
+  }
+  .picker-tray-thumb {
+    width: 46px; height: 46px; border-radius: var(--radius-sm);
+    position: relative; flex-shrink: 0; overflow: hidden;
+    background: var(--wf-block);
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .picker-tray-thumb-inner {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .picker-tray-order {
+    position: absolute; bottom: 2px; left: 2px;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--fg); color: #fff;
+    font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .picker-tray-del {
+    position: absolute; top: 1px; right: 1px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(13,17,23,0.65); color: #fff;
+    font-size: 9px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; line-height: 1;
+  }
+
+  /* 底部操作栏：左侧一键成片，右侧确定 */
+  .picker-bottom-bar {
+    height: 60px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .picker-btn-smart {
+    display: flex; align-items: center; gap: 5px;
+    height: 38px; padding: 0 14px;
+    background: #ffffff; border: 1.5px solid var(--accent);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg);
+    cursor: pointer; transition: all 120ms ease;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .picker-btn-smart:hover { background: var(--surface-warm); }
+  .picker-btn-smart .smart-spark { font-size: 14px; color: #f59e0b; }
+  .picker-btn-smart .smart-tip {
+    font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-left: 2px;
+  }
+
+  .picker-confirm-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .picker-btn-confirm {
+    height: 38px; padding: 0 18px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    white-space: nowrap; flex-shrink: 0;
+    transition: all 120ms ease;
+  }
+  .picker-btn-confirm:hover { background: var(--accent-hover); }
+  .picker-btn-confirm.disabled {
+    background: var(--border); color: var(--muted); cursor: not-allowed;
+  }
+  .picker-selected-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--fg); color: #fff;
+    width: 17px; height: 17px; border-radius: 50%;
+    font-size: 10px; font-family: var(--font-mono); font-weight: 700;
+  }
+
+  /* ─── 一键成片 (Smart Video Editor) ─────────────────────────── */
+  .sv-screen {
+    background: #0d1117; color: #ffffff;
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .sv-nav {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0; z-index: 10;
+  }
+  .sv-back {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: #ffffff; line-height: 1; cursor: pointer;
+  }
+  .sv-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #ffffff;
+  }
+  .sv-nav-placeholder { width: 28px; }
+
+  /* 上方选择音乐大按钮 */
+  .sv-music-banner-wrap {
+    padding: 6px 16px 8px; flex-shrink: 0; z-index: 10;
+  }
+  .sv-music-btn {
+    width: 100%; height: 38px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-pill);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; cursor: pointer;
+    transition: all 120ms ease;
+  }
+  .sv-music-btn:hover {
+    background: rgba(255,255,255,0.18); border-color: var(--accent);
+  }
+  .sv-music-left {
+    display: flex; align-items: center; gap: 8px; min-width: 0;
+  }
+  .sv-music-icon { font-size: 15px; color: var(--accent); }
+  .sv-music-name {
+    font-family: var(--font-body); font-size: 12px; font-weight: 600;
+    color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sv-music-tag {
+    font-family: var(--font-mono); font-size: 9px; color: var(--accent);
+    background: rgba(255,210,30,0.15); padding: 1px 5px; border-radius: 2px;
+  }
+  .sv-music-right {
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.65);
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+
+  /* 视频播放主体视口 */
+  .sv-player-viewport {
+    flex: 1; margin: 0 16px;
+    background: #1a1d24; border-radius: 12px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .sv-video-frame {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .sv-photo-slide {
+    width: 82%; aspect-ratio: 4/5; border-radius: 8px;
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .sv-photo-badge {
+    position: absolute; bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-family: var(--font-mono); font-size: 9px; padding: 2px 6px; border-radius: 3px;
+  }
+  .sv-play-center {
+    position: absolute; width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #ffffff; cursor: pointer;
+  }
+  .sv-video-timeline-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,0.2);
+  }
+  .sv-video-timeline-fill {
+    height: 100%; width: 40%; background: var(--accent);
+  }
+  .sv-video-duration {
+    position: absolute; bottom: 8px; right: 8px;
+    font-family: var(--font-mono); font-size: 10px; color: #ffffff;
+    background: rgba(0,0,0,0.6); padding: 1px 5px; border-radius: 2px;
+  }
+
+  /* 下方左右滑模板选择区 */
+  .sv-template-section {
+    padding: 10px 0 6px; flex-shrink: 0;
+  }
+  .sv-template-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 8px;
+  }
+  .sv-template-title {
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.85); letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .sv-template-tip {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.45);
+  }
+  .sv-template-scroll {
+    display: flex; gap: 10px; padding: 0 16px;
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .sv-template-card {
+    width: 82px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    cursor: pointer; position: relative;
+  }
+  .sv-template-thumb {
+    width: 82px; height: 96px; border-radius: 8px;
+    background: #1f242d; border: 1.5px solid rgba(255,255,255,0.12);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; transition: all 120ms ease;
+  }
+  .sv-template-card.active .sv-template-thumb {
+    border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent);
+  }
+  .sv-template-name {
+    font-family: var(--font-body); font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.7); text-align: center;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;
+  }
+  .sv-template-card.active .sv-template-name {
+    color: var(--accent); font-weight: 600;
+  }
+
+  /* 默认选中模板中的「编辑」状态入口 */
+  .sv-template-edit-tag {
+    position: absolute; top: 4px; right: 4px;
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+    padding: 1px 4px; border-radius: 3px; display: flex; align-items: center; gap: 2px;
+  }
+  .sv-template-edit-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(13,17,23,0.85); backdrop-filter: blur(4px);
+    padding: 3px 0; text-align: center;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--accent);
+    display: flex; align-items: center; justify-content: center; gap: 3px;
+    border-top: 1px solid rgba(255,210,30,0.3);
+  }
+
+  /* 最下方操作栏：下一步按钮 */
+  .sv-bottom-bar {
+    height: 56px; background: #0d1117;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .sv-bottom-summary {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .sv-summary-text {
+    font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.65);
+  }
+  .sv-summary-text strong { color: #ffffff; font-weight: 600; }
+  .sv-btn-next {
+    height: 38px; padding: 0 24px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    transition: all 120ms ease;
+  }
+  .sv-btn-next:hover { background: var(--accent-hover); }
+
+  /* ─── 模板编辑半弹层 (Template Edit Drawer / Sheet) ─────────── */
+  .tpl-edit-overlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .tpl-edit-sheet {
+    background: #18191c;
+    border-radius: 16px 16px 0 0;
+    padding: 0 0 calc(20px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .tpl-edit-header {
+    height: 48px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .tpl-edit-btn-cancel {
+    font-size: 18px; color: rgba(255, 255, 255, 0.7); cursor: pointer;
+    width: 32px; display: flex; align-items: center; justify-content: flex-start;
+  }
+  .tpl-edit-title {
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    color: #ffffff; letter-spacing: 0.02em;
+  }
+  .tpl-edit-btn-confirm {
+    font-size: 18px; font-weight: 700; color: #ffffff; cursor: pointer;
+    width: 32px; display: flex; align-items: center; justify-content: flex-end;
+  }
+
+  /* 片段缩略图水平滚动排布（如参考截图） */
+  .tpl-clips-scroll {
+    display: flex; gap: 12px; padding: 18px 16px 16px;
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .tpl-clip-card {
+    width: 64px; flex-shrink: 0; display: flex; flex-direction: column;
+    cursor: pointer; position: relative;
+  }
+  .tpl-clip-thumb {
+    width: 64px; height: 64px; border-radius: 6px;
+    background: #252830; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 4px; box-sizing: border-box;
+    border: 1.5px solid transparent;
+  }
+  .tpl-clip-card.active .tpl-clip-thumb {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1px #ffffff;
+  }
+  .tpl-clip-header-label {
+    font-size: 8px; color: rgba(255, 255, 255, 0.6);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    line-height: 1.2;
+  }
+  .tpl-clip-thumb-center {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin: auto 0;
+  }
+  .tpl-clip-duration {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: #ffffff; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.45); border-radius: 2px; padding: 1px 0;
+  }
+  .tpl-clip-waveform {
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    height: 12px;
+  }
+  .tpl-clip-waveform .wave-bar {
+    width: 2px; background: #ffffff; border-radius: 1px;
+  }
+  .tpl-clip-waveform .wave-bar:nth-child(1) { height: 6px; }
+  .tpl-clip-waveform .wave-bar:nth-child(2) { height: 11px; }
+  .tpl-clip-waveform .wave-bar:nth-child(3) { height: 8px; }
+  .tpl-clip-waveform .wave-bar:nth-child(4) { height: 4px; }
+
+  /* 底部操作按钮：替换素材（直接链接至选择照片状态） */
+  .tpl-edit-actions {
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 16px 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .tpl-action-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer; color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-body); font-size: 12px;
+    transition: color 120ms ease;
+  }
+  .tpl-action-item:hover { color: #ffffff; }
+  .tpl-action-icon {
+    font-size: 18px; line-height: 1; color: rgba(255, 255, 255, 0.9);
+  }
+
+
+
+
+  
+  /* ─── 图片预览与编辑主态 (Photo Preview View) ──────────────────── */
+  .preview-screen {
+    background: #0d1117; color: #ffffff;
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .preview-nav {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0; z-index: 10;
+  }
+  .preview-back {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: #ffffff; line-height: 1; cursor: pointer;
+  }
+  .preview-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #ffffff;
+  }
+  .preview-btn-next {
+    padding: 5px 14px; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    cursor: pointer; border: none;
+  }
+
+  .preview-main-viewport {
+    flex: 1; margin: 0 16px 8px;
+    background: #14171f; border-radius: 12px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+  }
+  .preview-main-box {
+    width: 86%; aspect-ratio: 4/5; border-radius: 8px;
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 68px; position: relative; overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .preview-page-indicator {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: var(--radius-pill);
+  }
+
+  /* 下方区域：展示所有选择的图片，右侧是一个滤镜按钮 */
+  .preview-bottom-bar {
+    background: #16181f; border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0; gap: 10px;
+  }
+  .preview-thumb-strip {
+    display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden;
+    flex: 1; align-items: center; padding: 2px 0;
+  }
+  .preview-strip-item {
+    width: 44px; height: 44px; border-radius: var(--radius-sm);
+    position: relative; flex-shrink: 0; cursor: pointer; overflow: hidden;
+    border: 1.5px solid transparent; background: #2a2e38;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    transition: all 120ms ease;
+  }
+  .preview-strip-item.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .preview-strip-order {
+    position: absolute; bottom: 2px; left: 2px;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: rgba(13,17,23,0.85); color: #fff;
+    font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+
+  /* 右侧工具入口容器与按钮 */
+  .preview-tools-container {
+    position: relative; flex-shrink: 0;
+  }
+  .preview-tool-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; width: 54px; height: 48px; border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+    color: #ffffff; cursor: pointer; flex-shrink: 0;
+    transition: all 120ms ease;
+  }
+  .preview-tool-btn:hover, .preview-tool-btn.active {
+    background: rgba(255,210,30,0.18); border-color: var(--accent); color: var(--accent);
+  }
+  .preview-tool-btn .t-icon { font-size: 16px; line-height: 1; }
+  .preview-tool-btn .t-text { font-family: var(--font-body); font-size: 10px; font-weight: 600; }
+
+  /* ─── 移动端标准自底向上工具抽屉 (Tools Action Sheet) ───────── */
+  .preview-tools-mask {
+    position: absolute; inset: 0; z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; flex-direction: column; justify-content: flex-end;
+    animation: maskFadeIn 150ms ease forwards;
+  }
+  .preview-tools-mask.visible { display: flex; }
+  @keyframes maskFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .preview-tools-sheet {
+    background: #181a20;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px 18px 0 0;
+    padding: 0 0 calc(16px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    animation: sheetSlideUp 200ms cubic-bezier(0.2, 0, 0, 1) forwards;
+  }
+  @keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .preview-tools-header {
+    height: 48px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .preview-tools-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: rgba(255, 255, 255, 0.9); letter-spacing: 0.02em;
+  }
+  .preview-tools-close {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: rgba(255, 255, 255, 0.7);
+    cursor: pointer; line-height: 1;
+  }
+  .preview-tools-close:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+  /* 移动端图标功能网格 (沉浸大按钮风格) */
+  .preview-tools-grid {
+    display: flex; gap: 20px; padding: 22px 20px 16px;
+    align-items: center;
+  }
+  .preview-tool-item {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; min-width: 60px;
+  }
+  .preview-tool-icon-circle {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #ffffff;
+    transition: all 120ms ease;
+  }
+  .preview-tool-item:hover .preview-tool-icon-circle,
+  .preview-tool-item.highlight .preview-tool-icon-circle {
+    background: rgba(255, 210, 30, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(255, 210, 30, 0.25);
+  }
+  .preview-tool-name {
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .preview-tool-item.highlight .preview-tool-name {
+    color: var(--accent); font-weight: 600;
+  }
+
+  /* ─── 滤镜页面状态 (Photo Filter View) ────────────────────────── */
+  .filter-screen {
+    background: #0d1117; color: #ffffff;
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .filter-nav {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0; z-index: 10;
+  }
+  .filter-back {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: #ffffff; line-height: 1; cursor: pointer;
+  }
+  .filter-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #ffffff;
+  }
+  .filter-nav-reset {
+    font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.65);
+    cursor: pointer;
+  }
+  .filter-nav-reset:hover { color: #ffffff; }
+
+  /* 滤镜主体大图预览视口 */
+  .filter-preview-viewport {
+    flex: 1; margin: 0 16px 10px;
+    background: #14171f; border-radius: 12px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+  }
+  .filter-preview-box {
+    width: 86%; aspect-ratio: 4/5; border-radius: 8px;
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; position: relative; overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    transition: filter 200ms ease;
+  }
+  .filter-badge-info {
+    position: absolute; bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+    color: #fff; font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+    padding: 2px 7px; border-radius: 3px;
+  }
+  .filter-compare-tag {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(255,255,255,0.2); backdrop-filter: blur(4px);
+    color: #fff; font-family: var(--font-mono); font-size: 9px;
+    padding: 3px 8px; border-radius: var(--radius-pill); cursor: pointer;
+  }
+
+  /* 滤镜强度调节滑块 */
+  .filter-slider-wrap {
+    padding: 0 24px 10px; display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  .filter-slider-lbl {
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+  }
+  .filter-slider-track {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.2);
+    border-radius: 2px; position: relative; cursor: pointer;
+  }
+  .filter-slider-fill {
+    height: 100%; width: 75%; background: var(--accent); border-radius: 2px;
+  }
+  .filter-slider-thumb {
+    position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%);
+    width: 14px; height: 14px; border-radius: 50%; background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  .filter-slider-val {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent);
+    width: 28px; text-align: right; flex-shrink: 0;
+  }
+
+  /* 滤镜分类与横向滑动手势列表 */
+  .filter-selector-section {
+    padding: 4px 0 12px; flex-shrink: 0;
+    background: #12141a; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .filter-cat-tabs {
+    display: flex; gap: 18px; padding: 0 16px 8px;
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .filter-cat-item {
+    font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.6);
+    cursor: pointer; padding-bottom: 4px; white-space: nowrap; position: relative;
+  }
+  .filter-cat-item.active {
+    color: #ffffff; font-weight: 600;
+  }
+  .filter-cat-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent); border-radius: 1px;
+  }
+
+  .filter-cards-scroll {
+    display: flex; gap: 10px; padding: 0 16px;
+    overflow-x: auto; overflow-y: hidden;
+  }
+  .filter-card {
+    width: 60px; flex-shrink: 0; display: flex; flex-direction: column;
+    align-items: center; gap: 5px; cursor: pointer;
+  }
+  .filter-thumb-box {
+    width: 58px; height: 58px; border-radius: 8px;
+    background: #232730; border: 1.5px solid transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; position: relative; overflow: hidden;
+    transition: all 120ms ease;
+  }
+  .filter-card.active .filter-thumb-box {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .filter-name {
+    font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.7);
+    text-align: center; white-space: nowrap;
+  }
+  .filter-card.active .filter-name {
+    color: var(--accent); font-weight: 600;
+  }
+
+  /* 滤镜底部操作栏 */
+  .filter-bottom-bar {
+    height: 54px; background: #0d1117;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .filter-batch-apply {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.75);
+    cursor: pointer;
+  }
+  .filter-batch-checkbox {
+    width: 14px; height: 14px; border-radius: 3px;
+    border: 1px solid var(--accent); background: var(--accent);
+    color: var(--accent-on); font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .filter-btn-done {
+    height: 36px; padding: 0 22px;
+    background: var(--accent); color: var(--accent-on);
+    border: none; border-radius: var(--radius-pill);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    transition: all 120ms ease;
+  }
+  .filter-btn-done:hover { background: var(--accent-hover); }
+
+</style>
+</head>
+<body>
+
+<div class="page-header" data-od-id="page-header">
+  <h1>发布器线框图</h1>
+  <p>小程序 · 像朋友圈一样发文字 / 图文 / 视频 · 纯文字 / 图文 / 选照片 / 图预览 / 滤镜 / 一键成片 / 编辑片段 / 选音乐 / 视频态 / 选视频 / 视频预览(滤镜+BGM+混音+剪辑) / 表情面板 十二态交互</p>
+</div>
+
+<div class="state-switcher" role="group" data-od->
+  <button class="state-btn active" data-state="text" onclick="setState('text')">① 纯文字态</button>
+  <button class="state-btn" data-state="image" onclick="setState('image')">② 图文态</button>
+  <button class="state-btn" data-state="photo-picker" onclick="setState('photo-picker')">③ 选择照片</button>
+  <button class="state-btn" data-state="photo-preview" onclick="setState('photo-preview')">④ 图片预览</button>
+  <button class="state-btn" data-state="photo-filter" onclick="setState('photo-filter')">⑤ 滤镜调节</button>
+  <button class="state-btn" data-state="smart-video" onclick="setState('smart-video')">⑥ 一键成片</button>
+  <button class="state-btn" data-state="template-edit" onclick="setState('template-edit')">⑦ 编辑片段</button>
+  <button class="state-btn" data-state="music-sheet" onclick="setState('music-sheet')">⑧ 选择音乐</button>
+  <button class="state-btn" data-state="video" onclick="setState('video')">⑨ 视频态</button>
+  <button class="state-btn" data-state="video-picker" onclick="setState('video-picker')">⑩ 选择视频</button>
+  <button class="state-btn" data-state="video-preview" onclick="setState('video-preview')">⑪ 视频预览</button>
+  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑫ 表情面板</button>
+</div>
+
+<div class="devices-row" style="display:flex;">
+
+<!-- ① 纯文字态 -->
+<div class="device-wrapper active" id="state-text" data-od-id="device-state-text">
+  <div class="device-label">① 纯文字态 · 发布器</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布内容</div>
+      </div>
+<div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">周末爬山，山顶风好大，人也好少，安静得只剩风声。#生活记录 就这样简单记录一下心情，纯文字动态也可以直接发布，不强制配图或视频。</div>
+        </div>
+        <div class="square-char-count filled">62 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 图文态 -->
+<div class="device-wrapper" id="state-image" data-od-id="device-state-image">
+  <div class="device-label">② 图文态 · 发布器</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布内容</div>
+      </div>
+<div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天做的brunch，拍了几张随手图，分享给大家<span class="inline-topic">#下厨日记</span></div>
+        </div>
+        <div class="square-char-count filled">24 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="image-grid">
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot add" onclick="setState('photo-picker')" title="点击添加照片">
+            <div class="u-icon">＋</div>
+            <div class="u-count">4/9</div>
+          </div>
+          <div class="image-slot bgm" onclick="setState('music-sheet')" title="点击选择音乐">
+            <div class="bgm-icon">🎵</div>
+            <div class="bgm-text">选择音乐</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ 选择照片（自研渲染相册选图状态） -->
+<div class="device-wrapper" id="state-photo-picker" data-od-id="device-state-photo-picker">
+  <div class="device-label">③ 选择照片 · 自研渲染</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      
+      <!-- 相册自定义导航栏（右上角无滤镜按钮） -->
+      <div class="picker-nav">
+        <div class="picker-cancel" onclick="setState('image')">取消</div>
+        <div class="picker-album-dropdown">
+          <span>所有照片</span>
+          <span class="picker-dropdown-arrow">▼</span>
+        </div>
+        <div class="picker-nav-spacer"></div>
+      </div>
+
+      <!-- 4列照片网格（无拍摄按钮） -->
+      <div class="picker-grid-wrap">
+        <div class="picker-grid">
+          <!-- 照片列表项（已选4张演示） -->
+          <div class="picker-item selected" data-id="1" data-emoji="🥗" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥗</div>
+            <div class="picker-checkbox">1</div>
+          </div>
+          <div class="picker-item selected" data-id="2" data-emoji="🥐" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥐</div>
+            <div class="picker-checkbox">2</div>
+          </div>
+          <div class="picker-item selected" data-id="3" data-emoji="☕️" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">☕️</div>
+            <div class="picker-checkbox">3</div>
+          </div>
+          <div class="picker-item selected" data-id="4" data-emoji="🥪" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥪</div>
+            <div class="picker-checkbox">4</div>
+          </div>
+          <div class="picker-item" data-id="5" data-emoji="🍓" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🍓</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="6" data-emoji="🥞" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥞</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="7" data-emoji="🥑" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥑</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="8" data-emoji="🥯" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🥯</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="9" data-emoji="🍳" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🍳</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="10" data-emoji="🍹" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🍹</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="11" data-emoji="🧇" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb">🧇</div>
+            <div class="picker-checkbox"></div>
+          </div>
+          <div class="picker-item" data-id="12" data-emoji="🍇" onclick="togglePickerSelect(this)">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #a855f7 0%, #6366f1 100%);">🍇</div>
+            <div class="picker-checkbox"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已选照片展示小区域：在一键成片与确定上方，从左到右横向排列 -->
+      <div class="picker-tray" id="picker-tray">
+        <span class="picker-tray-label">已选</span>
+        <div class="picker-tray-thumb" data-id="1">
+          <div class="picker-tray-thumb-inner" style="background:linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);">🥗</div>
+          <div class="picker-tray-order">1</div>
+          <div class="picker-tray-del" onclick="event.stopPropagation(); removeTrayPhoto('1')">×</div>
+        </div>
+        <div class="picker-tray-thumb" data-id="2">
+          <div class="picker-tray-thumb-inner" style="background:linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);">🥐</div>
+          <div class="picker-tray-order">2</div>
+          <div class="picker-tray-del" onclick="event.stopPropagation(); removeTrayPhoto('2')">×</div>
+        </div>
+        <div class="picker-tray-thumb" data-id="3">
+          <div class="picker-tray-thumb-inner" style="background:linear-gradient(135deg, #86efac 0%, #22c55e 100%);">☕️</div>
+          <div class="picker-tray-order">3</div>
+          <div class="picker-tray-del" onclick="event.stopPropagation(); removeTrayPhoto('3')">×</div>
+        </div>
+        <div class="picker-tray-thumb" data-id="4">
+          <div class="picker-tray-thumb-inner" style="background:linear-gradient(135deg, #f472b6 0%, #ec4899 100%);">🥪</div>
+          <div class="picker-tray-order">4</div>
+          <div class="picker-tray-del" onclick="event.stopPropagation(); removeTrayPhoto('4')">×</div>
+        </div>
+      </div>
+
+      <!-- 底部操作栏：左侧一键成片，右侧下一步（无中间滤镜按钮） -->
+      <div class="picker-bottom-bar">
+        <button class="picker-btn-smart" onclick="setState('smart-video')" title="将选中的图片快速生成精彩图文视频">
+          <span class="smart-spark">✨</span>
+          <span>一键成片</span>
+          <span class="smart-tip">智能剪辑</span>
+        </button>
+        <div class="picker-confirm-wrap">
+          <button class="picker-btn-confirm" onclick="setState('photo-preview')" title="点击下一步进入已选图片预览与编辑">
+            <span>下一步</span>
+            <span class="picker-selected-count">4</span>
+            <span style="font-size:11px;font-family:var(--font-mono);opacity:0.8;">/9</span>
+            <span style="font-size:12px;margin-left:2px;">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ 图片预览（包含下方所有已选图片与右侧滤镜按钮） -->
+<div class="device-wrapper" id="state-photo-preview" data-od-id="device-state-photo-preview">
+  <div class="device-label">④ 图片预览 · 下方已选图+右侧滤镜</div>
+  <div class="mp-device">
+    <div class="mp-screen preview-screen">
+      <div class="mp-status-bar" style="background:#0d1117;">
+        <span class="mp-status-time" style="color:#fff;">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 顶栏导航 -->
+      <div class="preview-nav">
+        <div class="preview-back" onclick="setState('photo-picker')" title="返回选择照片">‹</div>
+        <div class="preview-title">预览与编辑</div>
+        <button class="preview-btn-next" onclick="setState('image')" title="完成编辑并返回图文发布态">完成</button>
+      </div>
+
+      <!-- 主图大视口预览 -->
+      <div class="preview-main-viewport">
+        <div class="preview-main-box" id="preview-main-box">
+          <span id="preview-main-emoji">🥗</span>
+          <div class="preview-page-indicator" id="preview-page-indicator">1 / 4</div>
+        </div>
+      </div>
+
+      <!-- 下方区域：展示所有选择的图片，右侧是一个滤镜按钮 -->
+      <div class="preview-bottom-bar">
+        <!-- 从左到右展示所有选择的图片 -->
+        <div class="preview-thumb-strip" id="preview-thumb-strip">
+          <div class="preview-strip-item active" onclick="selectPreviewThumb(this, '🥗', 1, 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%)')">
+            <span>🥗</span>
+            <div class="preview-strip-order">1</div>
+          </div>
+          <div class="preview-strip-item" onclick="selectPreviewThumb(this, '🥐', 2, 'linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%)')">
+            <span>🥐</span>
+            <div class="preview-strip-order">2</div>
+          </div>
+          <div class="preview-strip-item" onclick="selectPreviewThumb(this, '☕️', 3, 'linear-gradient(135deg, #86efac 0%, #22c55e 100%)')">
+            <span>☕️</span>
+            <div class="preview-strip-order">3</div>
+          </div>
+          <div class="preview-strip-item" onclick="selectPreviewThumb(this, '🥪', 4, 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)')">
+            <span>🥪</span>
+            <div class="preview-strip-order">4</div>
+          </div>
+        </div>
+
+        <!-- 右侧工具主入口按钮 -->
+        <div class="preview-tools-container">
+          <div class="preview-tool-btn" onclick="openToolsSheet()" title="点击打开图片编辑工具">
+            <span class="t-icon">🛠️</span>
+            <span class="t-text">工具</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 移动端标准自底向上工具抽屉（Action Sheet） -->
+      <div class="preview-tools-mask" id="preview-tools-mask" onclick="closeToolsSheet()">
+        <div class="preview-tools-sheet" onclick="event.stopPropagation()">
+          <div class="preview-tools-header">
+            <div class="preview-tools-title">图片编辑工具</div>
+            <div class="preview-tools-close" onclick="closeToolsSheet()">✕</div>
+          </div>
+          <div class="preview-tools-grid">
+            <!-- 核心功能：滤镜调色 -->
+            <div class="preview-tool-item highlight" onclick="closeToolsSheet(); setState('photo-filter');" title="进入滤镜调色">
+              <div class="preview-tool-icon-circle">🎨</div>
+              <span class="preview-tool-name">滤镜</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 滤镜调节（点击滤镜按钮后弹出的调节面板状态） -->
+<div class="device-wrapper" id="state-photo-filter" data-od-id="device-state-photo-filter">
+  <div class="device-label">⑤ 滤镜调节 · 面板展开</div>
+  <div class="mp-device">
+    <div class="mp-screen filter-screen">
+      <div class="mp-status-bar" style="background:#0d1117;">
+        <span class="mp-status-time" style="color:#fff;">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 顶栏导航 -->
+      <div class="filter-nav">
+        <div class="filter-back" onclick="setState('photo-preview')" title="返回预览">‹</div>
+        <div class="filter-title">滤镜调节</div>
+        <div class="filter-nav-reset" onclick="resetFilter()" title="还原默认原图">原图</div>
+      </div>
+
+      <!-- 滤镜大图预览视口 -->
+      <div class="filter-preview-viewport">
+        <div class="filter-preview-box" id="filter-preview-target" style="filter: contrast(1.1) saturate(1.2) sepia(0.15);">
+          <span>🥗</span>
+          <div class="filter-badge-info">照片 1/4 · 胶片复古</div>
+          <div class="filter-compare-tag">按住看原图</div>
+        </div>
+      </div>
+
+      <!-- 滤镜强度调节滑条 -->
+      <div class="filter-slider-wrap">
+        <span class="filter-slider-lbl">滤镜强度</span>
+        <div class="filter-slider-track" onclick="adjustFilterStrength(event)">
+          <div class="filter-slider-fill" id="filter-slider-fill" style="width: 75%;"></div>
+          <div class="filter-slider-thumb" id="filter-slider-thumb" style="left: 75%;"></div>
+        </div>
+        <span class="filter-slider-val" id="filter-slider-val">75</span>
+      </div>
+
+      <!-- 滤镜分类与横向滑动手势列表 -->
+      <div class="filter-selector-section">
+        <div class="filter-cat-tabs">
+          <div class="filter-cat-item active" onclick="switchFilterCat(this)">热门推荐</div>
+          <div class="filter-cat-item" onclick="switchFilterCat(this)">复古胶片</div>
+          <div class="filter-cat-item" onclick="switchFilterCat(this)">日系清新</div>
+          <div class="filter-cat-item" onclick="switchFilterCat(this)">质感高级</div>
+          <div class="filter-cat-item" onclick="switchFilterCat(this)">经典黑白</div>
+        </div>
+
+        <div class="filter-cards-scroll">
+          <!-- 原图 -->
+          <div class="filter-card" onclick="selectFilter(this, '原图', 'none')">
+            <div class="filter-thumb-box" style="background:#2a2e39;">
+              <span style="font-size:12px;font-family:var(--font-mono);color:rgba(255,255,255,0.8);">原图</span>
+            </div>
+            <div class="filter-name">无滤镜</div>
+          </div>
+
+          <!-- 滤镜 1：胶片复古 (默认激活) -->
+          <div class="filter-card active" onclick="selectFilter(this, '胶片复古', 'contrast(1.1) saturate(1.2) sepia(0.15)')">
+            <div class="filter-thumb-box" style="background:linear-gradient(135deg, #f59e0b 0%, #b45309 100%);">
+              <span>🎞</span>
+            </div>
+            <div class="filter-name">胶片复古</div>
+          </div>
+
+          <!-- 滤镜 2：暖阳午后 -->
+          <div class="filter-card" onclick="selectFilter(this, '暖阳午后', 'sepia(0.25) saturate(1.3) brightness(1.05)')">
+            <div class="filter-thumb-box" style="background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%);">
+              <span>☀️</span>
+            </div>
+            <div class="filter-name">暖阳午后</div>
+          </div>
+
+          <!-- 滤镜 3：日系清透 -->
+          <div class="filter-card" onclick="selectFilter(this, '日系清透', 'brightness(1.08) contrast(0.95) saturate(1.15)')">
+            <div class="filter-thumb-box" style="background:linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
+              <span>🌊</span>
+            </div>
+            <div class="filter-name">日系清透</div>
+          </div>
+
+          <!-- 滤镜 4：冷氧森系 -->
+          <div class="filter-card" onclick="selectFilter(this, '冷氧森系', 'hue-rotate(-15deg) saturate(1.1) contrast(1.05)')">
+            <div class="filter-thumb-box" style="background:linear-gradient(135deg, #34d399 0%, #059669 100%);">
+              <span>🍃</span>
+            </div>
+            <div class="filter-name">冷氧森系</div>
+          </div>
+
+          <!-- 滤镜 5：法式黑白 -->
+          <div class="filter-card" onclick="selectFilter(this, '法式黑白', 'grayscale(1) contrast(1.2)')">
+            <div class="filter-thumb-box" style="background:linear-gradient(135deg, #64748b 0%, #1e293b 100%);">
+              <span>🖤</span>
+            </div>
+            <div class="filter-name">法式黑白</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作栏 -->
+      <div class="filter-bottom-bar">
+        <div class="filter-batch-apply" onclick="toggleBatchApply(this)">
+          <div class="filter-batch-checkbox">✓</div>
+          <span>应用到全部 4 张照片</span>
+        </div>
+        <button class="filter-btn-done" onclick="setState('photo-preview')" title="完成滤镜调节返回预览">
+          <span>完成</span>
+          <span>✓</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 一键成片（图文转视频模板编辑态） -->
+<div class="device-wrapper" id="state-smart-video" data-od-id="device-state-smart-video">
+  <div class="device-label">⑥ 一键成片 · 模板与配乐编辑</div>
+  <div class="mp-device">
+    <div class="mp-screen sv-screen">
+      <div class="mp-status-bar" style="background:#0d1117;">
+        <span class="mp-status-time" style="color:#fff;">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 导航栏 -->
+      <div class="sv-nav">
+        <div class="sv-back" onclick="setState('photo-picker')" title="返回选择照片">‹</div>
+        <div class="sv-title">一键成片</div>
+        <div class="sv-nav-placeholder"></div>
+      </div>
+
+      <!-- 上方：选择音乐大按钮 -->
+      <div class="sv-music-banner-wrap">
+        <div class="sv-music-btn" onclick="setState('music-sheet')" title="点击更换配乐">
+          <div class="sv-music-left">
+            <span class="sv-music-icon">🎵</span>
+            <span class="sv-music-name">晴天 - 周杰伦</span>
+            <span class="sv-music-tag">模板自带</span>
+          </div>
+          <div class="sv-music-right">
+            <span>选择音乐</span>
+            <span>›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 播放视口主体：本质是一个视频，正在按模板轮播照片 -->
+      <div class="sv-player-viewport">
+        <div class="sv-video-frame">
+          <div class="sv-photo-slide">
+            <span>🥗</span>
+            
+          </div>
+          <div class="sv-play-center">▶</div>
+          <div class="sv-video-duration">0:04 / 0:15</div>
+          <div class="sv-video-timeline-bar">
+            <div class="sv-video-timeline-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下方：左右滑选择不同模板 -->
+      <div class="sv-template-section">
+        <div class="sv-template-header">
+          <span class="sv-template-title">选择成片模板</span>
+          <span class="sv-template-tip">4张照片</span>
+        </div>
+        <div class="sv-template-scroll">
+          <!-- 模板 1：默认选中并带有编辑状态 -->
+          <div class="sv-template-card active" onclick="selectTemplate(this, '气氛感日云海')">
+            <div class="sv-template-thumb" style="background:linear-gradient(135deg, #fbbf24 0%, #ea580c 100%);">
+              <span>🌅</span>
+              <div class="sv-template-edit-tag">选定</div>
+              <div class="sv-template-edit-bar" onclick="event.stopPropagation(); triggerTemplateEdit()">✏️ 编辑片段</div>
+            </div>
+            <div class="sv-template-name">气氛感日云海</div>
+          </div>
+
+          <!-- 模板 2：照片欢快卡点 -->
+          <div class="sv-template-card" onclick="selectTemplate(this, '照片欢快卡点')">
+            <div class="sv-template-thumb" style="background:linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);">
+              <span>⚡️</span>
+            </div>
+            <div class="sv-template-name">照片欢快卡点</div>
+          </div>
+
+          <!-- 模板 3：快乐是什么 -->
+          <div class="sv-template-card" onclick="selectTemplate(this, '快乐是什么')">
+            <div class="sv-template-thumb" style="background:linear-gradient(135deg, #f472b6 0%, #db2777 100%);">
+              <span>🎈</span>
+            </div>
+            <div class="sv-template-name">快乐是什么</div>
+          </div>
+
+          <!-- 模板 4：胶片复古日常 -->
+          <div class="sv-template-card" onclick="selectTemplate(this, '胶片复古日常')">
+            <div class="sv-template-thumb" style="background:linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);">
+              <span>🎞</span>
+            </div>
+            <div class="sv-template-name">胶片复古日常</div>
+          </div>
+
+          <!-- 模板 5：慢节奏微风 -->
+          <div class="sv-template-card" onclick="selectTemplate(this, '慢节奏微风')">
+            <div class="sv-template-thumb" style="background:linear-gradient(135deg, #34d399 0%, #059669 100%);">
+              <span>🍃</span>
+            </div>
+            <div class="sv-template-name">慢节奏微风</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最下方操作栏：下一步按钮 -->
+      <div class="sv-bottom-bar">
+        <div class="sv-bottom-summary">
+          <div class="sv-summary-text">已应用: <strong id="sv-current-template">气氛感日云海</strong></div>
+        </div>
+        <button class="sv-btn-next" onclick="setState('video')" title="进入视频发布态">
+          <span>下一步</span>
+          <span>›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 模板编辑（点击一键成片模板「编辑片段」弹出的半弹层状态） -->
+<div class="device-wrapper" id="state-template-edit" data-od-id="device-state-template-edit">
+  <div class="device-label">⑦ 模板编辑 · 片段微调半弹层</div>
+  <div class="mp-device">
+    <div class="mp-screen sv-screen">
+      <div class="mp-status-bar" style="background:#0d1117;">
+        <span class="mp-status-time" style="color:#fff;">8:24</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 视频画面视口主体（保持播放展示当前编辑片段） -->
+      <div class="sv-player-viewport" style="margin: 12px 16px; background:#000;">
+        <div class="sv-video-frame" style="background:#000;">
+          <div class="sv-photo-slide" style="width: 90%; aspect-ratio: 16/10; border-radius: 4px; background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);">
+            <span style="font-size: 44px;">🧽</span>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: #fff; font-family: var(--font-display); font-size: 14px; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,0.9); white-space: nowrap;">快乐就是...</div>
+          </div>
+          <div class="sv-video-timeline-bar" style="bottom: 0;">
+            <div class="sv-video-timeline-fill" style="width: 25%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 类似于参考截图的「模板编辑」半弹层 -->
+      <div class="tpl-edit-sheet">
+        <!-- 弹层顶栏：左叉号、居中标题「模板编辑」、右对勾 -->
+        <div class="tpl-edit-header">
+          <div class="tpl-edit-btn-cancel" onclick="setState('smart-video')" title="取消">✕</div>
+          <div class="tpl-edit-title">模板编辑</div>
+          <div class="tpl-edit-btn-confirm" onclick="setState('smart-video')" title="完成">✓</div>
+        </div>
+
+        <!-- 片段水平缩略图滚动条 -->
+        <div class="tpl-clips-scroll">
+          <!-- 片段 1 (当前选中) -->
+          <div class="tpl-clip-card active" onclick="selectClipCard(this)">
+            <div class="tpl-clip-thumb" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+              <div class="tpl-clip-header-label">片段 1</div>
+              <div class="tpl-clip-thumb-center">🧽</div>
+              <div class="tpl-clip-duration">1.1秒</div>
+            </div>
+          </div>
+
+          <!-- 片段 2 -->
+          <div class="tpl-clip-card" onclick="selectClipCard(this)">
+            <div class="tpl-clip-thumb" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%);">
+              <div class="tpl-clip-header-label">片段 2</div>
+              <div class="tpl-clip-thumb-center">🥐</div>
+              <div class="tpl-clip-duration">0.9秒</div>
+            </div>
+          </div>
+
+          <!-- 片段 3 -->
+          <div class="tpl-clip-card" onclick="selectClipCard(this)">
+            <div class="tpl-clip-thumb" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
+              <div class="tpl-clip-header-label">片段 3</div>
+              <div class="tpl-clip-thumb-center">☕️</div>
+              <div class="tpl-clip-duration">1.3秒</div>
+            </div>
+          </div>
+
+          <!-- 片段 4 (音频卡点指示) -->
+          <div class="tpl-clip-card" onclick="selectClipCard(this)">
+            <div class="tpl-clip-thumb" style="background: linear-gradient(135deg, #1e293b 0%, #020617 100%);">
+              <div class="tpl-clip-header-label">卡点 4</div>
+              <div class="tpl-clip-waveform">
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+              </div>
+              <div class="tpl-clip-duration">0.8秒</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作按钮：替换素材（直接链接至选择照片状态） -->
+        <div class="tpl-edit-actions">
+          <div class="tpl-action-item" onclick="setState('photo-picker')" title="点击前往选择照片页面替换当前素材">
+            <span class="tpl-action-icon">⇄</span>
+            <span>替换素材</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 选择音乐（BGM 半弹层状态） -->
+<div class="device-wrapper" id="state-music-sheet" data-od-id="device-state-music-sheet">
+  <div class="device-label">⑧ 选择音乐 · 半弹层</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back" onclick="setState('image')">‹</div>
+        <div class="nav-title">发布内容</div>
+      </div>
+      <div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天做的brunch，拍了几张随手图，分享给大家<span class="inline-topic">#下厨日记</span></div>
+        </div>
+        <div class="square-char-count filled">24 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn">😀</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="image-grid">
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
+          <div class="image-slot add" onclick="setState('photo-picker')" title="点击添加照片">
+            <div class="u-icon">＋</div>
+            <div class="u-count">4/9</div>
+          </div>
+          <div class="image-slot bgm selected">
+            <div class="bgm-icon">🎵</div>
+            <div class="bgm-text">已选: 晴天</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+
+      <!-- 选择音乐半弹层 -->
+      <div class="music-sheet-overlay" onclick="setState('image')">
+        <div class="music-sheet" onclick="event.stopPropagation()">
+          <div class="music-sheet-handle"></div>
+          <div class="music-sheet-header">
+            <div class="music-sheet-title">选择音乐</div>
+            <div class="music-sheet-close" onclick="setState('image')">×</div>
+          </div>
+          
+          <!-- 搜索条 -->
+          <div class="music-sheet-search">
+            <div class="music-search-box">
+              <span class="music-search-icon">🔍</span>
+              <input type="text" class="music-search-input" placeholder="搜索歌曲、歌手或氛围标签…">
+            </div>
+          </div>
+
+          <!-- Tab 分类 -->
+          <div class="music-sheet-tabs">
+            <div class="music-tab-item active" onclick="switchMusicTab(this)">推荐</div>
+            <div class="music-tab-item" onclick="switchMusicTab(this)">热门流行</div>
+            <div class="music-tab-item" onclick="switchMusicTab(this)">治愈系</div>
+            <div class="music-tab-item" onclick="switchMusicTab(this)">节奏欢快</div>
+            <div class="music-tab-item" onclick="switchMusicTab(this)">我的喜欢</div>
+          </div>
+
+          <!-- 音乐列表 -->
+          <div class="music-list">
+            <div class="music-item active" onclick="selectMusicItem(this, '晴天', '周杰伦')">
+              <div class="music-item-left">
+                <div class="music-cover">▶</div>
+                <div class="music-meta">
+                  <div class="music-name">晴天</div>
+                  <div class="music-author">周杰伦 · 经典怀旧</div>
+                </div>
+              </div>
+              <div class="music-item-right">
+                <span class="music-duration">0:30</span>
+                <button class="music-use-btn used" onclick="event.stopPropagation(); selectMusicAndClose('晴天')">使用</button>
+              </div>
+            </div>
+
+            <div class="music-item" onclick="selectMusicItem(this, '夏天的风', '温岚')">
+              <div class="music-item-left">
+                <div class="music-cover">🎵</div>
+                <div class="music-meta">
+                  <div class="music-name">夏天的风</div>
+                  <div class="music-author">温岚 · 清爽浪漫</div>
+                </div>
+              </div>
+              <div class="music-item-right">
+                <span class="music-duration">0:45</span>
+                <button class="music-use-btn" onclick="event.stopPropagation(); selectMusicAndClose('夏天的风')">使用</button>
+              </div>
+            </div>
+
+            <div class="music-item" onclick="selectMusicItem(this, '阳光宅男', '周杰伦')">
+              <div class="music-item-left">
+                <div class="music-cover">🎵</div>
+                <div class="music-meta">
+                  <div class="music-name">阳光宅男</div>
+                  <div class="music-author">周杰伦 · 活力元气</div>
+                </div>
+              </div>
+              <div class="music-item-right">
+                <span class="music-duration">0:30</span>
+                <button class="music-use-btn" onclick="event.stopPropagation(); selectMusicAndClose('阳光宅男')">使用</button>
+              </div>
+            </div>
+
+            <div class="music-item" onclick="selectMusicItem(this, '慢半拍', '薛之谦')">
+              <div class="music-item-left">
+                <div class="music-cover">🎵</div>
+                <div class="music-meta">
+                  <div class="music-name">慢半拍</div>
+                  <div class="music-author">许嵩 / 薛之谦 · 悠闲随性</div>
+                </div>
+              </div>
+              <div class="music-item-right">
+                <span class="music-duration">0:40</span>
+                <button class="music-use-btn" onclick="event.stopPropagation(); selectMusicAndClose('慢半拍')">使用</button>
+              </div>
+            </div>
+
+            <div class="music-item" onclick="selectMusicItem(this, 'City Life', 'Acoustic')">
+              <div class="music-item-left">
+                <div class="music-cover">🎵</div>
+                <div class="music-meta">
+                  <div class="music-name">City Life (Acoustic)</div>
+                  <div class="music-author">Chill Vibes · 轻松轻音乐</div>
+                </div>
+              </div>
+              <div class="music-item-right">
+                <span class="music-duration">0:30</span>
+                <button class="music-use-btn" onclick="event.stopPropagation(); selectMusicAndClose('City Life')">使用</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ 视频态 -->
+<div class="device-wrapper" id="state-video" data-od-id="device-state-video">
+  <div class="device-label">⑨ 视频态 · 发布器</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布内容</div>
+      </div>
+<div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
+        </div>
+        <div class="square-char-count filled">20 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel" style="display:none;">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn disabled"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn active"><span class="ic">🎥</span>视频</div>
+        </div>
+        <div class="video-wrap" id="video-card-container">
+          <!-- 点击视频后未添加时的「＋ 选择视频」卡槽，点击直接进入 ⑩ 选择视频 -->
+          <div class="video-slot-add" id="video-add-slot" onclick="setState('video-picker')" title="点击像选择照片那样自研选择视频">
+            <div class="v-icon">＋</div>
+            <div class="v-text">选择视频</div>
+            <div class="v-sub">相册选取</div>
+          </div>
+
+          <!-- 已选择视频后的展示卡片（带播放图、时长与右上角移除） -->
+          <div class="video-portrait done" id="video-done-card" style="display:none;">
+            <div class="done-thumb-bg">▶</div>
+            <div class="done-duration">00:24</div>
+            <div class="video-remove" onclick="removeSelectedVideo()" title="移除视频">×</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑩ 选择视频（自研视频相册选择器） -->
+<div class="device-wrapper" id="state-video-picker" data-od-id="device-state-video-picker">
+  <div class="device-label">⑩ 选择视频 · 自研相册选择</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 导航栏 -->
+      <div class="picker-nav">
+        <div class="picker-cancel" onclick="setState('video')">取消</div>
+        <div class="picker-album-dropdown">
+          <span>所有视频</span>
+          <span class="picker-dropdown-arrow">▼</span>
+        </div>
+        <div class="picker-nav-spacer"></div>
+      </div>
+
+      <!-- 4列视频网格（自研渲染，展示时长与单选框） -->
+      <div class="picker-grid-wrap">
+        <div class="picker-grid">
+          <!-- 视频项 1 (默认选中) -->
+          <div class="picker-item selected" onclick="toggleVideoPickerSelect(this, '00:24')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox">1</div>
+            <span class="picker-item-duration">00:24</span>
+          </div>
+
+          <!-- 视频项 2 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '01:15')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #334155 0%, #1e293b 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">01:15</span>
+          </div>
+
+          <!-- 视频项 3 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '00:45')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #0f766e 0%, #115e59 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">00:45</span>
+          </div>
+
+          <!-- 视频项 4 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '02:30')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #854d0e 0%, #713f12 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">02:30</span>
+          </div>
+
+          <!-- 视频项 5 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '00:15')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #431407 0%, #7c2d12 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">00:15</span>
+          </div>
+
+          <!-- 视频项 6 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '00:58')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #581c87 0%, #3b0764 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">00:58</span>
+          </div>
+
+          <!-- 视频项 7 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '01:02')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #1e3a8a 0%, #172554 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">01:02</span>
+          </div>
+
+          <!-- 视频项 8 -->
+          <div class="picker-item" onclick="toggleVideoPickerSelect(this, '00:33')">
+            <div class="picker-item-thumb" style="background:linear-gradient(135deg, #374151 0%, #111827 100%);">
+              <span class="picker-item-play-icon">▶</span>
+            </div>
+            <div class="picker-checkbox"></div>
+            <span class="picker-item-duration">00:33</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作栏：左侧一键成片，右侧下一步 -->
+      <div class="picker-bottom-bar">
+        <button class="picker-btn-smart" onclick="setState('smart-video')" title="将选中的视频/片段快速智能成片">
+          <span class="smart-spark">✨</span>
+          <span>一键成片</span>
+          <span class="smart-tip">智能剪辑</span>
+        </button>
+        <div class="picker-confirm-wrap">
+          <button class="picker-btn-confirm" onclick="setState('video-preview')" title="点击下一步进入视频预览与编辑">
+            <span>下一步</span>
+            <span class="picker-selected-count" id="video-picker-count">1</span>
+            <span style="font-size:11px;font-family:var(--font-mono);opacity:0.8;">/1</span>
+            <span style="font-size:12px;margin-left:2px;">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑪ 视频预览（视频全功能预览与剪辑调色状态） -->
+<div class="device-wrapper" id="state-video-preview" data-od-id="device-state-video-preview">
+  <div class="device-label">⑪ 视频预览 · 滤镜+BGM+混音+剪辑</div>
+  <div class="mp-device">
+    <div class="mp-screen vp-screen">
+      <div class="mp-status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:30;">
+        <span class="mp-status-time" style="color:#fff;">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 顶栏导航 -->
+      <div class="vp-nav" style="margin-top:44px;">
+        <div class="vp-back" onclick="setState('video-picker')" title="返回选择视频">‹</div>
+        <div class="vp-title">视频预览与编辑</div>
+        <button class="vp-btn-done" onclick="completeVideoPreviewAndBack()" title="确认视频编辑并回填至发布主态">完成</button>
+      </div>
+
+      <!-- 上方：选择音乐大按钮（与一键成片位置一致） -->
+      <div class="sv-music-banner-wrap" style="z-index:20;">
+        <div class="sv-music-btn" onclick="setState('music-sheet')" title="点击选择或更换BGM配乐">
+          <div class="sv-music-left">
+            <span class="sv-music-icon">🎵</span>
+            <span class="sv-music-name" id="vp-top-bgm-title">添加背景音乐 (BGM)</span>
+            <span class="sv-music-tag" id="vp-top-bgm-tag">可选配乐</span>
+          </div>
+          <div class="sv-music-right">
+            <span>选择音乐</span>
+            <span>›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 视频播放主体视口 -->
+      <div class="vp-viewport">
+        <div class="vp-video-bg" id="vp-video-target" style="filter: contrast(1.1) saturate(1.2);">
+          <div class="vp-video-poster">🛹</div>
+          <div class="vp-video-title">滑板练习片段 · 00:24</div>
+        </div>
+        <div class="vp-play-center" onclick="toggleVpPlay(this)">▶</div>
+
+        <!-- 悬浮播放时间与进度条 -->
+        <div class="vp-timeline-overlay">
+          <span id="vp-current-time">00:10</span>
+          <span>00:24</span>
+        </div>
+        <div class="vp-timeline-bar">
+          <div class="vp-timeline-fill"></div>
+        </div>
+
+        <!-- 右侧悬浮快捷能力入口 -->
+        <div class="vp-right-actions">
+          <div class="vp-action-item" onclick="switchVpSubpanel('filter')">
+            <div class="vp-action-circle" id="vp-btn-filter">🎨</div>
+            <span class="vp-action-label">滤镜</span>
+          </div>
+          <div class="vp-action-item" onclick="switchVpSubpanel('volume')">
+            <div class="vp-action-circle" id="vp-btn-volume">🔊</div>
+            <span class="vp-action-label">音量</span>
+          </div>
+          <div class="vp-action-item" onclick="switchVpSubpanel('trim')">
+            <div class="vp-action-circle" id="vp-btn-trim">✂️</div>
+            <span class="vp-action-label">剪辑</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部调节抽屉面板（由右侧滤镜/音量/剪辑按钮呼出，已去除与右侧重叠的底部常驻条） -->
+      <div class="vp-bottom-panel" id="vp-bottom-panel">
+        <!-- 子面板 1：滤镜选择器 -->
+        <div class="vp-subpanel" id="vp-subpanel-filter" style="display:none;">
+          <div class="vp-subpanel-header">
+            <span class="vp-subpanel-title">视频滤镜</span>
+            <span class="vp-subpanel-close" onclick="closeVpSubpanel()">✕</span>
+          </div>
+          <div class="vp-filter-strip">
+            <div class="vp-filter-item" onclick="selectVpFilter(this, '原色', 'none')">
+              <div class="vp-filter-thumb">原色</div>
+              <span class="vp-filter-name">原色</span>
+            </div>
+            <div class="vp-filter-item active" onclick="selectVpFilter(this, '胶片', 'contrast(1.1) saturate(1.2)')">
+              <div class="vp-filter-thumb" style="background:linear-gradient(135deg,#f59e0b,#b45309);">🎞</div>
+              <span class="vp-filter-name">胶片</span>
+            </div>
+            <div class="vp-filter-item" onclick="selectVpFilter(this, '日系', 'brightness(1.08) contrast(0.95)')">
+              <div class="vp-filter-thumb" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">🌊</div>
+              <span class="vp-filter-name">日系</span>
+            </div>
+            <div class="vp-filter-item" onclick="selectVpFilter(this, '复古', 'sepia(0.3) contrast(1.1)')">
+              <div class="vp-filter-thumb" style="background:linear-gradient(135deg,#fbbf24,#d97706);">☀️</div>
+              <span class="vp-filter-name">复古</span>
+            </div>
+            <div class="vp-filter-item" onclick="selectVpFilter(this, '黑白', 'grayscale(1)')">
+              <div class="vp-filter-thumb" style="background:linear-gradient(135deg,#64748b,#1e293b);">🖤</div>
+              <span class="vp-filter-name">黑白</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 子面板 2：音量混音（原声 vs BGM） -->
+        <div class="vp-subpanel" id="vp-subpanel-volume" style="display:none;">
+          <div class="vp-subpanel-header">
+            <span class="vp-subpanel-title">音量混音</span>
+            <span class="vp-subpanel-close" onclick="closeVpSubpanel()">✕</span>
+          </div>
+          <div class="vp-volume-row">
+            <span class="vp-volume-label">视频原声</span>
+            <div class="vp-volume-track" onclick="adjustVpVol(event, 'orig')">
+              <div class="vp-volume-fill" id="vp-vol-orig-fill" style="width:100%;"></div>
+              <div class="vp-volume-thumb" id="vp-vol-orig-thumb" style="left:100%;"></div>
+            </div>
+            <span class="vp-volume-val" id="vp-vol-orig-val">100</span>
+          </div>
+          <div class="vp-volume-row">
+            <span class="vp-volume-label">BGM配乐</span>
+            <div class="vp-volume-track" onclick="adjustVpVol(event, 'bgm')">
+              <div class="vp-volume-fill" id="vp-vol-bgm-fill" style="width:60%;"></div>
+              <div class="vp-volume-thumb" id="vp-vol-bgm-thumb" style="left:60%;"></div>
+            </div>
+            <span class="vp-volume-val" id="vp-vol-bgm-val">60</span>
+          </div>
+        </div>
+
+        <!-- 子面板 3：剪辑截取选段 -->
+        <div class="vp-subpanel" id="vp-subpanel-trim" style="display:none;">
+          <div class="vp-subpanel-header">
+            <span class="vp-subpanel-title">视频剪辑选段</span>
+            <span class="vp-subpanel-close" onclick="closeVpSubpanel()">✕</span>
+          </div>
+          <div class="vp-trim-container">
+            <div class="vp-trim-track">
+              <div class="vp-trim-frames">
+                <span>🛹</span><span>🏂</span><span>🛹</span><span>🛹</span><span>🏂</span>
+              </div>
+              <div class="vp-trim-selection">
+                <div class="vp-trim-handle"></div>
+                <div class="vp-trim-handle"></div>
+              </div>
+            </div>
+            <div class="vp-trim-info">
+              <span>截取区间: 00:03 - 00:19</span>
+              <span style="color:var(--accent);">已选时长: 00:16</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 表情面板中：点击正文下方的表情按钮后，展开表情面板 -->
+<div class="device-wrapper" id="state-emoji" data-od-id="device-state-emoji">
+  <div class="device-label">⑫ 表情面板展开 · 发布器</div>
+  <div class="mp-device">
+    <div class="mp-screen">
+      <div class="mp-status-bar">
+        <span class="mp-status-time">9:41</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="wifi-icon"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+      <div class="mp-nav">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">发布内容</div>
+      </div>
+<div class="page-scroll">
+        <div class="square-text-wrap">
+          <div class="square-textarea filled">周末爬山，山顶风好大 😂<span class="caret"></span></div>
+        </div>
+        <div class="square-char-count filled">10 / 1000</div>
+        <div class="text-toolbar">
+          <div class="text-emoji-btn active" onclick="toggleEmojiPanel(this)">😀</div>
+        </div>
+        <div class="emoji-panel">
+          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
+          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
+          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
+          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
+          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
+          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
+        </div>
+        <div class="media-actions">
+          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
+          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pub-btn">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /devices-row -->
+
+<!-- Spec -->
+<div class="spec-panel" style="max-width:782px; width:100%;" data-od-id="spec-panel">
+  <h3>SPEC · 发布器结构与交互规范说明</h3>
+  <div class="spec-row">
+    <span class="spec-key">发布器交互形态</span>
+    <span class="spec-val">移除顶部内容类型 Tab，直截呈现统一发布器：如朋友圈般一站式支持 <span class="spec-badge">纯文字</span><span class="spec-badge">图文（文字+图片）</span><span class="spec-badge">视频（文字+视频）</span> 发布，无需预选模式</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布形式</span>
+    <span class="spec-val">与朋友圈一致：<span class="spec-badge">纯文字</span><span class="spec-badge">图文（文字+图片）</span><span class="spec-badge">视频（文字+视频）</span> 三种，无需分 Tab 选择，由是否添加媒体决定</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">正文输入</span>
+    <span class="spec-val">大段文字输入区（占位「这一刻的想法…」），最多 1000 字，键入 <span class="spec-badge">#</span> 内联识别话题；允许完全为空媒体、仅发文字</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发表情</span>
+    <span class="spec-val">正文下方一个表情按钮，点击后展开表情面板，选中的表情插入到光标处，与图片/视频输入互不影响，可与文字任意组合</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑩ 表情面板中</span>
+    <span class="spec-val">点击表情按钮后，原位置展开 8 列表情网格，再点一次收起；面板展开状态下仍可继续切换图片/视频媒体类型</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片 / 视频互斥</span>
+    <span class="spec-val">「图片」「视频」两个媒体入口二选一：选中一种后另一种禁用（灰色不可点），与文字任意组合，不能同时发图片和视频</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片</span>
+    <span class="spec-val">3 列宫格 · 最多 9 张 · 每张右上角可删除，上传中显示旋转加载圈 + 百分比 + 进度条</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑨ 视频态（加号选视频）</span>
+    <span class="spec-val">点击媒体动作「视频」后展示视频管理区：未添加时呈现标准 <span class="spec-badge">＋ 选择视频</span> 卡槽；点击加号直接打开 <span class="spec-badge">⑩ 选择视频</span> 自研相册网格；选定后卡片切换为已选视频缩略图（带播放标识、时长角标与右上角删除「×」），点击「×」可移除并恢复加号卡槽。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑩ 选择视频（自研相册）</span>
+    <span class="spec-val">像选择照片一样的自研多媒体相册视图：4 列网格陈列本地视频库，每项带播放标识与时间长度角标（如 00:24、01:15），右上角提供圆形数字勾选框，单选控制（1/1）。<br>
+    底部操作栏与选择照片保持一致布局：<br>
+    - <b>左侧「✨ 一键成片」</b>：直接将勾选的视频/片段导入智能剪辑，进入「⑥ 一键成片」；<br>
+    - <b>右侧「下一步 (1/1) ›」</b>：黄色主按钮，确认选定并直接进入「⑪ 视频预览」进行全能剪辑与调色。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑪ 视频预览（多功能剪辑编辑）</span>
+    <span class="spec-val">如同图片预览一样的全功能视频预览与编辑主态：<br>
+    1. <b>上方大按钮「选择音乐」（位置同「一键成片」一致）</b>：位于导航栏下方、播放视口上方通栏陈列，展示当前背景音乐状态与「选择音乐 ›」入口，点击直达音乐选择半弹层；<br>
+    2. <b>中央全屏播放视口</b>：9:16 全屏纯净播放视口，带中央播放/暂停控制与底部实时进度条/时间码（00:10 / 00:24）；<br>
+    3. <b>右侧标准悬浮工具组（已去除底部重复工具栏）</b>：告别与右侧功能重叠的底部常驻按钮，所有功能统一由右侧标准悬浮图标唤起底端抽屉：<br>
+       - <b>视频滤镜 (🎨)</b>：点击右侧滤镜图标，自底向上滑出滤镜调色抽屉，支持横向切换「原色 / 胶片 / 日系 / 复古 / 黑白」风格；<br>
+       - <b>音量混音调节 (🔊)</b>：点击右侧音量图标，滑出「视频原声」与「BGM配乐」独立双轨 0~100 混音抽屉；<br>
+       - <b>剪辑选段 (✂️)</b>：点击右侧剪辑图标，滑出时间线胶卷轨道与出入点截取抽屉；<br>
+    4. <b>顶部完成按钮</b>：确认编辑效果后点击「完成」，将制作就绪的视频回填至视频发布主态。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">发布条件</span>
+    <span class="spec-val">文字 / 图片 / 视频三者至少填写一项即可发布；媒体上传中禁用发布按钮，直至全部完成</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">③ 选择照片（自研渲染）</span>
+    <span class="spec-val">替代传统调用系统相册的黑盒交互，自研照片选择器界面：<br>
+    1. <b>顶部导航栏</b>：左侧「取消」（返回图文编辑）、居中相册下拉切换「所有照片 ▼」，无多余按钮保持居中；<br>
+    2. <b>4 列沉浸照片网格</b>：无拍摄按钮，纯粹照片多选，右上角圆形数字勾选框（支持 1~9 多选并实时标注序号）；<br>
+    3. <b>已选照片预览托盘</b>：位于操作栏上方，自左向右横向展示已勾选照片微缩图（带顺序角标与快捷删除「×」）；<br>
+    4. <b>底部操作栏</b>：左侧「✨ 一键成片」，右侧主按钮为「下一步 (4/9) ›」，无中间滤镜按钮，点击直接进入「④ 图片预览」。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">④ 图片预览（含移动端工具抽屉）</span>
+    <span class="spec-val">点击选择照片的「下一步」后进入的大图预览与编辑主态：<br>
+    1. <b>中央大图视口</b>：高清全画幅预览当前焦点的照片，支持大图滑动切换与右上角页码指示（如 1 / 4）；<br>
+    2. <b>下方全量已选图片栏</b>：底部从左到右横向平铺展示所有已勾选的照片缩略图，点击任意一张可快速切换主屏大图；<br>
+    3. <b>移动端标准工具抽屉（Action Sheet）</b>：右侧为「🛠️ 工具」按钮，去除了桌面端气泡式浮层与裁剪/贴纸多余项。点击自底向上滑出规范的半屏暗黑磨砂工具抽屉，内含 <span class="spec-badge">🎨 滤镜</span> 大图标功能项，点击即可唤起「⑤ 滤镜调节」面板，未来新增工具可规范向右平铺扩展；<br>
+    4. <b>顶部完成按钮</b>：直接完成所有图片选定并返回图文发布编辑主态。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑤ 滤镜调节（面板展开态）</span>
+    <span class="spec-val">在图片预览态点击右侧「滤镜」按钮呼出的调色功能样式：<br>
+    1. <b>大图视口预览</b>：沉浸式呈现当前照片与所选滤镜的实际效果，支持「按住看原图」实时对比；<br>
+    2. <b>滤镜强度滑条</b>：0~100 强度细致微调；<br>
+    3. <b>分类与滤镜横滑列表</b>：热门推荐 / 复古胶片 / 日系清透 / 质感高级 / 经典黑白 等预设风格；<br>
+    4. <b>批量应用与返回</b>：支持「应用到全部照片」一键统一全套图文风格，点击「完成」保存并返回「④ 图片预览」。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑥ 一键成片（图文转视频）</span>
+    <span class="spec-val">点击选择照片底部的 <span class="spec-badge">✨ 一键成片</span> 后进入独立的视频生成与编辑状态，本质为照片自动转场视频：<br>
+    1. <b>上方大按钮「选择音乐」</b>：通栏展示当前应用的自带配乐（如「晴天 - 周杰伦」），支持点击打开音乐选择半弹层更换 BGM；<br>
+    2. <b>中央播放主体视口</b>：竖版视频播放窗口，预览已选照片在当前模板下的运镜、转场效果及进度条/时长；<br>
+    3. <b>下方横向滑动模板库</b>：支持左右手势滑动选择不同剪辑模板（如 <span class="spec-badge">气氛感日云海</span>、<span class="spec-badge">照片欢快卡点</span>、<span class="spec-badge">快乐是什么</span>、胶片复古日常等）；<br>
+    4. <b>默认选中模板带「编辑」状态</b>：当前选中的模板卡片上附带「✏️ 编辑片段」入口，点击即可呼出「⑤ 模板编辑」微调半弹层；<br>
+    5. <b>最下方操作栏「下一步」</b>：确认模板与成片效果后，点击「下一步」直接带入视频发布态进行最终标题与权限设置并发布。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑦ 模板编辑（半弹层）</span>
+    <span class="spec-val">点击「✏️ 编辑片段」弹出的底端操作弹层（仿剪辑行业标杆规范）：<br>
+    1. <b>弹层顶栏</b>：左侧取消「✕」、居中「模板编辑」、右侧确认「✓」；<br>
+    2. <b>横向片段列表</b>：展示构成视频的各个镜头切片，精确标注时长（如 1.1秒、0.9秒、1.3秒、波形卡点），高亮白框指示当前焦点片段；<br>
+    3. <b>底部操作功能</b>：<br>
+       - <b>「⇄ 替换素材」</b>：点击后直接跳转链接到「③ 选择照片」自研相册状态，重新选取照片替换当前焦点片段。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">⑧ 选择音乐（半弹层）</span>
+    <span class="spec-val">点击图文九宫格加号旁边的 <span class="spec-badge">选择音乐</span> 卡槽后，自底向上滑出 70% 高度半弹层。弹层内集成：<br>
+    1. 顶部拖拽手柄、居中标题「选择音乐」与右上角关闭「×」；<br>
+    2. <b>搜索框</b>：支持搜索歌曲、歌手或氛围标签；<br>
+    3. <b>分类 Tab</b>：横向切换「推荐 / 热门流行 / 治愈系 / 节奏欢快 / 我的喜欢」等；<br>
+    4. <b>音乐列表</b>：单行展示封面微缩图、歌曲名、歌手与标签、试听时长（0:30~0:45）及「使用」按钮；点击「使用」或单行即可完成选中并关闭弹层返回图文态，卡槽切换为「已选: 曲目名」并带黄边高亮。</span>
+  </div>
+</div>
+
+<script>
+  
+  let selectedVideoDuration = '00:24';
+
+  function removeSelectedVideo() {
+    const addSlot = document.getElementById('video-add-slot');
+    const doneCard = document.getElementById('video-done-card');
+    if (addSlot) addSlot.style.display = 'flex';
+    if (doneCard) doneCard.style.display = 'none';
+  }
+
+  function toggleVideoPickerSelect(item, duration) {
+    const isSelected = item.classList.contains('selected');
+    document.querySelectorAll('#state-video-picker .picker-item').forEach(it => {
+      it.classList.remove('selected');
+      const box = it.querySelector('.picker-checkbox');
+      if (box) box.textContent = '';
+    });
+    
+    const countEl = document.getElementById('video-picker-count');
+    const confirmBtn = document.querySelector('#state-video-picker .picker-btn-confirm');
+
+    if (!isSelected) {
+      item.classList.add('selected');
+      const box = item.querySelector('.picker-checkbox');
+      if (box) box.textContent = '1';
+      selectedVideoDuration = duration;
+      if (countEl) countEl.textContent = '1';
+      if (confirmBtn) confirmBtn.classList.remove('disabled');
+    } else {
+      selectedVideoDuration = '';
+      if (countEl) countEl.textContent = '0';
+      if (confirmBtn) confirmBtn.classList.add('disabled');
+    }
+  }
+
+  
+  function switchVpSubpanel(type) {
+    const bottomPanel = document.getElementById('vp-bottom-panel');
+    const panels = ['filter', 'volume', 'trim'];
+    let anyActive = false;
+
+    panels.forEach(p => {
+      const el = document.getElementById('vp-subpanel-' + p);
+      const btn = document.getElementById('vp-btn-' + p);
+      if (p === type) {
+        const isShown = el && el.style.display !== 'none';
+        if (el) el.style.display = isShown ? 'none' : 'flex';
+        if (btn) btn.classList.toggle('active', !isShown);
+        if (!isShown) anyActive = true;
+      } else {
+        if (el) el.style.display = 'none';
+        if (btn) btn.classList.remove('active');
+      }
+    });
+
+    if (bottomPanel) {
+      if (anyActive) bottomPanel.classList.add('visible');
+      else bottomPanel.classList.remove('visible');
+    }
+  }
+
+  function closeVpSubpanel() {
+    const bottomPanel = document.getElementById('vp-bottom-panel');
+    ['filter', 'volume', 'trim'].forEach(p => {
+      const el = document.getElementById('vp-subpanel-' + p);
+      const btn = document.getElementById('vp-btn-' + p);
+      if (el) el.style.display = 'none';
+      if (btn) btn.classList.remove('active');
+    });
+    if (bottomPanel) bottomPanel.classList.remove('visible');
+  }
+
+  function selectVpFilter(el, name, filterCss) {
+    el.closest('.vp-filter-strip').querySelectorAll('.vp-filter-item').forEach(it => it.classList.remove('active'));
+    el.classList.add('active');
+    const target = document.getElementById('vp-video-target');
+    if (target) target.style.filter = filterCss;
+  }
+
+  function adjustVpVol(e, kind) {
+    const track = e.currentTarget;
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
+    const fill = document.getElementById('vp-vol-' + kind + '-fill');
+    const thumb = document.getElementById('vp-vol-' + kind + '-thumb');
+    const val = document.getElementById('vp-vol-' + kind + '-val');
+    if (fill) fill.style.width = pct + '%';
+    if (thumb) thumb.style.left = pct + '%';
+    if (val) val.textContent = pct;
+  }
+
+  function toggleVpPlay(btn) {
+    btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
+  }
+
+  function completeVideoPreviewAndBack() {
+    const addSlot = document.getElementById('video-add-slot');
+    const doneCard = document.getElementById('video-done-card');
+    if (addSlot) addSlot.style.display = 'none';
+    if (doneCard) doneCard.style.display = 'flex';
+    setState('video');
+  }
+
+  function confirmVideoSelection() {
+    const addSlot = document.getElementById('video-add-slot');
+    const doneCard = document.getElementById('video-done-card');
+    const durEl = document.querySelector('#video-done-card .done-duration');
+    if (addSlot) addSlot.style.display = 'none';
+    if (doneCard) doneCard.style.display = 'flex';
+    if (durEl && selectedVideoDuration) durEl.textContent = selectedVideoDuration;
+    setState('video');
+  }
+
+  function openToolsSheet() {
+    const mask = document.getElementById('preview-tools-mask');
+    const btn = document.querySelector('.preview-tool-btn');
+    if (mask) mask.classList.add('visible');
+    if (btn) btn.classList.add('active');
+  }
+
+  function closeToolsSheet() {
+    const mask = document.getElementById('preview-tools-mask');
+    const btn = document.querySelector('.preview-tool-btn');
+    if (mask) mask.classList.remove('visible');
+    if (btn) btn.classList.remove('active');
+  }
+
+  function renderPickerTray() {
+    const tray = document.getElementById('picker-tray');
+    if (!tray) return;
+    const selectedItems = Array.from(document.querySelectorAll('#state-photo-picker .picker-item.selected'));
+    
+    // re-index checkbox
+    selectedItems.forEach((el, index) => {
+      const box = el.querySelector('.picker-checkbox');
+      if (box) box.textContent = index + 1;
+    });
+    document.querySelectorAll('#state-photo-picker .picker-item:not(.selected) .picker-checkbox').forEach(box => {
+      box.textContent = '';
+    });
+
+    // rebuild tray content
+    if (selectedItems.length === 0) {
+      tray.innerHTML = '<span class="picker-tray-label">暂未选择照片</span>';
+    } else {
+      let html = '<span class="picker-tray-label">已选</span>';
+      selectedItems.forEach((el, index) => {
+        const id = el.dataset.id;
+        const emoji = el.dataset.emoji || '🖼';
+        const thumbStyle = el.querySelector('.picker-item-thumb').getAttribute('style') || '';
+        html += `
+          <div class="picker-tray-thumb" data-id="${id}">
+            <div class="picker-tray-thumb-inner" style="${thumbStyle}">${emoji}</div>
+            <div class="picker-tray-order">${index + 1}</div>
+            <div class="picker-tray-del" onclick="event.stopPropagation(); removeTrayPhoto('${id}')">×</div>
+          </div>
+        `;
+      });
+      tray.innerHTML = html;
+    }
+
+    // update confirm button
+    const count = selectedItems.length;
+    const confirmCount = document.querySelector('.picker-selected-count');
+    const confirmBtn = document.querySelector('.picker-btn-confirm');
+    if (confirmCount) confirmCount.textContent = count;
+    if (confirmBtn) {
+      if (count === 0) confirmBtn.classList.add('disabled');
+      else confirmBtn.classList.remove('disabled');
+    }
+  }
+
+  function togglePickerSelect(item) {
+    item.classList.toggle('selected');
+    renderPickerTray();
+  }
+
+  function removeTrayPhoto(id) {
+    const item = document.querySelector(`#state-photo-picker .picker-item[data-id="${id}"]`);
+    if (item) {
+      item.classList.remove('selected');
+      renderPickerTray();
+    }
+  }
+
+  function triggerSmartVideo() {
+    setState('smart-video');
+  }
+
+  function selectTemplate(cardEl, tplName) {
+    cardEl.closest('.sv-template-scroll').querySelectorAll('.sv-template-card').forEach(c => {
+      c.classList.remove('active');
+      const editBar = c.querySelector('.sv-template-edit-bar');
+      const editTag = c.querySelector('.sv-template-edit-tag');
+      if (editBar) editBar.remove();
+      if (editTag) editTag.remove();
+    });
+    cardEl.classList.add('active');
+    
+    // Add edit entry to active template
+    const thumb = cardEl.querySelector('.sv-template-thumb');
+    if (thumb) {
+      thumb.insertAdjacentHTML('beforeend', '<div class="sv-template-edit-tag">选定</div><div class="sv-template-edit-bar" onclick="event.stopPropagation(); triggerTemplateEdit()">✏️ 编辑片段</div>');
+    }
+    
+    const summary = document.getElementById('sv-current-template');
+    if (summary) summary.textContent = tplName;
+  }
+
+  function triggerTemplateEdit() {
+    setState('template-edit');
+  }
+
+  function selectClipCard(cardEl) {
+    cardEl.closest('.tpl-clips-scroll').querySelectorAll('.tpl-clip-card').forEach(c => c.classList.remove('active'));
+    cardEl.classList.add('active');
+  }
+
+  
+  
+  function selectPreviewThumb(el, emoji, index, bgGradient) {
+    el.closest('.preview-thumb-strip').querySelectorAll('.preview-strip-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    const mainBox = document.getElementById('preview-main-box');
+    const mainEmoji = document.getElementById('preview-main-emoji');
+    const pageIndicator = document.getElementById('preview-page-indicator');
+    if (mainBox) mainBox.style.background = bgGradient;
+    if (mainEmoji) mainEmoji.textContent = emoji;
+    if (pageIndicator) pageIndicator.textContent = index + ' / 4';
+  }
+
+  function selectFilter(cardEl, name, cssFilter) {
+    cardEl.closest('.filter-cards-scroll').querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+    cardEl.classList.add('active');
+    const target = document.getElementById('filter-preview-target');
+    if (target) {
+      target.style.filter = cssFilter;
+      const badge = target.querySelector('.filter-badge-info');
+      if (badge) badge.textContent = '照片 1/4 · ' + name;
+    }
+  }
+
+  function resetFilter() {
+    const target = document.getElementById('filter-preview-target');
+    if (target) {
+      target.style.filter = 'none';
+      const badge = target.querySelector('.filter-badge-info');
+      if (badge) badge.textContent = '照片 1/4 · 原图';
+    }
+    const cards = document.querySelectorAll('.filter-card');
+    cards.forEach(c => c.classList.remove('active'));
+    if (cards[0]) cards[0].classList.add('active');
+    const sliderVal = document.getElementById('filter-slider-val');
+    const sliderFill = document.getElementById('filter-slider-fill');
+    const sliderThumb = document.getElementById('filter-slider-thumb');
+    if (sliderVal) sliderVal.textContent = '0';
+    if (sliderFill) sliderFill.style.width = '0%';
+    if (sliderThumb) sliderThumb.style.left = '0%';
+  }
+
+  function adjustFilterStrength(e) {
+    const track = e.currentTarget;
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
+    const sliderVal = document.getElementById('filter-slider-val');
+    const sliderFill = document.getElementById('filter-slider-fill');
+    const sliderThumb = document.getElementById('filter-slider-thumb');
+    if (sliderVal) sliderVal.textContent = pct;
+    if (sliderFill) sliderFill.style.width = pct + '%';
+    if (sliderThumb) sliderThumb.style.left = pct + '%';
+  }
+
+  function switchFilterCat(el) {
+    el.closest('.filter-cat-tabs').querySelectorAll('.filter-cat-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function toggleBatchApply(el) {
+    const box = el.querySelector('.filter-batch-checkbox');
+    if (box.textContent === '✓') box.textContent = '';
+    else box.textContent = '✓';
+  }
+
+  function switchMusicTab(el) {
+    el.closest('.music-sheet-tabs').querySelectorAll('.music-tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectMusicItem(el, title, artist) {
+    el.closest('.music-list').querySelectorAll('.music-item').forEach(item => {
+      item.classList.remove('active');
+      const btn = item.querySelector('.music-use-btn');
+      if (btn) { btn.classList.remove('used'); btn.textContent = '使用'; }
+    });
+    el.classList.add('active');
+    const btn = el.querySelector('.music-use-btn');
+    if (btn) { btn.classList.add('used'); btn.textContent = '使用'; }
+  }
+
+  function selectMusicAndClose(songName) {
+    // update the bgm button in state-image
+    const bgmBtn = document.querySelector('#state-image .image-slot.bgm');
+    if (bgmBtn) {
+      bgmBtn.classList.add('selected');
+      const text = bgmBtn.querySelector('.bgm-text');
+      if (text) text.textContent = '已选: ' + songName;
+    }
+    // update the top bgm banner in video preview
+    const vpBgmTitle = document.getElementById('vp-top-bgm-title');
+    const vpBgmTag = document.getElementById('vp-top-bgm-tag');
+    if (vpBgmTitle) vpBgmTitle.textContent = songName + ' - 已添加';
+    if (vpBgmTag) vpBgmTag.textContent = '已选配乐';
+    
+    // update smart-video banner
+    const svBgmName = document.querySelector('.sv-music-name');
+    if (svBgmName) svBgmName.textContent = songName;
+    
+    // return to previous state or default to video-preview if in video mode
+    const currentWrapper = document.querySelector('.device-wrapper.active');
+    if (currentWrapper && (currentWrapper.id === 'state-video-preview' || currentWrapper.id === 'state-smart-video')) {
+      // keep in current
+    } else {
+      setState('image');
+    }
+  }
+
+  function setState(state) {
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      w.classList.toggle('active', w.id === 'state-' + state);
+    });
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.state === state);
+    });
+  }
+
+  function toggleEmojiPanel(el) {
+    const panel = el.closest('.text-toolbar').nextElementSibling;
+    if (!panel || !panel.classList.contains('emoji-panel')) return;
+    const showing = panel.style.display !== 'none';
+    panel.style.display = showing ? 'none' : 'grid';
+    el.classList.toggle('active', !showing);
+  }
+
+  document.addEventListener('click', function(e) {
+    const item = e.target.closest('.emoji-item');
+    if (!item) return;
+    const panel = item.closest('.emoji-panel');
+    const textarea = panel.closest('.page-scroll').querySelector('.square-textarea');
+    if (!textarea) return;
+    const caret = textarea.querySelector('.caret');
+    const emojiText = document.createTextNode(item.textContent);
+    if (caret) textarea.insertBefore(emojiText, caret);
+    else textarea.appendChild(emojiText);
+  });
+</script>
+
+
+
+</body></html>

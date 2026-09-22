@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "publish-wireframe.html",
+  "entry": "publish-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-09-22T11:05:13.148047Z",
+  "updatedAt": "2026-09-22T14:26:33.912135Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
