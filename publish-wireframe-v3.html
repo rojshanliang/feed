@@ -42,21 +42,68 @@
   .page-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
   .page-header p { font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); }
 
-  /* ─── State switcher（切换 纯文字/图文/视频/上传中 状态，避免平铺） ── */
+
+  /* ─── 顶部三重大分类 Tab 与状态切换器 ─────────────────────── */
+  .category-nav-bar {
+    display: flex; justify-content: center; width: 100%; max-width: 780px;
+    margin-bottom: -16px;
+  }
+  .major-tabs-container {
+    display: flex; background: #e5e7eb; padding: 4px; border-radius: var(--radius-pill);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+    gap: 4px;
+  }
+  .major-tab-btn {
+    display: flex; align-items: center; gap: 8px; padding: 8px 24px;
+    border-radius: var(--radius-pill); border: none; background: transparent;
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    color: #4b5563; cursor: pointer; transition: all 180ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .major-tab-btn .tab-badge {
+    font-family: var(--font-mono); font-size: 11px; padding: 1px 7px;
+    border-radius: 10px; background: rgba(0,0,0,0.08); color: inherit;
+    font-weight: 500;
+  }
+  .major-tab-btn:hover:not(.active) {
+    color: #111827; background: rgba(255, 255, 255, 0.4);
+  }
+  .major-tab-btn.active {
+    background: #ffffff; color: #111827; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .major-tab-btn.active .tab-badge {
+    background: var(--accent); color: var(--accent-on); font-weight: 700;
+  }
+
+  /* 子态切换按钮组（根据当前选中的大分类仅展示所属子状态） */
+  .substate-switcher-container {
+    display: flex; justify-content: center; width: 100%; max-width: 860px;
+  }
   .state-switcher {
-    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 4px;
+    border-radius: var(--radius-md); padding: 5px 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
   .state-btn {
     font-family: var(--font-mono); font-size: 12px; font-weight: 500;
-    padding: 6px 14px; border-radius: 4px; border: none;
+    padding: 6px 14px; border-radius: 6px; border: none;
     background: transparent; color: var(--muted);
     cursor: pointer; white-space: nowrap;
     transition: all 120ms cubic-bezier(0.2,0,0,1);
+    display: none; /* 默认由 JS 或分类过滤控制显示 */
   }
-  .state-btn.active { background: var(--accent); color: var(--accent-on); }
-  .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg); }
+  .state-btn.visible {
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .state-btn.active {
+    background: var(--accent); color: var(--accent-on); font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .state-btn:hover:not(.active) {
+    background: var(--border-soft); color: var(--fg);
+  }
+
 
   /* ─── Device ──────────────────────────────────────────────── */
   .device-wrapper { display: none; flex-direction: column; align-items: center; gap: 12px; }
@@ -1097,18 +1144,53 @@
   }
 
   .preview-main-viewport {
-    flex: 1; margin: 0 16px 8px;
-    background: #14171f; border-radius: 12px;
+    flex: 1; margin: 0 14px 6px;
+    background: #000000; border-radius: 14px;
     position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.55);
+    min-height: 250px;
   }
   .preview-main-box {
-    width: 86%; aspect-ratio: 4/5; border-radius: 8px;
+    width: 100%; height: 100%; border-radius: 14px;
     background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
     display: flex; align-items: center; justify-content: center;
-    font-size: 68px; position: relative; overflow: hidden;
+    font-size: 76px; position: relative; overflow: hidden;
     box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    transition: all 200ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* 比例模式与满铺样式 */
+  .preview-main-box.ratio-fill {
+    width: 100%; height: 100%; aspect-ratio: auto; border-radius: 14px;
+  }
+  .preview-main-box.ratio-3-4 {
+    width: auto; height: 100%; aspect-ratio: 3/4; max-width: 100%; border-radius: 10px;
+  }
+  .preview-main-box.ratio-1-1 {
+    width: auto; height: 100%; aspect-ratio: 1/1; max-width: 100%; border-radius: 10px;
+  }
+  .preview-main-box.ratio-fit {
+    width: 90%; height: auto; aspect-ratio: 4/5; max-height: 94%; border-radius: 8px;
+  }
+
+  /* 比例控制胶囊：浮动于预览图左上方 */
+  .preview-ratio-control {
+    position: absolute; top: 10px; left: 10px; z-index: 10;
+    display: flex; align-items: center; gap: 3px;
+    background: rgba(13, 17, 23, 0.72); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 3px 6px; border-radius: var(--radius-pill);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+  .preview-ratio-btn {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: rgba(255, 255, 255, 0.7); padding: 2px 6px; border-radius: 10px;
+    cursor: pointer; transition: all 120ms ease; user-select: none;
+    line-height: 1.2;
+  }
+  .preview-ratio-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.12); }
+  .preview-ratio-btn.active {
+    background: var(--accent); color: var(--accent-on); font-weight: 700;
   }
   .preview-page-indicator {
     position: absolute; top: 12px; right: 12px;
@@ -1238,6 +1320,112 @@
   .preview-tool-item.highlight .preview-tool-name {
     color: var(--accent); font-weight: 600;
   }
+
+  
+  /* ─── 底部左右滑动模式文字 Tab (取代原底部发布按钮) ───────── */
+  .bottom-mode-bar {
+    height: 58px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 16px env(safe-area-inset-bottom, 0px);
+    flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .bottom-mode-tabs-scroll {
+    display: flex; align-items: center; gap: 28px;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+    padding: 4px 20px;
+  }
+  .bottom-mode-tabs-scroll::-webkit-scrollbar { display: none; }
+  .bottom-mode-tab {
+    font-family: var(--font-display); font-size: 14px; font-weight: 500;
+    color: var(--muted); cursor: pointer; white-space: nowrap; position: relative;
+    padding: 6px 4px; transition: all 120ms ease;
+  }
+  .bottom-mode-tab.active {
+    color: var(--fg); font-size: 15px; font-weight: 700;
+  }
+  .bottom-mode-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 3px; background: var(--accent); border-radius: 2px;
+  }
+
+  /* 图片选择页底部保留的滑动Tab（浅色底栏或暗色底栏适配） */
+  .picker-bottom-mode-bar {
+    height: 52px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .picker-bottom-mode-bar .bottom-mode-tabs-scroll {
+    gap: 32px;
+  }
+
+  /* 顶栏右上角主发布按钮（取代原底部发布按钮） */
+  .nav-publish-action {
+    height: 28px; padding: 0 14px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 120ms ease;
+  }
+  .nav-publish-action.inactive {
+    background: var(--border); color: var(--muted); cursor: not-allowed;
+  }
+
+  /* ─── 图片预览页：大图下方图文正文与表情输入区域 ──────────── */
+  .preview-caption-section {
+    padding: 8px 16px 10px;
+    display: flex; flex-direction: column; gap: 6px;
+    flex-shrink: 0;
+  }
+  .preview-caption-box {
+    background: #181b22; border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md); padding: 10px 12px 8px;
+    display: flex; flex-direction: column; gap: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  .preview-caption-textarea {
+    width: 100%; min-height: 54px; max-height: 80px;
+    background: transparent; border: none; outline: none;
+    font-family: var(--font-body); font-size: 13px; color: #ffffff;
+    line-height: 1.5; resize: none;
+  }
+  .preview-caption-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .preview-caption-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .preview-caption-left {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .preview-caption-emoji-btn {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .preview-caption-topic-btn {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: #3b82f6; background: rgba(59, 130, 246, 0.15);
+    padding: 1px 6px; border-radius: 3px; cursor: pointer;
+  }
+  .preview-caption-count {
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255, 255, 255, 0.45);
+  }
+  .preview-emoji-panel {
+    background: #1e222b; border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md); padding: 8px 6px;
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
+    margin-top: 4px;
+  }
+  .preview-emoji-item {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; border-radius: 4px; cursor: pointer;
+  }
+  .preview-emoji-item:hover { background: rgba(255, 255, 255, 0.1); }
 
   /* ─── 滤镜页面状态 (Photo Filter View) ────────────────────────── */
   .filter-screen {
@@ -1394,37 +1582,432 @@
   }
   .filter-btn-done:hover { background: var(--accent-hover); }
 
+
+  /* ─── 纯文字态：沉浸式卡片+写文字/写长文双Tab+语音键+输入法辅助栏 ─── */
+  /* ─── 纯文字态：白底全站一致标准风格（卡片布局+语音键+输入辅助） ─── */
+  .text-screen-light {
+    background: #ffffff; color: var(--fg);
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .text-screen-light .mp-status-bar {
+    background: var(--fg);
+  }
+  .text-screen-light .mp-status-time {
+    color: #ffffff;
+  }
+  .text-screen-light .icon-bar .bar {
+    background: #ffffff;
+  }
+  .text-screen-light .wifi-icon::before {
+    background: white;
+  }
+
+  /* 顶部导航栏：返回 + 纯净标题 + 下一步发布主按钮 */
+  .text-nav-top {
+    height: 44px; background: #ffffff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .text-nav-back {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--border-soft); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300; color: var(--fg); cursor: pointer;
+    line-height: 1; transition: background 120ms ease;
+  }
+  .text-nav-back:hover { background: var(--border); }
+
+  .text-nav-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;
+  }
+
+  .text-nav-next-btn {
+    height: 28px; padding: 0 14px; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); transition: all 120ms ease;
+  }
+  .text-nav-next-btn:hover { background: var(--accent-hover); }
+
+  /* 主体卡片编辑区域（纯白背景下的优雅质感浅灰卡片） */
+  .text-card-viewport {
+    flex: 1; padding: 14px 16px 12px;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: #ffffff;
+  }
+  .text-editor-card {
+    flex: 1; background: #f8f9fa; border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    padding: 24px 22px 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative;
+  }
+
+  /* 顶部雅致双引号装饰 */
+  .text-card-quote-mark {
+    font-size: 38px; line-height: 1; font-family: Georgia, serif;
+    color: rgba(0, 0, 0, 0.12); user-select: none; margin-bottom: 4px;
+    height: 28px; display: flex; align-items: flex-start;
+  }
+
+  /* 输入内容区（大字居中聚焦） */
+  .text-input-field-wrap {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 10px 0;
+  }
+  .text-pure-display-text {
+    font-size: 28px; font-weight: 700; color: var(--fg);
+    font-family: var(--font-display), var(--font-body); line-height: 1.45;
+  }
+  .text-input-caret {
+    display: inline-block; width: 2.5px; height: 26px;
+    background: var(--fg); margin-left: 2px; vertical-align: middle;
+    border-radius: 1px; animation: textCaretBlink 1s step-end infinite;
+  }
+  @keyframes textCaretBlink { 50% { opacity: 0; } }
+
+  /* 卡片右下角麦克风语音速记输入按钮 */
+  .text-card-bottom-actions {
+    display: flex; justify-content: flex-end; align-items: center;
+    padding-top: 8px;
+  }
+  .text-mic-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #ffffff; border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg); cursor: pointer; font-size: 16px;
+    transition: all 120ms ease;
+  }
+  .text-mic-btn:hover { background: var(--border-soft); }
+
+  /* 卡片下方快捷工具栏：表情 / 清空 */
+  .text-keyboard-accessory-bar {
+    height: 44px; background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; flex-shrink: 0; z-index: 10;
+  }
+  .accessory-left-icons {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .accessory-icon-btn {
+    color: var(--muted); font-size: 18px; cursor: pointer;
+    font-weight: 500; display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%; transition: all 120ms ease;
+  }
+  .accessory-icon-btn:hover { color: var(--fg); background: var(--border-soft); }
+  .accessory-right-group {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .text-card-char-count {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.02em; user-select: none;
+  }
+  .accessory-done-btn {
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  }
+  .accessory-done-btn:hover { color: var(--fg); background: var(--border-soft); }
+
+  /* 纯文字态下展开的白底表情网格面板 (White/Light Theme) */
+  .text-card-emoji-grid-panel {
+    background: #ffffff; border-top: 1px solid var(--border-soft);
+    padding: 12px 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    flex-shrink: 0;
+  }
+  .text-emoji-grid-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 4px 6px; border-bottom: 1px solid var(--border-soft);
+  }
+  .text-emoji-grid-title {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .text-emoji-grid-close {
+    font-size: 12px; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 4px;
+  }
+  .text-emoji-grid-close:hover { color: var(--fg); background: var(--border-soft); }
+  .text-emoji-grid {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
+    max-height: 180px; overflow-y: auto;
+  }
+  .text-emoji-grid .emoji-cell {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border-radius: 6px; cursor: pointer; transition: all 100ms ease;
+  }
+  .text-emoji-grid .emoji-cell:hover {
+    background: var(--border-soft); transform: scale(1.15);
+  }
+
+
+  /* ─── 纯文字态：③ 文字模板选择与发布页 (Text Template Selection) ─── */
+  .text-tpl-screen {
+    background: #000000; color: #ffffff;
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+  }
+  .text-tpl-screen .mp-status-bar {
+    background: #000000; flex-shrink: 0;
+  }
+  .text-tpl-screen .mp-status-time { color: #ffffff; }
+  .text-tpl-screen .icon-bar .bar { background: #ffffff; }
+  .text-tpl-screen .battery-icon { border-color: rgba(255,255,255,0.8); }
+  .text-tpl-screen .battery-icon::before,
+  .text-tpl-screen .battery-icon::after { background: #ffffff; }
+  .text-tpl-screen .wifi-icon::before { background: #ffffff; }
+
+  /* 顶部导航：返回 + 居中BGM胶囊 + 右侧设置 */
+  .text-tpl-nav {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; flex-shrink: 0; z-index: 20; background: #000000;
+    position: relative;
+  }
+  .text-tpl-nav-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .text-tpl-back {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 300; color: #ffffff; cursor: pointer;
+    line-height: 1; transition: background 120ms ease;
+  }
+  .text-tpl-back:hover { background: rgba(255, 255, 255, 0.15); }
+
+  .text-tpl-bgm-capsule {
+    height: 32px; background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-pill);
+    display: flex; align-items: center; padding: 0 12px; gap: 8px;
+    cursor: pointer; max-width: 200px; backdrop-filter: blur(8px);
+  }
+  .text-tpl-bgm-icon { font-size: 13px; color: var(--accent); }
+  .text-tpl-bgm-name {
+    font-family: var(--font-body); font-size: 12px; color: #ffffff;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;
+  }
+  .text-tpl-bgm-close {
+    font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1;
+  }
+
+  .text-tpl-settings-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; color: #ffffff; font-size: 18px; line-height: 1;
+  }
+  .text-tpl-settings-label {
+    font-family: var(--font-body); font-size: 9px; color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* 中央主体画布：沉浸式卡片展示，支持多款主题实时换肤 */
+  .text-tpl-canvas-wrap {
+    flex: 1; margin: 4px 16px 6px;
+    border-radius: 18px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 24px 20px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    transition: background 250ms ease, color 250ms ease;
+  }
+
+  /* 主题 1：参考图淡黄米格纸纹 */
+  .text-tpl-canvas-wrap.theme-yellow {
+    background: #fff8e7;
+    background-image: radial-gradient(rgba(220, 190, 130, 0.3) 1px, transparent 0);
+    background-size: 12px 12px;
+    color: #332211;
+  }
+  /* 主题 2：清爽薄荷青 */
+  .text-tpl-canvas-wrap.theme-cyan {
+    background: #e6f7f6;
+    background-image: linear-gradient(135deg, #e0f2fe 0%, #ccfbf1 100%);
+    color: #064e3b;
+  }
+  /* 主题 3：纯黑暗夜金句 */
+  .text-tpl-canvas-wrap.theme-dark {
+    background: #18191d;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 0);
+    background-size: 16px 16px;
+    color: #ffffff;
+  }
+  /* 主题 4：温润日落橙粉 */
+  .text-tpl-canvas-wrap.theme-sunset {
+    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fbcfe8 100%);
+    color: #431407;
+  }
+
+  /* 画布内顶栏标头 */
+  .text-tpl-card-top-tag {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    opacity: 0.45; text-align: center;
+  }
+
+  /* 画布居中文案艺术字（支持换字与描边立体排版） */
+  .text-tpl-art-text-box {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 10px 0; text-align: center;
+  }
+  .text-tpl-art-text {
+    font-family: var(--font-display), "PingFang SC", sans-serif;
+    font-size: 38px; font-weight: 800; letter-spacing: 0.04em;
+    line-height: 1.35;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.06);
+    transition: all 200ms ease;
+  }
+  .text-tpl-canvas-wrap.theme-yellow .text-tpl-art-text {
+    color: #e67e22;
+    -webkit-text-stroke: 1.5px #ffffff;
+    text-shadow: 0 2px 8px rgba(230, 126, 34, 0.25);
+  }
+  .text-tpl-canvas-wrap.theme-cyan .text-tpl-art-text {
+    color: #0891b2;
+    -webkit-text-stroke: 1px #ffffff;
+  }
+  .text-tpl-canvas-wrap.theme-dark .text-tpl-art-text {
+    color: #ffffff;
+    -webkit-text-stroke: 0px;
+    text-shadow: 0 0 16px rgba(255, 210, 30, 0.35);
+  }
+  .text-tpl-canvas-wrap.theme-sunset .text-tpl-art-text {
+    color: #be123c;
+    -webkit-text-stroke: 1px #ffffff;
+  }
+
+  /* 画布中央梗向/插图挂件图片 */
+  .text-tpl-meme-slot {
+    display: flex; justify-content: center; align-items: center;
+    margin-bottom: 10px;
+  }
+  .text-tpl-meme-img {
+    width: 88px; height: 88px; border-radius: 12px;
+    object-fit: cover; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    border: 2px solid #ffffff;
+    background: #ffecd2; display: flex; align-items: center; justify-content: center;
+    font-size: 44px; user-select: none;
+  }
+  .text-tpl-meme-img span {
+    display: inline-block; transition: transform 140ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+
+
+  /* 底部模块：模板类别筛选与模板横向轮播条 */
+  .text-tpl-bottom-tray {
+    background: #000000; padding: 6px 14px 10px;
+    display: flex; flex-direction: column; gap: 8px;
+    flex-shrink: 0;
+  }
+  .text-tpl-cat-dropdown-pill {
+    align-self: center; background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 3px 12px; border-radius: var(--radius-pill);
+    display: flex; align-items: center; gap: 4px;
+    font-family: var(--font-body); font-size: 11px; font-weight: 600;
+    color: #ffffff; cursor: pointer;
+  }
+  .text-tpl-cards-scroll {
+    display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none; padding: 2px 2px;
+  }
+  .text-tpl-cards-scroll::-webkit-scrollbar { display: none; }
+
+  .text-tpl-card-option {
+    width: 54px; height: 68px; border-radius: 8px; flex-shrink: 0;
+    cursor: pointer; position: relative; overflow: hidden;
+    border: 2px solid transparent; transition: all 140ms ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 4px 3px; font-size: 8px; text-align: center;
+  }
+  .text-tpl-card-option.active {
+    border-color: var(--accent); transform: scale(1.04);
+    box-shadow: 0 0 10px rgba(255, 210, 30, 0.35);
+  }
+  .text-tpl-card-option .tpl-badge {
+    font-size: 14px; margin-bottom: 2px;
+  }
+  .text-tpl-card-option .tpl-title {
+    font-family: var(--font-body); font-size: 8px; line-height: 1.1; font-weight: 600;
+  }
+
+  /* 底部主发布操作栏（无限定日常，无继续下一步，直接就是「发布」主按钮） */
+  .text-tpl-publish-bar {
+    height: 52px; background: #000000;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 16px; flex-shrink: 0;
+  }
+  .text-tpl-direct-publish-btn {
+    width: 100%; height: 40px; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(255, 210, 30, 0.35); transition: all 120ms ease;
+  }
+  .text-tpl-direct-publish-btn:hover { background: var(--accent-hover); }
+
 </style>
 </head>
 <body>
 
 <div class="page-header" data-od-id="page-header">
   <h1>发布器线框图</h1>
-  <p>小程序 · 像朋友圈一样发文字 / 图文 / 视频 · 纯文字 / 图文 / 选照片 / 图预览 / 滤镜 / 一键成片 / 编辑片段 / 选音乐 / 视频态 / 选视频 / 视频预览(滤镜+BGM+混音+剪辑) / 表情面板 十二态交互</p>
+  <p>小程序 · 底部滑动模式Tab（文字 / 发图片 / 发视频）· 取消中间选择图片/视频Tab · 发图片直达相册选图 · 图片预览支持大图下方1000字正文与表情输入</p>
 </div>
 
-<div class="state-switcher" role="group" data-od->
-  <button class="state-btn active" data-state="text" onclick="setState('text')">① 纯文字态</button>
-  <button class="state-btn" data-state="image" onclick="setState('image')">② 图文态</button>
-  <button class="state-btn" data-state="photo-picker" onclick="setState('photo-picker')">③ 选择照片</button>
-  <button class="state-btn" data-state="photo-preview" onclick="setState('photo-preview')">④ 图片预览</button>
-  <button class="state-btn" data-state="photo-filter" onclick="setState('photo-filter')">⑤ 滤镜调节</button>
-  <button class="state-btn" data-state="smart-video" onclick="setState('smart-video')">⑥ 一键成片</button>
-  <button class="state-btn" data-state="template-edit" onclick="setState('template-edit')">⑦ 编辑片段</button>
-  <button class="state-btn" data-state="music-sheet" onclick="setState('music-sheet')">⑧ 选择音乐</button>
-  <button class="state-btn" data-state="video" onclick="setState('video')">⑨ 视频态</button>
-  <button class="state-btn" data-state="video-picker" onclick="setState('video-picker')">⑩ 选择视频</button>
-  <button class="state-btn" data-state="video-preview" onclick="setState('video-preview')">⑪ 视频预览</button>
-  <button class="state-btn" data-state="emoji" onclick="setState('emoji')">⑫ 表情面板</button>
+<!-- 顶层三大业务形态大 Tab 切换：纯文字态 / 图片态 / 视频态 -->
+<div class="category-nav-bar" data-od-id="category-nav-bar">
+  <div class="major-tabs-container">
+    <button class="major-tab-btn active" id="major-tab-text" onclick="switchCategory('text')" title="切换至纯文字态的原型">
+      <span>纯文字态</span>
+      <span class="tab-badge">3</span>
+    </button>
+    <button class="major-tab-btn" id="major-tab-image" onclick="switchCategory('image')" title="切换至图片态的所有原型">
+      <span>图片态</span>
+      <span class="tab-badge">6</span>
+    </button>
+    <button class="major-tab-btn" id="major-tab-video" onclick="switchCategory('video')" title="切换至视频态的所有原型">
+      <span>视频态</span>
+      <span class="tab-badge">3</span>
+    </button>
+  </div>
+</div>
+
+<!-- 分类下属子状态展示项切换（每次仅展示一个设备原型，不并列平铺） -->
+<div class="substate-switcher-container">
+  <div class="state-switcher" role="group" data-od-id="state-switcher">
+    <!-- 纯文字态专属子项 -->
+    <button class="state-btn visible active" data-category="text" data-state="text" onclick="setState('text')">① 纯文字卡片态</button>
+    <button class="state-btn visible" data-category="text" data-state="emoji" onclick="setState('emoji')">② 表情面板展开</button>
+    <button class="state-btn visible" data-category="text" data-state="text-template" onclick="setState('text-template')">③ 模板选择与发布</button>
+
+    <!-- 图片态专属子项（直达自研相册选图，取消上下结构） -->
+    <button class="state-btn" data-category="image" data-state="photo-picker" onclick="setState('photo-picker')">① 自研相册选图</button>
+    <button class="state-btn" data-category="image" data-state="photo-preview" onclick="setState('photo-preview')">② 图片预览+1000字</button>
+    <button class="state-btn" data-category="image" data-state="photo-filter" onclick="setState('photo-filter')">③ 滤镜调色面板</button>
+    <button class="state-btn" data-category="image" data-state="music-sheet" onclick="setState('music-sheet')">④ 配乐选择面板</button>
+    <button class="state-btn" data-category="image" data-state="smart-video" onclick="setState('smart-video')">⑤ 图片一键成片</button>
+    <button class="state-btn" data-category="image" data-state="template-edit" onclick="setState('template-edit')">⑥ 模板编辑</button>
+
+    <!-- 视频态专属子项（直达自研视频选择，取消卡槽过渡态） -->
+    <button class="state-btn" data-category="video" data-state="video-picker" onclick="setState('video-picker')">① 自研视频选择</button>
+    <button class="state-btn" data-category="video" data-state="video-preview" onclick="setState('video-preview')">② 视频预览+BGM+剪辑</button>
+    <button class="state-btn" data-category="video" data-state="template-edit" onclick="setState('template-edit')">③ 视频片段编辑</button>
+  </div>
 </div>
 
 <div class="devices-row" style="display:flex;">
 
-<!-- ① 纯文字态 -->
+<!-- ① 纯文字态（全站统一白底风格，卡片排版+大字聚焦+语音速记） -->
 <div class="device-wrapper active" id="state-text" data-od-id="device-state-text">
-  <div class="device-label">① 纯文字态 · 发布器</div>
+  <div class="device-label">① 纯文字态 · 全站统一白底风格</div>
   <div class="mp-device">
-    <div class="mp-screen">
+    <div class="mp-screen text-screen-light">
+      <!-- 统一状态栏 -->
       <div class="mp-status-bar">
         <span class="mp-status-time">9:41</span>
         <div class="mp-status-icons">
@@ -1432,97 +2015,66 @@
           <div class="wifi-icon"></div><div class="battery-icon"></div>
         </div>
       </div>
-      <div class="mp-nav">
-        <div class="nav-back">‹</div>
-        <div class="nav-title">发布内容</div>
+
+      <!-- 顶部纯净白底导航栏：返回 + 纯净标题 + 下一步发布主按钮 -->
+      <div class="text-nav-top">
+        <div class="text-nav-back" title="返回上级">‹</div>
+        <div class="text-nav-title">发文字</div>
+        <button class="text-nav-next-btn" onclick="setState('text-template')" title="点击下一步进入选择文字模板">下一步</button>
       </div>
-<div class="page-scroll">
-        <div class="square-text-wrap">
-          <div class="square-textarea filled">周末爬山，山顶风好大，人也好少，安静得只剩风声。#生活记录 就这样简单记录一下心情，纯文字动态也可以直接发布，不强制配图或视频。</div>
-        </div>
-        <div class="square-char-count filled">62 / 1000</div>
-        <div class="text-toolbar">
-          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
-        </div>
-        <div class="emoji-panel" style="display:none;">
-          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
-          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
-          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
-          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
-          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
-          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
-        </div>
-        <div class="media-actions">
-          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
-          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+
+      <!-- 主体卡片编辑区域（纯白背景+浅灰优雅大字卡片） -->
+      <div class="text-card-viewport">
+        <div class="text-editor-card" id="text-editor-card">
+          <!-- 顶部双引号装饰 -->
+          <div class="text-card-quote-mark">“</div>
+
+          <!-- 输入文本主体区 -->
+          <div class="text-input-field-wrap">
+            <div style="display:flex; align-items:center; flex-wrap:wrap;">
+              <span id="text-pure-display" class="text-pure-display-text">今天心情不错</span>
+              <span class="text-input-caret"></span>
+            </div>
+          </div>
+
+          <!-- 右下角语音速记拾音按钮 -->
+          <div class="text-card-bottom-actions">
+            
+          </div>
         </div>
       </div>
 
-      <div class="bottom-bar">
-        <button class="pub-btn">发布</button>
+      <!-- 快捷工具栏：表情按钮 / 字数统计（清空左侧） / 清空 -->
+      <div class="text-keyboard-accessory-bar">
+        <div class="accessory-left-icons">
+          <div class="accessory-icon-btn" onclick="setState('emoji')" title="展开表情面板">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="15" x2="15.01" y2="15"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="accessory-right-group">
+          <span class="text-card-char-count" id="text-card-char-count">6 / 1000</span>
+          <div class="accessory-done-btn" onclick="clearTextCard()" title="清除内容">清空</div>
+        </div>
+      </div>
+
+      <!-- 底部左右滑文字 Tab（全站统一浅白背景、深灰文字与品牌黄下划线） -->
+      <div class="bottom-mode-bar">
+        <div class="bottom-mode-tabs-scroll">
+          <div class="bottom-mode-tab active" onclick="switchBottomMode('text')">发文字</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('image')">发图片</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('video')">发视频</div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ② 图文态 -->
-<div class="device-wrapper" id="state-image" data-od-id="device-state-image">
-  <div class="device-label">② 图文态 · 发布器</div>
-  <div class="mp-device">
-    <div class="mp-screen">
-      <div class="mp-status-bar">
-        <span class="mp-status-time">9:41</span>
-        <div class="mp-status-icons">
-          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
-          <div class="wifi-icon"></div><div class="battery-icon"></div>
-        </div>
-      </div>
-      <div class="mp-nav">
-        <div class="nav-back">‹</div>
-        <div class="nav-title">发布内容</div>
-      </div>
-<div class="page-scroll">
-        <div class="square-text-wrap">
-          <div class="square-textarea filled">今天做的brunch，拍了几张随手图，分享给大家<span class="inline-topic">#下厨日记</span></div>
-        </div>
-        <div class="square-char-count filled">24 / 1000</div>
-        <div class="text-toolbar">
-          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
-        </div>
-        <div class="emoji-panel" style="display:none;">
-          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
-          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
-          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
-          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
-          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
-          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
-        </div>
-        <div class="media-actions">
-          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
-          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
-        </div>
-        <div class="image-grid">
-          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
-          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
-          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
-          <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
-          <div class="image-slot add" onclick="setState('photo-picker')" title="点击添加照片">
-            <div class="u-icon">＋</div>
-            <div class="u-count">4/9</div>
-          </div>
-          <div class="image-slot bgm" onclick="setState('music-sheet')" title="点击选择音乐">
-            <div class="bgm-icon">🎵</div>
-            <div class="bgm-text">选择音乐</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="bottom-bar">
-        <button class="pub-btn">发布</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ③ 选择照片（自研渲染相册选图状态） -->
 <div class="device-wrapper" id="state-photo-picker" data-od-id="device-state-photo-picker">
@@ -1539,7 +2091,7 @@
       
       <!-- 相册自定义导航栏（右上角无滤镜按钮） -->
       <div class="picker-nav">
-        <div class="picker-cancel" onclick="setState('image')">取消</div>
+        <div class="picker-cancel" onclick="setState('text')">取消</div>
         <div class="picker-album-dropdown">
           <span>所有照片</span>
           <span class="picker-dropdown-arrow">▼</span>
@@ -1627,7 +2179,7 @@
         </div>
       </div>
 
-      <!-- 底部操作栏：左侧一键成片，右侧下一步（无中间滤镜按钮） -->
+      <!-- 底部操作栏：左侧一键成片，右侧下一步 -->
       <div class="picker-bottom-bar">
         <button class="picker-btn-smart" onclick="setState('smart-video')" title="将选中的图片快速生成精彩图文视频">
           <span class="smart-spark">✨</span>
@@ -1635,12 +2187,21 @@
           <span class="smart-tip">智能剪辑</span>
         </button>
         <div class="picker-confirm-wrap">
-          <button class="picker-btn-confirm" onclick="setState('photo-preview')" title="点击下一步进入已选图片预览与编辑">
+          <button class="picker-btn-confirm" onclick="setState('photo-preview')" title="点击下一步进入大图预览与1000字文案编辑">
             <span>下一步</span>
             <span class="picker-selected-count">4</span>
             <span style="font-size:11px;font-family:var(--font-mono);opacity:0.8;">/9</span>
             <span style="font-size:12px;margin-left:2px;">›</span>
           </button>
+        </div>
+      </div>
+
+      <!-- 底部保留的滑动文字Tab -->
+      <div class="picker-bottom-mode-bar">
+        <div class="bottom-mode-tabs-scroll">
+          <div class="bottom-mode-tab" onclick="switchBottomMode('text')">发文字</div>
+          <div class="bottom-mode-tab active" onclick="switchBottomMode('image')">发图片</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('video')">发视频</div>
         </div>
       </div>
     </div>
@@ -1664,18 +2225,60 @@
       <div class="preview-nav">
         <div class="preview-back" onclick="setState('photo-picker')" title="返回选择照片">‹</div>
         <div class="preview-title">预览与编辑</div>
-        <button class="preview-btn-next" onclick="setState('image')" title="完成编辑并返回图文发布态">完成</button>
+        <button class="preview-btn-next" onclick="publishPhotoContent()" title="完成图文编辑并发布">发布</button>
       </div>
 
-      <!-- 主图大视口预览 -->
+      <!-- 上方：选择音乐大按钮（与视频态/一键成片位置与样式完全一致） -->
+      <div class="sv-music-banner-wrap" style="z-index:20; padding: 4px 14px 6px;">
+        <div class="sv-music-btn" onclick="setState('music-sheet')" title="点击选择或更换图文配乐">
+          <div class="sv-music-left">
+            <span class="sv-music-icon">🎵</span>
+            <span class="sv-music-name" id="photo-top-bgm-title">添加背景音乐 (BGM)</span>
+            <span class="sv-music-tag" id="photo-top-bgm-tag">可选配乐</span>
+          </div>
+          <div class="sv-music-right">
+            <span>选择音乐</span>
+            <span>›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主图大视口预览：满铺自适应与多比例控制切换 -->
       <div class="preview-main-viewport">
-        <div class="preview-main-box" id="preview-main-box">
-          <span id="preview-main-emoji">🥗</span>
+        <!-- 比例切换控制胶囊（填满视口 / 3:4标清 / 1:1方图 / 留边适应） -->
+        
+        <div class="preview-main-box ratio-fill" id="preview-main-box">
+          <span id="preview-main-emoji" style="font-size: 72px;">🥗</span>
           <div class="preview-page-indicator" id="preview-page-indicator">1 / 4</div>
         </div>
       </div>
 
-      <!-- 下方区域：展示所有选择的图片，右侧是一个滤镜按钮 -->
+      <!-- 大图片下方输入框：支持1000字正文输入与选择表情 -->
+      <div class="preview-caption-section">
+        <div class="preview-caption-box">
+          <textarea class="preview-caption-textarea" id="preview-caption-input" placeholder="输入这组图文的想法，支持1000字…">今天做的brunch，拍了几张随手图，阳光真好！#下厨日记</textarea>
+          <div class="preview-caption-toolbar">
+            <div class="preview-caption-left">
+              <div class="preview-caption-emoji-btn" onclick="togglePreviewEmoji()" title="添加表情">😀</div>
+              
+            </div>
+            <span class="preview-caption-count" id="preview-caption-count">32 / 1000</span>
+          </div>
+          <!-- 展开的表情选择面板 -->
+          <div class="preview-emoji-panel" id="preview-emoji-panel" style="display:none;">
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('😀')">😀</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('😍')">😍</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('🥳')">🥳</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('😂')">😂</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('✨')">✨</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('☕️')">☕️</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('🥐')">🥐</div>
+            <div class="preview-emoji-item" onclick="insertPreviewEmoji('❤️')">❤️</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下方区域：展示所有选择的图片，右侧是工具箱按钮 -->
       <div class="preview-bottom-bar">
         <!-- 从左到右展示所有选择的图片 -->
         <div class="preview-thumb-strip" id="preview-thumb-strip">
@@ -1958,7 +2561,7 @@
 
 <!-- ⑤ 模板编辑（点击一键成片模板「编辑片段」弹出的半弹层状态） -->
 <div class="device-wrapper" id="state-template-edit" data-od-id="device-state-template-edit">
-  <div class="device-label">⑦ 模板编辑 · 片段微调半弹层</div>
+  <div class="device-label">模板编辑 · 视频片段微调半弹层（图片成片 / 视频态通用）</div>
   <div class="mp-device">
     <div class="mp-screen sv-screen">
       <div class="mp-status-bar" style="background:#0d1117;">
@@ -1986,9 +2589,9 @@
       <div class="tpl-edit-sheet">
         <!-- 弹层顶栏：左叉号、居中标题「模板编辑」、右对勾 -->
         <div class="tpl-edit-header">
-          <div class="tpl-edit-btn-cancel" onclick="setState('smart-video')" title="取消">✕</div>
+          <div class="tpl-edit-btn-cancel" onclick="exitTemplateEdit()" title="取消">✕</div>
           <div class="tpl-edit-title">模板编辑</div>
-          <div class="tpl-edit-btn-confirm" onclick="setState('smart-video')" title="完成">✓</div>
+          <div class="tpl-edit-btn-confirm" onclick="exitTemplateEdit()" title="完成">✓</div>
         </div>
 
         <!-- 片段水平缩略图滚动条 -->
@@ -2071,10 +2674,7 @@
         <div class="text-toolbar">
           <div class="text-emoji-btn">😀</div>
         </div>
-        <div class="media-actions">
-          <div class="media-action-btn active"><span class="ic">🖼</span>图片</div>
-          <div class="media-action-btn disabled"><span class="ic">🎥</span>视频</div>
-        </div>
+
         <div class="image-grid">
           <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
           <div class="image-slot filled"><div class="image-slot-remove">×</div></div>
@@ -2096,12 +2696,12 @@
       </div>
 
       <!-- 选择音乐半弹层 -->
-      <div class="music-sheet-overlay" onclick="setState('image')">
+      <div class="music-sheet-overlay" onclick="setState('photo-preview')">
         <div class="music-sheet" onclick="event.stopPropagation()">
           <div class="music-sheet-handle"></div>
           <div class="music-sheet-header">
             <div class="music-sheet-title">选择音乐</div>
-            <div class="music-sheet-close" onclick="setState('image')">×</div>
+            <div class="music-sheet-close" onclick="setState('photo-preview')">×</div>
           </div>
           
           <!-- 搜索条 -->
@@ -2199,65 +2799,7 @@
   </div>
 </div>
 
-<!-- ④ 视频态 -->
-<div class="device-wrapper" id="state-video" data-od-id="device-state-video">
-  <div class="device-label">⑨ 视频态 · 发布器</div>
-  <div class="mp-device">
-    <div class="mp-screen">
-      <div class="mp-status-bar">
-        <span class="mp-status-time">9:41</span>
-        <div class="mp-status-icons">
-          <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
-          <div class="wifi-icon"></div><div class="battery-icon"></div>
-        </div>
-      </div>
-      <div class="mp-nav">
-        <div class="nav-back">‹</div>
-        <div class="nav-title">发布内容</div>
-      </div>
-<div class="page-scroll">
-        <div class="square-text-wrap">
-          <div class="square-textarea filled">今天练习的滑板小片段，摔了好几次才拍成<span class="inline-topic">#滑板日常</span></div>
-        </div>
-        <div class="square-char-count filled">20 / 1000</div>
-        <div class="text-toolbar">
-          <div class="text-emoji-btn" onclick="toggleEmojiPanel(this)">😀</div>
-        </div>
-        <div class="emoji-panel" style="display:none;">
-          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
-          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
-          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
-          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
-          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
-          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
-        </div>
-        <div class="media-actions">
-          <div class="media-action-btn disabled"><span class="ic">🖼</span>图片</div>
-          <div class="media-action-btn active"><span class="ic">🎥</span>视频</div>
-        </div>
-        <div class="video-wrap" id="video-card-container">
-          <!-- 点击视频后未添加时的「＋ 选择视频」卡槽，点击直接进入 ⑩ 选择视频 -->
-          <div class="video-slot-add" id="video-add-slot" onclick="setState('video-picker')" title="点击像选择照片那样自研选择视频">
-            <div class="v-icon">＋</div>
-            <div class="v-text">选择视频</div>
-            <div class="v-sub">相册选取</div>
-          </div>
 
-          <!-- 已选择视频后的展示卡片（带播放图、时长与右上角移除） -->
-          <div class="video-portrait done" id="video-done-card" style="display:none;">
-            <div class="done-thumb-bg">▶</div>
-            <div class="done-duration">00:24</div>
-            <div class="video-remove" onclick="removeSelectedVideo()" title="移除视频">×</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bottom-bar">
-        <button class="pub-btn">发布</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ⑩ 选择视频（自研视频相册选择器） -->
 <div class="device-wrapper" id="state-video-picker" data-od-id="device-state-video-picker">
@@ -2274,7 +2816,7 @@
 
       <!-- 导航栏 -->
       <div class="picker-nav">
-        <div class="picker-cancel" onclick="setState('video')">取消</div>
+        <div class="picker-cancel" onclick="setState('text')">取消</div>
         <div class="picker-album-dropdown">
           <span>所有视频</span>
           <span class="picker-dropdown-arrow">▼</span>
@@ -2375,6 +2917,15 @@
           </button>
         </div>
       </div>
+
+      <!-- 底部保留的滑动文字Tab（与选照片完全一致） -->
+      <div class="picker-bottom-mode-bar">
+        <div class="bottom-mode-tabs-scroll">
+          <div class="bottom-mode-tab" onclick="switchBottomMode('text')">发文字</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('image')">发图片</div>
+          <div class="bottom-mode-tab active" onclick="switchBottomMode('video')">发视频</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2396,7 +2947,7 @@
       <div class="vp-nav" style="margin-top:44px;">
         <div class="vp-back" onclick="setState('video-picker')" title="返回选择视频">‹</div>
         <div class="vp-title">视频预览与编辑</div>
-        <button class="vp-btn-done" onclick="completeVideoPreviewAndBack()" title="确认视频编辑并回填至发布主态">完成</button>
+        <button class="vp-btn-done" onclick="publishVideoContent()" title="确认视频编辑并直接发布">发布</button>
       </div>
 
       <!-- 上方：选择音乐大按钮（与一键成片位置一致） -->
@@ -2444,6 +2995,30 @@
           <div class="vp-action-item" onclick="switchVpSubpanel('trim')">
             <div class="vp-action-circle" id="vp-btn-trim">✂️</div>
             <span class="vp-action-label">剪辑</span>
+          </div>
+        </div>
+      </div>
+      <!-- 视频正下方输入区：支持输入文字、1000字统计与选择表情（同图片预览逻辑一致） -->
+      <div class="preview-caption-section" style="padding: 6px 14px 10px; z-index: 20;">
+        <div class="preview-caption-box" style="background:#161922; border:1px solid rgba(255,255,255,0.12);">
+          <textarea class="preview-caption-textarea" id="video-caption-input" placeholder="输入这则视频的想法，支持1000字…" oninput="updateVideoCaptionCount()">今天练习的滑板小片段，摔了好几次才拍成，酷不酷！#滑板日常</textarea>
+          <div class="preview-caption-toolbar">
+            <div class="preview-caption-left">
+              <div class="preview-caption-emoji-btn" onclick="toggleVideoEmoji()" title="添加表情">😀</div>
+              
+            </div>
+            <span class="preview-caption-count" id="video-caption-count">33 / 1000</span>
+          </div>
+          <!-- 展开的表情选择面板 -->
+          <div class="preview-emoji-panel" id="video-emoji-panel" style="display:none;">
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('😀')">😀</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('🛹')">🛹</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('🔥')">🔥</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('😎')">😎</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('✨')">✨</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('🤙')">🤙</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('👏')">👏</div>
+            <div class="preview-emoji-item" onclick="insertVideoEmoji('❤️')">❤️</div>
           </div>
         </div>
       </div>
@@ -2531,11 +3106,108 @@
   </div>
 </div>
 
-<!-- ⑥ 表情面板中：点击正文下方的表情按钮后，展开表情面板 -->
-<div class="device-wrapper" id="state-emoji" data-od-id="device-state-emoji">
-  <div class="device-label">⑫ 表情面板展开 · 发布器</div>
+<!-- ③ 纯文字态 · 模板选择与发布态（点击下一步进入，支持选文字模板，无限定日常，直接点击发布） -->
+<div class="device-wrapper" id="state-text-template" data-od-id="device-state-text-template">
+  <div class="device-label">③ 纯文字态 · 模板选择与直接发布</div>
   <div class="mp-device">
-    <div class="mp-screen">
+    <div class="mp-screen text-tpl-screen">
+      <!-- 统一沉浸暗色状态栏 -->
+      <div class="mp-status-bar" style="background:#000000; color:#ffffff;">
+        <span class="mp-status-time" style="color:#ffffff;">3:36</span>
+        <div class="mp-status-icons">
+          <div class="icon-bar"><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span><span class="bar" style="background:#fff;"></span></div>
+          <div class="wifi-icon" style="filter:invert(1);"></div><div class="battery-icon"></div>
+        </div>
+      </div>
+
+      <!-- 顶栏导航：返回 + 纯净标题 + 右侧设置 -->
+      <div class="text-tpl-nav">
+        <div class="text-tpl-back" onclick="setState('text')" title="返回编辑卡片">‹</div>
+        <div class="text-nav-title" style="color:#ffffff;">文字模板与发布</div>
+        <div class="text-tpl-settings-btn" title="文字模板排版设置">
+          
+          
+        </div>
+      </div>
+
+      <!-- 上方：选择音乐大按钮（与图片态、视频态、一键成片完全统一一致的标准通栏胶囊） -->
+      <div class="sv-music-banner-wrap" style="z-index:20; padding: 4px 16px 8px;">
+        <div class="sv-music-btn" onclick="setState('music-sheet')" title="点击选择或更换背景音乐">
+          <div class="sv-music-left">
+            <span class="sv-music-icon">🎵</span>
+            <span class="sv-music-name" id="text-top-bgm-title">left to survey</span>
+            <span class="sv-music-tag" id="text-top-bgm-tag">已选配乐</span>
+          </div>
+          <div class="sv-music-right">
+            <span>选择音乐</span>
+            <span>›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央主体画布：支持多种精美卡片模板换肤 -->
+      <div class="text-tpl-canvas-wrap theme-yellow" id="text-tpl-canvas">
+        <!-- 顶部小英文副标 -->
+        <div class="text-tpl-card-top-tag" id="text-tpl-top-tag">DAILY NOTE</div>
+
+        <!-- 居中艺术排版文字 -->
+        <div class="text-tpl-art-text-box">
+          <div class="text-tpl-art-text" id="text-tpl-main-art">哈哈哈哈</div>
+        </div>
+
+        <!-- 挂件/梗图插画区域 -->
+        <div class="text-tpl-meme-slot">
+          <div class="text-tpl-meme-img" id="text-tpl-meme-img">
+            <span>🤪</span>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- 底部模板分类选择与卡片横向轮播条 -->
+      <div class="text-tpl-bottom-tray">
+        
+        <div class="text-tpl-cards-scroll">
+          <!-- 自定义模板 -->
+          
+          <!-- 换一换/梗图 -->
+          <div class="text-tpl-card-option active" style="background:#fff8e7; color:#332211;" onclick="selectTplCard(this, 'theme-yellow', '日常梗图', '🤪')">
+            <div class="tpl-badge">🔄</div>
+            <div class="tpl-title">梗图黄</div>
+          </div>
+          <!-- 清新蓝绿 -->
+          <div class="text-tpl-card-option" style="background:#e0f2fe; color:#0369a1;" onclick="selectTplCard(this, 'theme-cyan', '清爽便签', '🥐')">
+            <div class="tpl-badge">🍃</div>
+            <div class="tpl-title">清新蓝</div>
+          </div>
+          <!-- 暗黑便签 -->
+          <div class="text-tpl-card-option" style="background:#111827; color:#f9fafb;" onclick="selectTplCard(this, 'theme-dark', '深邃灵感', '💡')">
+            <div class="tpl-badge">🌙</div>
+            <div class="tpl-title">暗夜黑</div>
+          </div>
+          <!-- 日落橙粉 -->
+          <div class="text-tpl-card-option" style="background:#fde68a; color:#7c2d12;" onclick="selectTplCard(this, 'theme-sunset', '温暖夕阳', '🌅')">
+            <div class="tpl-badge">✨</div>
+            <div class="tpl-title">暖阳粉</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部主发布操作栏（无限定日常，无继续下一步，直接点击是「发布」） -->
+      <div class="text-tpl-publish-bar">
+        <button class="text-tpl-direct-publish-btn" onclick="directPublishFromTemplate()" title="确认模板并立即发布">发布</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 纯文字态 · 表情面板展开态（全站统一白底风格） -->
+<div class="device-wrapper" id="state-emoji" data-od-id="device-state-emoji">
+  <div class="device-label">② 纯文字态 · 表情面板展开</div>
+  <div class="mp-device">
+    <div class="mp-screen text-screen-light">
+      <!-- 统一状态栏 -->
       <div class="mp-status-bar">
         <span class="mp-status-time">9:41</span>
         <div class="mp-status-icons">
@@ -2543,34 +3215,100 @@
           <div class="wifi-icon"></div><div class="battery-icon"></div>
         </div>
       </div>
-      <div class="mp-nav">
-        <div class="nav-back">‹</div>
-        <div class="nav-title">发布内容</div>
+
+      <!-- 顶部纯净白底导航栏 -->
+      <div class="text-nav-top">
+        <div class="text-nav-back" onclick="setState('text')" title="返回收起表情">‹</div>
+        <div class="text-nav-title">发文字</div>
+        <button class="text-nav-next-btn" onclick="setState('text-template')" title="点击下一步进入选择文字模板">下一步</button>
       </div>
-<div class="page-scroll">
-        <div class="square-text-wrap">
-          <div class="square-textarea filled">周末爬山，山顶风好大 😂<span class="caret"></span></div>
-        </div>
-        <div class="square-char-count filled">10 / 1000</div>
-        <div class="text-toolbar">
-          <div class="text-emoji-btn active" onclick="toggleEmojiPanel(this)">😀</div>
-        </div>
-        <div class="emoji-panel">
-          <div class="emoji-item">😀</div><div class="emoji-item">😂</div><div class="emoji-item">😍</div><div class="emoji-item">🥳</div>
-          <div class="emoji-item">😭</div><div class="emoji-item">😡</div><div class="emoji-item">🤔</div><div class="emoji-item">😴</div>
-          <div class="emoji-item">👍</div><div class="emoji-item">👏</div><div class="emoji-item">🙏</div><div class="emoji-item">💪</div>
-          <div class="emoji-item">❤️</div><div class="emoji-item">🔥</div><div class="emoji-item">🎉</div><div class="emoji-item">✨</div>
-          <div class="emoji-item">😅</div><div class="emoji-item">😱</div><div class="emoji-item">🤣</div><div class="emoji-item">😎</div>
-          <div class="emoji-item">🤗</div><div class="emoji-item">😏</div><div class="emoji-item">🙄</div><div class="emoji-item">🥺</div>
-        </div>
-        <div class="media-actions">
-          <div class="media-action-btn" onclick="setState('image')"><span class="ic">🖼</span>图片</div>
-          <div class="media-action-btn" onclick="setState('video')"><span class="ic">🎥</span>视频</div>
+
+      <!-- 主体卡片编辑区域（已插入表情大字效果） -->
+      <div class="text-card-viewport" style="flex: 1; padding: 10px 16px 8px;">
+        <div class="text-editor-card" id="text-editor-card-emoji" style="padding: 20px 22px 14px;">
+          <!-- 顶部双引号装饰 -->
+          <div class="text-card-quote-mark">“</div>
+
+          <!-- 输入文本主体区（显示带表情文本与闪烁光标） -->
+          <div class="text-input-field-wrap">
+            <div style="display:flex; align-items:center; flex-wrap:wrap;">
+              <span id="text-pure-display-emoji" class="text-pure-display-text" style="font-size:26px;">今天心情不错 😂✨</span>
+              <span class="text-input-caret"></span>
+            </div>
+          </div>
+
+          <!-- 右下角语音速记拾音按钮 -->
+          <div class="text-card-bottom-actions">
+            <div class="text-mic-btn" title="按住语音转文字速记">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bottom-bar">
-        <button class="pub-btn">发布</button>
+      <!-- 快捷工具栏：表情按钮激活高亮态 / 字数统计 / 收起 -->
+      <div class="text-keyboard-accessory-bar">
+        <div class="accessory-left-icons">
+          <div class="accessory-icon-btn active" style="color:var(--accent-on); background:var(--accent);" onclick="setState('text')" title="收起表情面板">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="15" x2="15.01" y2="15"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="accessory-right-group">
+          <span class="text-card-char-count" id="text-card-char-count-emoji">10 / 1000</span>
+          <div class="accessory-done-btn" onclick="setState('text')" title="收起表情面板">收起</div>
+        </div>
+      </div>
+
+      <!-- 展开的白底高质感表情网格抽屉 -->
+      <div class="text-card-emoji-grid-panel">
+        <div class="text-emoji-grid-header">
+          <span class="text-emoji-grid-title">常用表情</span>
+          <span class="text-emoji-grid-close" onclick="setState('text')">✕ 收起</span>
+        </div>
+        <div class="text-emoji-grid">
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😀')">😀</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😂')">😂</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😍')">😍</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🥳')">🥳</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😭')">😭</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😡')">😡</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🤔')">🤔</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😴')">😴</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '👍')">👍</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '👏')">👏</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🙏')">🙏</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '💪')">💪</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '❤️')">❤️</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🔥')">🔥</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🎉')">🎉</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '✨')">✨</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😅')">😅</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '😎')">😎</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '☕️')">☕️</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🥐')">🥐</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🌈')">🌈</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '🍕')">🍕</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '💯')">💯</div>
+          <div class="emoji-cell" onclick="insertEmojiToState(this, '✨')">✨</div>
+        </div>
+      </div>
+
+      <!-- 底部左右滑文字 Tab（全站统一浅白背景、深灰文字与品牌黄下划线） -->
+      <div class="bottom-mode-bar">
+        <div class="bottom-mode-tabs-scroll">
+          <div class="bottom-mode-tab active" onclick="switchBottomMode('text')">文字</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('image')">发图片</div>
+          <div class="bottom-mode-tab" onclick="switchBottomMode('video')">发视频</div>
+        </div>
       </div>
     </div>
   </div>
@@ -2582,12 +3320,29 @@
 <div class="spec-panel" style="max-width:782px; width:100%;" data-od-id="spec-panel">
   <h3>SPEC · 发布器结构与交互规范说明</h3>
   <div class="spec-row">
-    <span class="spec-key">发布器交互形态</span>
-    <span class="spec-val">移除顶部内容类型 Tab，直截呈现统一发布器：如朋友圈般一站式支持 <span class="spec-badge">纯文字</span><span class="spec-badge">图文（文字+图片）</span><span class="spec-badge">视频（文字+视频）</span> 发布，无需预选模式</span>
+    <span class="spec-key">顶层三重大Tab分组视图（核心改造）</span>
+<span class="spec-val">为解决此前多原型并列冗余与认知负荷过重的问题，顶层拆分为清晰的三个大业务分类 Tab：<br>
+    - <b>「纯文字态」Tab（3项完整闭环）</b>：包含「① 纯文字卡片态」、「② 表情面板展开」以及<b>「③ 模板选择与发布」</b>。在卡片态点击「下一步」直接进入模板选择；<b>上方「选择音乐」胶囊横幅与「图片态」「视频态」「一键成片」样式及位置完全统一规范</b>，提供纯粹沉浸的艺术字排版、底纹主题与梗向表情包插图（<b>点击「梗向表情包」分类胶囊仅切换趣味表情包挂件，背景底色保持稳定不发生跳变；背景底色仅由下方独立主题卡片选择切换</b>，界面无右侧多余工具悬浮栏）；<b>无限定日常开关，无继续下一步，底部主按钮直接就是高亮「发布」</b>；<br>
+    - <b>「图片态」Tab（6项）</b>：<b>切到发图片直接进入自研相册选图</b>（彻底取消此前的上下结构过渡态），包含「① 自研相册选图」、「② 图片预览+1000字」、「③ 滤镜调色面板」、「④ 配乐选择面板」、「⑤ 图片一键成片」、「⑥ 视频片段编辑」6 个闭环原型；<br>
+    - <b>「视频态」Tab（3项闭环直达）</b>：<b>切到发视频直接进入「自研视频选择」</b>（彻底取消此前的文字+加号视频卡槽中间过渡态，与图片态保持完全一致的极速直选交互）。包含「① 自研视频选择」、「② 视频预览+BGM+剪辑」、「③ 视频片段编辑」3 个全链路原型；视频预览右上角直接点击「发布」完成发送；<br>
+    - <b>「视频片段编辑」通用能力</b>：<b>该状态不仅在视频态中可用，在图片态的「一键成片」流程中同样支持</b>，满足图片转视频模板时精确微调各照片分段时长与替换素材的诉求；<br>
+    - <b>单卡沉浸展示原则</b>：切换大分类时自动过滤并联动下属子展示项，始终<b>只聚焦展示单个设备原型</b>，告别多原型并列横向溢出，体验清爽流畅。</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">发布形式</span>
-    <span class="spec-val">与朋友圈一致：<span class="spec-badge">纯文字</span><span class="spec-badge">图文（文字+图片）</span><span class="spec-badge">视频（文字+视频）</span> 三种，无需分 Tab 选择，由是否添加媒体决定</span>
+    <span class="spec-key">底部滑动模式 Tab（发布器内）</span>
+    <span class="spec-val">底部不再设置单一的发布按钮（主发布按钮移至顶部导航栏右上角），底部采用左右滑动文字 Tab 栏：<br>
+    - <b>首项「文字」（全站统一纯白底色风格）</b>：<br>
+      &nbsp;&nbsp;1. <b>全站统一白色背景体系</b>：纯文字态、图片态、视频态<b>全部统一为纯白底色（#ffffff）界面</b>，消除不同形态之间的底色割裂感；<br>
+      &nbsp;&nbsp;2. <b>轻量质感卡片与纯黑大字</b>：卡片采用极浅柔和质感灰底（#f8f9fa）与微边框（var(--border-soft)），正文大字号为清晰的纯黑色（var(--fg) 即 #0d1117），点缀淡雅双引号装饰与右下角白色麦克风语音速记圆形按钮；<br>
+      &nbsp;&nbsp;3. <b>白底高质感表情抽屉面板</b>：表情展开面板采用与全站相匹配的纯白底色，8 列表情紧凑排布并支持点击上屏；<br>
+      &nbsp;&nbsp;4. <b>全站统一导航与品牌标准色</b>：顶部导航栏白底黑字、右上角「下一步」采用经典品牌黄（#ffd21e），底部滑动文字 Tab 为统一浅白底栏加黄色激活小横线，三大业务形态视觉完全浑然一体。<br>
+    - <b>次项「发图片」</b>：点击直达自研相册选图（彻底取消原图文上下结构过渡态，直接由相册选图进入「② 图片预览+1000字」完成大图浏览与文案输入）；<br>
+    - <b>第三项「发视频」</b>：点击直达自研视频选择（彻底取消中间加号卡槽过渡态，直接选视频进入预览编辑与发布）；<br>
+    - <b>取消中间 Tab 胶囊</b>：彻底取消原正文下方的「图片/视频」切换按钮，发布形态完全由底部滑动 Tab 驱动。</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">图片预览大图下输入框（核心改造）</span>
+    <span class="spec-val">在「④ 图片预览」界面中，大图片预览视口正下方新增完整的图文输入模块：结合支持输入 1000 字的正文文本框、字数实时统计、表情按钮 😀（展开 8 列表情选择面板）及话题 # 插入功能，实现大图预览与写文案一体化。</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">正文输入</span>
@@ -2624,7 +3379,8 @@
     <span class="spec-key">⑪ 视频预览（多功能剪辑编辑）</span>
     <span class="spec-val">如同图片预览一样的全功能视频预览与编辑主态：<br>
     1. <b>上方大按钮「选择音乐」（位置同「一键成片」一致）</b>：位于导航栏下方、播放视口上方通栏陈列，展示当前背景音乐状态与「选择音乐 ›」入口，点击直达音乐选择半弹层；<br>
-    2. <b>中央全屏播放视口</b>：9:16 全屏纯净播放视口，带中央播放/暂停控制与底部实时进度条/时间码（00:10 / 00:24）；<br>
+    2. <b>中央纯净播放视口</b>：全画幅高清播放视口，带中央播放/暂停控制与底部实时进度条/时间码（00:10 / 00:24）；<br>
+    3. <b>播放视口下方文字输入与表情区（与图片预览完全一致）</b>：视口正下方留出文案输入区，支持输入 1000 字想法、实时字数统计、添加话题 # 及 😀 表情面板，解决此前视频态缺失输入文案能力的痛点；<br>
     3. <b>右侧标准悬浮工具组（已去除底部重复工具栏）</b>：告别与右侧功能重叠的底部常驻按钮，所有功能统一由右侧标准悬浮图标唤起底端抽屉：<br>
        - <b>视频滤镜 (🎨)</b>：点击右侧滤镜图标，自底向上滑出滤镜调色抽屉，支持横向切换「原色 / 胶片 / 日系 / 复古 / 黑白」风格；<br>
        - <b>音量混音调节 (🔊)</b>：点击右侧音量图标，滑出「视频原声」与「BGM配乐」独立双轨 0~100 混音抽屉；<br>
@@ -2644,9 +3400,10 @@
     4. <b>底部操作栏</b>：左侧「✨ 一键成片」，右侧主按钮为「下一步 (4/9) ›」，无中间滤镜按钮，点击直接进入「④ 图片预览」。</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">④ 图片预览（含移动端工具抽屉）</span>
+    <span class="spec-key">④ 图片预览（含上方 BGM 横幅与移动端工具抽屉）</span>
     <span class="spec-val">点击选择照片的「下一步」后进入的大图预览与编辑主态：<br>
-    1. <b>中央大图视口</b>：高清全画幅预览当前焦点的照片，支持大图滑动切换与右上角页码指示（如 1 / 4）；<br>
+    1. <b>上方大按钮「选择音乐」（位置与视频态完全一致）</b>：位于导航栏正下方、大图视口上方通栏陈列，展示当前背景音乐状态与「选择音乐 ›」入口，点击直达配乐选择半弹层；选定后胶囊内实时更新歌曲名与已选状态，实现图文也能随心搭配 BGM；<br>
+    2. <b>中央大图视口（满铺与比例控制）</b>：彻底解决大图无法填满与边框留白问题，大图视口默认满铺展示（100% 充满视口），并在左上方提供比例切换浮动胶囊（「填满」/「3:4」/「1:1」/「留边」），可根据图片构图随时切换比例与裁剪模式；右上角保留「1 / 4」页码指示；<br>
     2. <b>下方全量已选图片栏</b>：底部从左到右横向平铺展示所有已勾选的照片缩略图，点击任意一张可快速切换主屏大图；<br>
     3. <b>移动端标准工具抽屉（Action Sheet）</b>：右侧为「🛠️ 工具」按钮，去除了桌面端气泡式浮层与裁剪/贴纸多余项。点击自底向上滑出规范的半屏暗黑磨砂工具抽屉，内含 <span class="spec-badge">🎨 滤镜</span> 大图标功能项，点击即可唤起「⑤ 滤镜调节」面板，未来新增工具可规范向右平铺扩展；<br>
     4. <b>顶部完成按钮</b>：直接完成所有图片选定并返回图文发布编辑主态。</span>
@@ -2800,6 +3557,262 @@
     setState('video');
   }
 
+  
+  
+  function switchTextSubtab(type) {
+    const tabShort = document.getElementById('subtab-short');
+    const tabLong = document.getElementById('subtab-long');
+    const disp = document.getElementById('text-pure-display');
+    const subdesc = document.getElementById('text-pure-subdesc');
+    if (type === 'short') {
+      if (tabShort) tabShort.classList.add('active');
+      if (tabLong) tabLong.classList.remove('active');
+      if (disp) {
+        disp.textContent = '今天心情不错';
+        disp.style.fontSize = '26px';
+      }
+      if (subdesc) subdesc.style.display = 'none';
+    } else {
+      if (tabShort) tabShort.classList.remove('active');
+      if (tabLong) tabLong.classList.add('active');
+      if (disp) {
+        disp.textContent = '写下一篇长文题目…';
+        disp.style.fontSize = '20px';
+      }
+      if (subdesc) subdesc.style.display = 'block';
+    }
+  }
+
+  function mockVoiceInput() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent = '今天心情不错，阳光正好！✨';
+    }
+  }
+
+  function insertAtMention() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent += ' @小助理 ';
+    }
+  }
+
+  function insertCardTopic() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent += ' #日常打卡 ';
+    }
+  }
+
+  function toggleCardEmoji() {
+    const d = document.getElementById('text-card-emoji-drawer');
+    if (d) {
+      d.style.display = d.style.display === 'none' ? 'grid' : 'none';
+    }
+  }
+
+  function addCardEmoji(emoji) {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent += emoji;
+    }
+  }
+
+  function backspaceText() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp && disp.textContent.length > 0) {
+      disp.textContent = disp.textContent.slice(0, -1);
+    }
+  }
+
+  function toggleKeyboard() {
+    const kb = document.getElementById('text-mock-keyboard');
+    if (kb) {
+      kb.style.display = kb.style.display === 'none' ? 'flex' : 'none';
+    }
+  }
+
+  function updateTextCharCount(targetId, countId) {
+    const disp = document.getElementById(targetId);
+    const countEl = document.getElementById(countId);
+    if (disp && countEl) {
+      const len = disp.textContent ? disp.textContent.length : 0;
+      countEl.textContent = len + ' / 1000';
+    }
+  }
+
+  function clearTextCard() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent = '';
+      updateTextCharCount('text-pure-display', 'text-card-char-count');
+    }
+  }
+
+  function insertEmojiToState(cellEl, emoji) {
+    const disp = document.getElementById('text-pure-display-emoji');
+    if (disp) {
+      disp.textContent += emoji;
+      updateTextCharCount('text-pure-display-emoji', 'text-card-char-count-emoji');
+    }
+  }
+
+  function mockVoiceInput() {
+    const disp = document.getElementById('text-pure-display');
+    if (disp) {
+      disp.textContent = '今天心情不错，阳光正好！✨';
+      updateTextCharCount('text-pure-display', 'text-card-char-count');
+    }
+  }
+
+  
+  function selectTplCard(cardEl, themeClass, tagText, memeEmoji) {
+    cardEl.closest('.text-tpl-cards-scroll').querySelectorAll('.text-tpl-card-option').forEach(c => c.classList.remove('active'));
+    cardEl.classList.add('active');
+    const canvas = document.getElementById('text-tpl-canvas');
+    if (canvas) {
+      canvas.className = 'text-tpl-canvas-wrap ' + themeClass;
+    }
+    const tag = document.getElementById('text-tpl-top-tag');
+    if (tag) tag.textContent = tagText.toUpperCase();
+    if (memeEmoji) {
+      const memeSlot = document.querySelector('#text-tpl-meme-img span');
+      if (memeSlot) memeSlot.textContent = memeEmoji;
+    }
+  }
+
+  const memeList = ['🤪', '🐸', '🐱', '🧐', '🥳', '😎', '☕️', '✨'];
+  const memeCategoryLabels = ['梗向表情包', '魔性蛙蛙', '萌宠猫咪', '深思考究', '派对狂欢', '帅气墨镜', '慢调咖啡', '高光灵感'];
+  let memeIdx = 0;
+  function cycleTplMeme(pillEl) {
+    // 仅切换表情包贴纸/挂件内容，绝不改变后方的背景颜色或卡片主题
+    memeIdx = (memeIdx + 1) % memeList.length;
+    const memeSlot = document.querySelector('#text-tpl-meme-img span');
+    if (memeSlot) {
+      memeSlot.textContent = memeList[memeIdx];
+      // 轻微缩放反馈动画
+      memeSlot.style.transform = 'scale(1.25)';
+      setTimeout(() => { memeSlot.style.transform = 'scale(1)'; }, 140);
+    }
+    const catLabel = document.getElementById('text-tpl-cat-label');
+    if (catLabel) catLabel.textContent = memeCategoryLabels[memeIdx];
+  }
+
+  const themeList = ['theme-yellow', 'theme-cyan', 'theme-dark', 'theme-sunset'];
+  let themeIdx = 0;
+  function cycleTplTheme() {
+    themeIdx = (themeIdx + 1) % themeList.length;
+    const canvas = document.getElementById('text-tpl-canvas');
+    if (canvas) {
+      canvas.className = 'text-tpl-canvas-wrap ' + themeList[themeIdx];
+    }
+  }
+
+  function insertTplTopic() {
+    const art = document.getElementById('text-tpl-main-art');
+    if (art && !art.textContent.includes('#')) {
+      art.textContent += ' #随手记';
+    }
+  }
+
+  function toggleArtTextStyle() {
+    const art = document.getElementById('text-tpl-main-art');
+    if (art) {
+      if (art.style.textDecoration === 'underline') {
+        art.style.textDecoration = 'none';
+      } else {
+        art.style.textDecoration = 'underline';
+      }
+    }
+  }
+
+  function directPublishFromTemplate() {
+    alert('正在发布模板文字动态… 恭喜发布成功！');
+  }
+
+  function publishTextDirectly() {
+    alert('正在发布纯文字动态… 发布成功！');
+  }
+
+  function publishPhotoContent() {
+    alert('正在发布图文动态… 发布成功！');
+  }
+
+  function publishVideoContent() {
+    alert('正在发布视频动态… 发布成功！');
+  }
+
+  function switchBottomMode(mode) {
+    if (mode === 'text') {
+      setState('text');
+    } else if (mode === 'image') {
+      // 用户要求：选择发图片的时候，直接进入选择图片
+      setState('photo-picker');
+    } else if (mode === 'video') {
+      // 用户要求：选择发视频的时候，直接进入自研视频选择
+      setState('video-picker');
+    }
+  }
+
+  
+  function toggleVideoEmoji() {
+    const p = document.getElementById('video-emoji-panel');
+    if (p) p.style.display = p.style.display === 'none' ? 'grid' : 'none';
+  }
+
+  function insertVideoEmoji(emoji) {
+    const t = document.getElementById('video-caption-input');
+    if (t) {
+      t.value += emoji;
+      updateVideoCaptionCount();
+    }
+  }
+
+  function insertVideoTopic() {
+    const t = document.getElementById('video-caption-input');
+    if (t) {
+      t.value += ' #极限运动 ';
+      updateVideoCaptionCount();
+    }
+  }
+
+  function updateVideoCaptionCount() {
+    const t = document.getElementById('video-caption-input');
+    const c = document.getElementById('video-caption-count');
+    if (t && c) {
+      c.textContent = t.value.length + ' / 1000';
+    }
+  }
+
+  function togglePreviewEmoji() {
+    const p = document.getElementById('preview-emoji-panel');
+    if (p) p.style.display = p.style.display === 'none' ? 'grid' : 'none';
+  }
+
+  function insertPreviewEmoji(emoji) {
+    const t = document.getElementById('preview-caption-input');
+    if (t) {
+      t.value += emoji;
+      updatePreviewCaptionCount();
+    }
+  }
+
+  function insertPreviewTopic() {
+    const t = document.getElementById('preview-caption-input');
+    if (t) {
+      t.value += ' #话题标签 ';
+      updatePreviewCaptionCount();
+    }
+  }
+
+  function updatePreviewCaptionCount() {
+    const t = document.getElementById('preview-caption-input');
+    const c = document.getElementById('preview-caption-count');
+    if (t && c) {
+      c.textContent = t.value.length + ' / 1000';
+    }
+  }
+
   function openToolsSheet() {
     const mask = document.getElementById('preview-tools-mask');
     const btn = document.querySelector('.preview-tool-btn');
@@ -2900,6 +3913,14 @@
     setState('template-edit');
   }
 
+    function exitTemplateEdit() {
+    if (currentCategory === 'video') {
+      setState('video-preview');
+    } else {
+      setState('smart-video');
+    }
+  }
+
   function selectClipCard(cardEl) {
     cardEl.closest('.tpl-clips-scroll').querySelectorAll('.tpl-clip-card').forEach(c => c.classList.remove('active'));
     cardEl.classList.add('active');
@@ -2907,6 +3928,17 @@
 
   
   
+  function setPreviewRatio(ratioType, btnEl) {
+    const box = document.getElementById('preview-main-box');
+    if (!box) return;
+    box.classList.remove('ratio-fill', 'ratio-3-4', 'ratio-1-1', 'ratio-fit');
+    box.classList.add('ratio-' + ratioType);
+    if (btnEl) {
+      btnEl.closest('.preview-ratio-control').querySelectorAll('.preview-ratio-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+  }
+
   function selectPreviewThumb(el, emoji, index, bgGradient) {
     el.closest('.preview-thumb-strip').querySelectorAll('.preview-strip-item').forEach(item => item.classList.remove('active'));
     el.classList.add('active');
@@ -2987,39 +4019,128 @@
   }
 
   function selectMusicAndClose(songName) {
-    // update the bgm button in state-image
-    const bgmBtn = document.querySelector('#state-image .image-slot.bgm');
-    if (bgmBtn) {
-      bgmBtn.classList.add('selected');
-      const text = bgmBtn.querySelector('.bgm-text');
-      if (text) text.textContent = '已选: ' + songName;
+    // 0. 同步更新纯文字模板态上方的 BGM 胶囊横幅（统一样式）
+    const textBgmTitle = document.getElementById('text-top-bgm-title');
+    const textBgmTag = document.getElementById('text-top-bgm-tag');
+    if (textBgmTitle) textBgmTitle.textContent = songName + ' - 已添加';
+    if (textBgmTag) {
+      textBgmTag.textContent = '已选配乐';
+      textBgmTag.style.background = 'rgba(255,210,30,0.25)';
     }
-    // update the top bgm banner in video preview
+
+    // 1. 同步更新图片预览态上方的 BGM 胶囊横幅
+    const photoBgmTitle = document.getElementById('photo-top-bgm-title');
+    const photoBgmTag = document.getElementById('photo-top-bgm-tag');
+    if (photoBgmTitle) photoBgmTitle.textContent = songName + ' - 已添加';
+    if (photoBgmTag) {
+      photoBgmTag.textContent = '已选配乐';
+      photoBgmTag.style.background = 'rgba(255,210,30,0.25)';
+    }
+
+    // 2. 同步更新视频预览态上方的 BGM 胶囊横幅
     const vpBgmTitle = document.getElementById('vp-top-bgm-title');
     const vpBgmTag = document.getElementById('vp-top-bgm-tag');
     if (vpBgmTitle) vpBgmTitle.textContent = songName + ' - 已添加';
     if (vpBgmTag) vpBgmTag.textContent = '已选配乐';
     
-    // update smart-video banner
+    // 3. 同步更新一键成片模板的配乐显示
     const svBgmName = document.querySelector('.sv-music-name');
     if (svBgmName) svBgmName.textContent = songName;
     
-    // return to previous state or default to video-preview if in video mode
+    // 4. 选择完成后根据当前上下文自动平滑返回对应来源态
     const currentWrapper = document.querySelector('.device-wrapper.active');
     if (currentWrapper && (currentWrapper.id === 'state-video-preview' || currentWrapper.id === 'state-smart-video')) {
-      // keep in current
+      // 保持在视频预览或成片模式
+    } else if (currentWrapper && currentWrapper.id === 'state-text-template') {
+      setState('text-template');
     } else {
-      setState('image');
+      setState('photo-preview');
     }
   }
 
-  function setState(state) {
-    document.querySelectorAll('.device-wrapper').forEach(w => {
-      w.classList.toggle('active', w.id === 'state-' + state);
+  // 状态与分类映射字典（template-edit 可支持 image 与 video 双分类）
+  const stateCategoryMap = {
+    'text': 'text',
+    'emoji': 'text',
+    'text-template': 'text',
+    'photo-picker': 'image',
+    'photo-preview': 'image',
+    'photo-filter': 'image',
+    'music-sheet': 'image',
+    'smart-video': 'image',
+    
+    'video-picker': 'video',
+    'video-preview': 'video',
+    'template-edit': 'both'
+  };
+
+  // 分类默认激活子状态（发图片直达相册选图，发视频直达视频选择）
+  const categoryDefaultState = {
+    'text': 'text',
+    'image': 'photo-picker',
+    'video': 'video-picker'
+  };
+
+  let currentCategory = 'text';
+
+  function switchCategory(cat) {
+    currentCategory = cat;
+    // 1. 更新顶部大Tab高亮
+    document.querySelectorAll('.major-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.id === 'major-tab-' + cat);
     });
+
+    // 2. 过滤显示下方的子状态按钮（仅显示属于当前分类的项）
     document.querySelectorAll('.state-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.state === state);
+      const match = btn.dataset.category === cat;
+      btn.classList.toggle('visible', match);
     });
+
+    // 3. 切换展示该分类的默认原型，确保页面只展示一个原型
+    const defaultState = categoryDefaultState[cat] || 'text';
+    setState(defaultState);
+  }
+
+  function setState(state) {
+    // 每次只激活并展示一个设备原型，其余完全隐藏，坚决不并列
+    document.querySelectorAll('.device-wrapper').forEach(w => {
+      const isActive = w.id === 'state-' + state;
+      w.classList.toggle('active', isActive);
+      if (!isActive) {
+        w.style.display = 'none';
+      } else {
+        w.style.display = 'flex';
+      }
+    });
+
+    // 如果调用的 state 属于明确的另一个大分类（非 both），联动大分类
+    const targetCat = stateCategoryMap[state];
+    if (targetCat && targetCat !== 'both' && targetCat !== currentCategory) {
+      currentCategory = targetCat;
+      document.querySelectorAll('.major-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'major-tab-' + targetCat);
+      });
+      document.querySelectorAll('.state-btn').forEach(btn => {
+        btn.classList.toggle('visible', btn.dataset.category === targetCat);
+      });
+    }
+
+    // 如果目标是 template-edit，确保在当前大分类（无论 image 还是 video）中对应的子按钮高亮
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      if (btn.dataset.state === state) {
+        // 如果是多分类通用态，只高亮当前激活分类下的子按钮
+        const isCurrentCat = btn.dataset.category === currentCategory;
+        btn.classList.toggle('active', isCurrentCat);
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // 滚动页面至原型顶部以保证良好的浏览体验
+    const activeDevice = document.getElementById('state-' + state);
+    if (activeDevice && window.scrollY > 200) {
+      activeDevice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   function toggleEmojiPanel(el) {
