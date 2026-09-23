@@ -692,17 +692,17 @@
   }
   .picker-cancel {
     font-family: var(--font-body); font-size: 14px; color: var(--fg-2);
-    cursor: pointer; width: 36px;
+    cursor: pointer; width: 28px;
   }
   .picker-album-dropdown {
     display: flex; align-items: center; gap: 4px;
-    font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg);
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
     cursor: pointer;
   }
   .picker-dropdown-arrow {
     font-size: 10px; color: var(--muted); transition: transform 120ms ease;
   }
-  .picker-nav-spacer { width: 36px; }
+  .picker-nav-spacer { width: 28px; height: 28px; }
 
   .picker-grid-wrap {
     flex: 1; overflow-y: auto; background: #ffffff;
@@ -2089,9 +2089,9 @@
         </div>
       </div>
       
-      <!-- 相册自定义导航栏（右上角无滤镜按钮） -->
+      <!-- 相册自定义导航栏：左侧统一返回键（与纯文字态一致） + 居中相册下拉切换 -->
       <div class="picker-nav">
-        <div class="picker-cancel" onclick="setState('text')">取消</div>
+        <div class="text-nav-back" onclick="setState('text')" title="返回纯文字态">‹</div>
         <div class="picker-album-dropdown">
           <span>所有照片</span>
           <span class="picker-dropdown-arrow">▼</span>
@@ -2814,9 +2814,9 @@
         </div>
       </div>
 
-      <!-- 导航栏 -->
+      <!-- 导航栏：左侧统一返回键（与纯文字态一致） + 居中视频下拉切换 -->
       <div class="picker-nav">
-        <div class="picker-cancel" onclick="setState('text')">取消</div>
+        <div class="text-nav-back" onclick="setState('text')" title="返回纯文字态">‹</div>
         <div class="picker-album-dropdown">
           <span>所有视频</span>
           <span class="picker-dropdown-arrow">▼</span>
@@ -3394,7 +3394,7 @@
   <div class="spec-row">
     <span class="spec-key">③ 选择照片（自研渲染）</span>
     <span class="spec-val">替代传统调用系统相册的黑盒交互，自研照片选择器界面：<br>
-    1. <b>顶部导航栏</b>：左侧「取消」（返回图文编辑）、居中相册下拉切换「所有照片 ▼」，无多余按钮保持居中；<br>
+    1. <b>顶部导航栏</b>：左侧统一圆形返回键「‹」（与纯文字态完全一致，点击返回纯文字态）、居中相册下拉切换「所有照片 ▼」，右侧占位对称保持居中；<br>
     2. <b>4 列沉浸照片网格</b>：无拍摄按钮，纯粹照片多选，右上角圆形数字勾选框（支持 1~9 多选并实时标注序号）；<br>
     3. <b>已选照片预览托盘</b>：位于操作栏上方，自左向右横向展示已勾选照片微缩图（带顺序角标与快捷删除「×」）；<br>
     4. <b>底部操作栏</b>：左侧「✨ 一键成片」，右侧主按钮为「下一步 (4/9) ›」，无中间滤镜按钮，点击直接进入「④ 图片预览」。</span>
