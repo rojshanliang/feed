@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "publish-prototype-hifi.html",
+  "entry": "publish-prototype-hifi.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-09-28T03:56:46.218Z",
+  "updatedAt": "2026-09-28T03:56:46.218Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
