@@ -874,7 +874,7 @@
 #screen-stage .profile-avatar { width: 52px; height: 52px; border-radius: 6px; background: var(--wf-block-dark);
     border: 2px solid #ffffff; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center; font-size: 22px; }
-#screen-stage .profile-name { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); text-align: center; }
+#screen-stage .profile-name { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #ef4444; text-align: center; }
 #screen-stage .square-message-toast { position: relative; z-index: 1;
     display: flex; align-items: center; gap: 8px;
     width: fit-content; margin: 10px auto 0;
@@ -921,7 +921,7 @@
     font-size: 17px; }
 #screen-stage .moment-meta { flex: 1; min-width: 0; }
 #screen-stage .moment-name-row { display: flex; align-items: center; gap: 5px; }
-#screen-stage .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg); }
+#screen-stage .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #ef4444; }
 #screen-stage .moment-item.pinned { background: var(--surface-warm); }
 #screen-stage .pinned-badge { display: flex; align-items: center; gap: 3px; flex-shrink: 0;
     font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover); }
@@ -2515,7 +2515,39 @@
   }
 
   /* 宿主等级徽章（排在后面：简洁微型平台等级胶囊，无中文介绍） */
-  .badge-host-level {
+    /* 段位称谓徽章（紧随等级旁边展示：展示段位官方荣誉头衔，如「偶遇知音」、「赏金乐人」） */
+  .badge-tier-title {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1px 7px 1px 6px; border-radius: 9999px;
+    background: rgba(255, 210, 30, 0.12);
+    border: 1px solid rgba(255, 210, 30, 0.35);
+    color: #ffd21e; font-family: var(--font-display);
+    font-size: 10px; font-weight: 700; line-height: 1.35;
+    letter-spacing: 0.02em; flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(255, 210, 30, 0.12);
+    transition: all 140ms ease;
+  }
+  .badge-tier-title:hover {
+    background: rgba(255, 210, 30, 0.2);
+    border-color: rgba(255, 210, 30, 0.55);
+  }
+  .badge-tier-title.creator-tier {
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: #c084fc;
+    box-shadow: 0 1px 4px rgba(168, 85, 247, 0.15);
+  }
+  .badge-tier-title.creator-tier:hover {
+    background: rgba(168, 85, 247, 0.22);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+  .badge-tier-title .tier-dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+.badge-host-level {
     display: inline-flex; align-items: center; gap: 3.5px;
     padding: 1px 6px; border-radius: 4px;
     background: #f3f4f6; border: 1px solid #e5e7eb;
@@ -2535,7 +2567,7 @@
   }
   #screen-stage .moment-name {
     font-family: var(--font-display); font-size: 13px; font-weight: 700;
-    color: var(--fg);
+    color: #ef4444;
   }
   #screen-stage .profile-level-badges {
     display: inline-flex; align-items: center; gap: 4px;
@@ -4003,6 +4035,7 @@
             <div class="profile-name-row">
               <div class="profile-name">用户昵称</div>
               <div class="profile-level-badges">
+                <span class="badge-tier-title" onclick="switchPage('level')" style="cursor:pointer;" title="当前成长段位称谓：偶遇知音（点击查看成长权益）"><span class="tier-dot"></span>偶遇知音</span>
                 <span class="badge-app-level" onclick="switchPage('level')" style="cursor:pointer;" title="点击进入等级中心查看我的权益与成长"><span class="lvl-icon">⚡</span>Lv.14</span>
                 <span class="badge-host-level" title="宿主等级：Lv.7"><span class="host-dot"></span>Lv.7</span>
               </div>
@@ -4279,6 +4312,7 @@
             <div class="profile-name-row">
               <div class="profile-name">创作者昵称</div>
               <div class="profile-level-badges">
+                <span class="badge-tier-title creator-tier" onclick="openUserLevelDrawer(28, '创作者昵称', '🎨', '金牌创作者')" style="cursor:pointer;" title="创作者成长段位称谓：赏金乐人（点击查看特权对比）"><span class="tier-dot"></span>赏金乐人</span>
                 <span class="badge-app-level creator-badge" onclick="openUserLevelDrawer(28, '创作者昵称', '🎨', '金牌创作者')" style="cursor:pointer;" title="查看等级信息与权益对比"><span class="lvl-icon">👑</span>Lv.28</span>
                 <span class="badge-host-level" title="宿主等级：V.8"><span class="host-dot" style="background:#ef4444;"></span>V.8</span>
               </div>
@@ -4529,8 +4563,9 @@
           <div class="profile-identity-group">
             <div class="profile-avatar">👤</div>
             <div class="profile-name" style="display:flex;align-items:center;gap:6px;">
-              <span>阿伟</span>
+              <span style="color: rgb(0, 0, 0);">阿伟</span>
               <span class="profile-level-badges" style="transform:scale(0.9);transform-origin:left center;">
+                <span class="badge-tier-title" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor: pointer; color: rgb(239, 68, 68);" title="当前成长段位称谓：偶遇知音（点击查看特权）"><span class="tier-dot"></span>偶遇知音</span>
                 <span class="badge-app-level" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor:pointer;" title="点击查看等级勋章气泡"><span class="lvl-icon">⚡</span>Lv.14</span>
                 <span class="badge-host-level" title="宿主APP等级：Lv.5"><span class="host-dot"></span>Lv.5</span>
               </span>
@@ -4539,10 +4574,7 @@
         </div>
 
         <!-- 新消息提醒：悬浮胶囊，锚定在头像/昵称下方、Tab 上方，随头图一起滚动 -->
-        <div class="square-message-toast">
-          <div class="square-message-toast-avatar">👤</div>
-          <div class="square-message-toast-label">12条新消息</div>
-        </div>
+        
       </div>
 
 
@@ -4556,7 +4588,7 @@
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
                 <div class="moment-name-row">
-                  <span class="moment-name">阿伟</span>
+                  <span class="moment-name" style="color: rgb(0, 0, 0);">阿伟</span>
                   <span class="profile-level-badges">
                     <span class="badge-app-level" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor:pointer;" title="点击查看等级勋章气泡"><span class="lvl-icon">⚡</span>Lv.14</span>
                     <span class="badge-host-level" title="宿主APP等级：Lv.5"><span class="host-dot"></span>Lv.5</span>
@@ -4597,7 +4629,7 @@
               <div class="moment-avatar">👤</div>
               <div class="moment-meta">
                 <div class="moment-name-row">
-                  <span class="moment-name">Lucy</span>
+                  <span class="moment-name" style="color: rgb(0, 0, 0);">Lucy</span>
                   <span class="profile-level-badges">
                     <span class="badge-app-level" onclick="showStageLevelBubble(event, 22, 'Lucy', '💃', '大舞台达人')" style="cursor:pointer;" title="点击查看等级勋章气泡"><span class="lvl-icon">⚡</span>Lv.22</span>
                     <span class="badge-host-level" title="宿主APP等级：Lv.12"><span class="host-dot"></span>Lv.12</span>
@@ -5678,7 +5710,7 @@
                   <div class="lvl-banner-tag">STAGE EXCLUSIVE · 专属特权</div>
                   <div class="lvl-banner-title" id="lvl-banner-title">大舞台专属高光进场横幅</div>
                   <div class="lvl-banner-sub" id="lvl-banner-sub">点亮知音专属发光勋章，发言置顶展示</div>
-                  <button class="lvl-banner-btn" onclick="showMatrixToast('已激活当前等级大舞台特效')">去看看</button>
+                  
                 </div>
               </div>
 
