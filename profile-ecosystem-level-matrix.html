@@ -3047,7 +3047,7 @@
   }
   #screen-level.active { display: flex; }
 
-  /* 沉浸式固定头部容器（上方不动，下方内容滚动） */
+  /* 顶部容器（放在 .lvx-body 里，随整页一起滚动） */
   .lvx-head {
     flex-shrink: 0;
     position: relative;
@@ -3294,6 +3294,8 @@
     transition: width 300ms cubic-bezier(0.2, 0, 0, 1);
   }
 
+  .lvx-growth-reward { margin-top: 12px; }
+
   /* 阶段大进度轴（Stepped Timeline） */
   .lvx-stepper {
     position: relative;
@@ -3399,9 +3401,10 @@
   /* ═══ 下方滚动内容区域 ═══ */
   .lvx-body {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 14px 0 44px;
+    padding: 0 0 44px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -3414,6 +3417,7 @@
   .lvx-cards-wrap {
     overflow: hidden;
     position: relative;
+    flex-shrink: 0; /* 不被压缩，内容撑开后整页才能上下滑 */
   }
   .lvx-cards {
     display: flex;
@@ -4042,8 +4046,8 @@
             <div class="profile-name-row">
               <div class="profile-name">用户昵称</div>
               <div class="profile-level-badges">
-                <span class="badge-tier-title" onclick="switchPage('level')" style="cursor:pointer;" title="当前成长段位称谓：偶遇知音（点击查看成长权益）"><span class="tier-dot"></span>偶遇知音</span>
-                <span class="badge-app-level" onclick="switchPage('level')" style="cursor:pointer;" title="点击进入等级中心查看我的权益与成长"><span class="lvl-icon">⚡</span>Lv.14</span>
+                <span class="badge-tier-title" onclick="openUserLevelDrawer(14, '用户昵称', '👤', '我本人')" style="cursor:pointer;" title="当前成长段位称谓：偶遇知音（点击查看等级与权益）"><span class="tier-dot"></span>偶遇知音</span>
+                <span class="badge-app-level" onclick="openUserLevelDrawer(14, '用户昵称', '👤', '我本人')" style="cursor:pointer;" title="查看我的等级与权益"><span class="lvl-icon">⚡</span>Lv.14</span>
                 <span class="badge-host-level" title="宿主等级：Lv.7"><span class="host-dot"></span>Lv.7</span>
               </div>
             </div>
@@ -4570,9 +4574,9 @@
           <div class="profile-identity-group">
             <div class="profile-avatar">👤</div>
             <div class="profile-name" style="display:flex;align-items:center;gap:6px;">
-              <span style="color: #ef4444; font-weight: 700;">阿伟</span>
+              <span style="color: rgb(0, 0, 0); font-weight: 700;">阿伟</span>
               <span class="profile-level-badges" style="transform:scale(0.9);transform-origin:left center;">
-                <span class="badge-tier-title" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor: pointer;" title="当前成长段位称谓：偶遇知音（点击查看特权）"><span class="tier-dot"></span>偶遇知音</span>
+                <span class="badge-tier-title" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor: pointer; color: rgb(239, 68, 68); background-color: rgb(245, 158, 11);" title="当前成长段位称谓：偶遇知音（点击查看特权）"><span class="tier-dot"></span>偶遇知音</span>
                 <span class="badge-app-level" onclick="showStageLevelBubble(event, 14, '阿伟', '🎸', '大舞台主唱')" style="cursor:pointer;" title="点击查看等级勋章气泡"><span class="lvl-icon">⚡</span>Lv.14</span>
                 <span class="badge-host-level" title="宿主APP等级：Lv.5"><span class="host-dot"></span>Lv.5</span>
               </span>
@@ -5591,7 +5595,8 @@
 
 <!-- 5. 全新等级体系展示页 (对应截图一结构 + 截图二7阶称号) -->
     <div class="mp-screen-view active" id="screen-level">
-<!-- 固定的沉浸式顶部区域（上方不动）：包含状态栏、导航栏、用户信息与阶段大进度轴 -->
+      <div class="level-scroll-body lvx-body">
+<!-- 顶部区域（随整页一起滚动）：包含状态栏、导航栏、用户信息与阶段大进度轴 -->
       <div class="level-sticky-top-header lvx-head">
         <div class="mp-status-bar level-status-bar">
           <span class="mp-status-time">9:41</span>
@@ -5612,7 +5617,7 @@
             <span class="lvx-avatar-badge" title="当前等级">14</span>
           </div>
           <div class="lvx-user-meta">
-            <div class="lvx-user-name">用户昵称 <span class="lvx-status-chip">在线</span></div>
+            <div class="lvx-user-name">用户昵称 </div>
             <div class="lvx-user-tags">
               <span class="lvx-title-chip"><span>🎵</span> 偶遇知音</span>
             </div>
@@ -5629,6 +5634,22 @@
             <span class="lvx-growth-next">还需 1,580 升至 Lv.20</span>
           </div>
           <div class="lvx-growth-bar"><div class="lvx-growth-fill" style="width:47.3%"></div></div>
+          <div class="lvx-reward-hero lvx-growth-reward" onclick="showMatrixToast('打赏记录实时计入成长值，1 钻 = 1 成长值')">
+            <div class="lvx-reward-left">
+              <div class="lvx-reward-name-row">
+                <span class="lvx-reward-name">🎁 打赏贡献</span>
+                <span class="lvx-reward-badge">核心驱动</span>
+              </div>
+              <div class="lvx-reward-rule"><span>⚡</span> 1 钻 = 1 成长值 · 不设上限</div>
+            </div>
+            <div class="lvx-reward-val">+420</div>
+          </div>
+          <div class="lvx-daily-head"><span>今日活跃</span><span><b>62</b> / 100</span></div>
+          <div class="lvx-daily">
+            <div class="lvx-pill is-capped"><span>登录</span><em>已达上限 ✓</em></div>
+            <div class="lvx-pill"><span>发布</span><em>+30/60</em></div>
+            <div class="lvx-pill"><span>点赞评论</span><em>+12/20</em></div>
+          </div>
         </div>
         <!-- 阶段大进度轴 -->
         <div class="lvx-stepper" id="level-stepper-track" data-od-id="level-stage-stepper">
@@ -5676,7 +5697,6 @@
       </div>
       </div>
 
-      <div class="level-scroll-body lvx-body">
         <!-- 称号卡片：左右滑动 -->
         <div class="lvx-cards-wrap" data-od-id="level-title-cards">
           <div class="lvx-cards" id="level-hero-carousel">
@@ -5793,33 +5813,6 @@
             <div class="lvx-card-foot"><span>🎁</span> 达到 Lv.70 解锁</div>
           </div>
         </div>
-
-        <!-- 成长值来源 -->
-        <section class="lvx-block" data-od-id="level-growth-sources">
-          <div class="lvx-block-head">
-            <div class="lvx-block-title-wrap">
-              <span class="lvx-block-icon">⚡</span>
-              <span class="lvx-block-title">成长值来源</span>
-            </div>
-            <span class="lvx-block-sub">新体系上线起算</span>
-          </div>
-          <div class="lvx-reward-hero" onclick="showMatrixToast('打赏记录实时计入成长值，1 钻 = 1 成长值')">
-            <div class="lvx-reward-left">
-              <div class="lvx-reward-name-row">
-                <span class="lvx-reward-name">🎁 打赏贡献</span>
-                <span class="lvx-reward-badge">核心驱动</span>
-              </div>
-              <div class="lvx-reward-rule"><span>⚡</span> 1 钻 = 1 成长值 · 不设上限</div>
-            </div>
-            <div class="lvx-reward-val">+420</div>
-          </div>
-          <div class="lvx-daily-head"><span>今日活跃</span><span><b>62</b> / 100</span></div>
-          <div class="lvx-daily">
-            <div class="lvx-pill is-capped"><span>登录</span><em>已达上限 ✓</em></div>
-            <div class="lvx-pill"><span>发布</span><em>+30/60</em></div>
-            <div class="lvx-pill"><span>点赞评论</span><em>+12/20</em></div>
-          </div>
-        </section>
 
         <!-- 装饰权益 -->
         <section class="lvx-block" data-od-id="level-decor-perks">
@@ -6020,30 +6013,31 @@
         </div>
       </div>
 
-      <!-- 用户等级对比与专属权益展示半屏抽屉 (User Level Profile Modal) -->
-      <div class="user-level-drawer-backdrop" id="user-level-modal" onclick="closeUserLevelDrawer(event)">
-        <div class="user-level-drawer" onclick="event.stopPropagation()">
-          <div class="user-level-drawer-handle"></div>
-          <div class="user-level-drawer-header">
-            <div class="user-level-drawer-title-wrap">
-              <span style="font-size:16px;">👑</span>
-              <span class="user-level-drawer-title">用户等级与专属权益</span>
-            </div>
-            <div class="user-level-drawer-close" onclick="closeUserLevelDrawer()">×</div>
+    </div><!-- /screen-level -->
+    </div><!-- 闭合 screen-level，半屏挂在 device-shell 下才能在各页面弹出 -->
+
+    <!-- 用户等级对比与专属权益展示半屏抽屉 (User Level Profile Modal) -->
+    <div class="user-level-drawer-backdrop" id="user-level-modal" onclick="closeUserLevelDrawer(event)">
+      <div class="user-level-drawer" onclick="event.stopPropagation()">
+        <div class="user-level-drawer-handle"></div>
+        <div class="user-level-drawer-header">
+          <div class="user-level-drawer-title-wrap">
+            <span style="font-size:16px;">👑</span>
+            <span class="user-level-drawer-title">用户等级与专属权益</span>
           </div>
-          <div class="user-level-drawer-body" id="user-level-drawer-body">
-            <!-- 动态填充内容：目标用户卡、我的差距、TA的特权清单 -->
+          <div class="user-level-drawer-close" onclick="closeUserLevelDrawer()">×</div>
+        </div>
+        <div class="user-level-drawer-body" id="user-level-drawer-body">
+          <!-- 动态填充内容：目标用户卡、我的差距、TA的特权清单 -->
+        </div>
+        <div class="user-level-drawer-footer">
+          <div class="drawer-footer-tip">
+            <span>⚡</span><span>我的等级：<strong>Lv.14 偶遇知音</strong></span>
           </div>
-          <div class="user-level-drawer-footer">
-            <div class="drawer-footer-tip">
-              <span>⚡</span><span>我的等级：<strong>Lv.14 偶遇知音</strong></span>
-            </div>
-            <button class="drawer-footer-btn" onclick="goToLevelCenterFromDrawer()">前往等级中心 ›</button>
-          </div>
+          <button class="drawer-footer-btn" onclick="goToLevelCenterFromDrawer()">前往等级中心 ›</button>
         </div>
       </div>
-
-    </div><!-- /screen-level -->
+    </div>
 
   </div><!-- /device-shell -->
 
@@ -6944,13 +6938,26 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
 
     const tier = getTierByLevel(targetLevel);
     const diff = targetLevel - MY_CURRENT_LEVEL;
-    
+    // 个人页点自己的等级：不做"与自己对比"，改为展示我的成长进度
+    const isSelf = roleName === '我本人';
+
     // 1. 差距状态文案与样式
     let gapTagHtml = '';
     let gapTipText = '';
     let gapProgressWidth = '50%';
+    let gapTitleText = '等级梯队对比';
+    let gapLeftNode = `我 (Lv.${MY_CURRENT_LEVEL})`;
+    let gapRightNode = `${userName} (Lv.${targetLevel})`;
 
-    if (diff > 0) {
+    if (isSelf) {
+      const nextTier = LEVEL_TIERS[Math.min(tier.tierIdx + 1, LEVEL_TIERS.length - 1)];
+      gapTitleText = '我的成长进度';
+      gapTagHtml = `<span class="level-gap-status-tag behind">还需 1,580 升至 Lv.${nextTier.min}</span>`;
+      gapTipText = `当前成长值 <strong>1,420 / 3,000</strong>，升至 <strong>Lv.${nextTier.min} ${nextTier.title}</strong> 即可解锁下一阶段装扮与权益。`;
+      gapProgressWidth = '47.3%';
+      gapLeftNode = `Lv.${MY_CURRENT_LEVEL} ${tier.title}`;
+      gapRightNode = `Lv.${nextTier.min} ${nextTier.title}`;
+    } else if (diff > 0) {
       gapTagHtml = `<span class="level-gap-status-tag behind">距离TA还差 ${diff} 级</span>`;
       gapTipText = `您当前为 <strong>Lv.${MY_CURRENT_LEVEL} ${MY_CURRENT_TIER_TITLE}</strong>，距离 ${userName} 的 <strong>Lv.${targetLevel} ${tier.title}</strong> 还差 <strong>${diff} 级</strong>。通过大舞台打赏赠礼与日常发布互动可快速追赶！`;
       const ratio = Math.min(100, Math.max(15, Math.round((MY_CURRENT_LEVEL / targetLevel) * 100)));
@@ -7016,14 +7023,14 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
       <div class="level-gap-comparison-card">
         <div class="level-gap-header">
           <div class="level-gap-title">
-            <span>🎯</span> 等级梯队对比
+            <span>🎯</span> ${gapTitleText}
           </div>
           ${gapTagHtml}
         </div>
         <div class="level-gap-progress-wrap">
           <div class="level-gap-nodes-row">
-            <span>我 (Lv.${MY_CURRENT_LEVEL})</span>
-            <span>${userName} (Lv.${targetLevel})</span>
+            <span>${gapLeftNode}</span>
+            <span>${gapRightNode}</span>
           </div>
           <div class="level-gap-track">
             <div class="level-gap-bar" style="width: ${gapProgressWidth};"></div>
