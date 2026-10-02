@@ -3681,64 +3681,202 @@
     z-index: 1;
   }
 
-  /* 今日活跃任务 */
+  /* 今日活跃分值与成长指引 (无任务字样) */
+  .lvx-daily-box {
+    margin-top: 14px;
+    padding: 11px 12px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.028);
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .lvx-daily-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 14px 0 8px;
+    color: rgba(255, 255, 255, 0.65);
+    padding-bottom: 3px;
   }
-  .lvx-daily-head b {
+  .lvx-daily-head-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lvx-daily-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f3f4f6;
+    letter-spacing: -0.01em;
+  }
+  .lvx-daily-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .lvx-daily-head-right {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-body);
+  }
+  .lvx-daily-head-right b {
     color: #ffd21e;
     font-family: var(--font-mono);
     font-weight: 700;
+    font-size: 13px;
   }
-  .lvx-daily {
-    display: flex;
-    gap: 8px;
-  }
-  .lvx-pill {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 9px 10px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 160ms ease;
-  }
-  .lvx-pill:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-  .lvx-pill span {
-    font-size: 12px;
-    font-weight: 500;
-    color: #e5e7eb;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .lvx-pill em {
+  .lvx-daily-head-right em {
     font-style: normal;
     font-family: var(--font-mono);
-    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .lvx-daily-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lvx-act-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 140ms ease;
+  }
+  .lvx-act-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .lvx-act-row.is-done {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%);
+    border-color: rgba(16, 185, 129, 0.22);
+  }
+  .lvx-act-left {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+  .lvx-act-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .lvx-act-row.is-done .lvx-act-icon {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  .lvx-act-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .lvx-act-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lvx-act-name {
+    font-size: 12px;
     font-weight: 600;
+    color: #e5e7eb;
+  }
+  .lvx-act-guide {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lvx-act-guide span.highlight {
+    color: #ffd21e;
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+  .lvx-act-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .lvx-act-score {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+  .lvx-act-score-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
     color: #ffd21e;
   }
-  .lvx-pill.is-capped {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.04) 100%);
-    border-color: rgba(16, 185, 129, 0.35);
-  }
-  .lvx-pill.is-capped em {
+  .lvx-act-row.is-done .lvx-act-score-val {
     color: #34d399;
+  }
+  .lvx-act-score-cap {
+    font-size: 9.5px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: var(--font-mono);
+  }
+  .lvx-act-btn {
+    border: none;
+    outline: none;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 140ms ease;
+    white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 2px;
+  }
+  .lvx-act-btn.btn-action {
+    background: #ffd21e;
+    color: #0d1117;
+    box-shadow: 0 2px 8px rgba(255, 210, 30, 0.25);
+  }
+  .lvx-act-btn.btn-action:hover {
+    background: #f59e0b;
+    transform: translateY(-1px);
+  }
+  .lvx-act-btn.btn-action:active {
+    transform: translateY(0);
+  }
+  .lvx-act-btn.btn-done {
+    background: rgba(16, 185, 129, 0.16);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    cursor: default;
+  }
+  .lvx-act-btn.btn-sub {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f3f4f6;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .lvx-act-btn.btn-sub:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
   }
 
   /* ═══ 装饰权益 2 列视觉卡片网格 ═══ */
@@ -5644,57 +5782,101 @@
             </div>
             <div class="lvx-reward-val">+420</div>
           </div>
-          <div class="lvx-daily-head"><span>今日活跃</span><span><b>62</b> / 100</span></div>
-          <div class="lvx-daily">
-            <div class="lvx-pill is-capped"><span>登录</span><em>已达上限 ✓</em></div>
-            <div class="lvx-pill"><span>发布</span><em>+30/60</em></div>
-            <div class="lvx-pill"><span>点赞评论</span><em>+12/20</em></div>
+          <!-- 今日活跃明细与互动引导 (上限100分，无任务字样) -->
+          <div class="lvx-daily-box" data-od-id="level-daily-activity-box">
+            <div class="lvx-daily-head">
+              <div class="lvx-daily-head-left">
+                <span class="lvx-daily-title">今日活跃成长</span>
+                <span class="lvx-daily-tag">每日重置</span>
+              </div>
+              <div class="lvx-daily-head-right">
+                今日已获 <b>62</b> <em>/ 100 分</em>
+              </div>
+            </div>
+            <div class="lvx-daily-list">
+              <!-- 1. 登录 -->
+              <div class="lvx-act-row is-done" id="act-row-login">
+                <div class="lvx-act-left">
+                  <div class="lvx-act-icon">📱</div>
+                  <div class="lvx-act-info">
+                    <div class="lvx-act-name-row">
+                      <span class="lvx-act-name">每日登录</span>
+                    </div>
+                    <div class="lvx-act-guide">已完成今日登录 · 进度 1/1 次</div>
+                  </div>
+                </div>
+                <div class="lvx-act-right">
+                  <div class="lvx-act-score">
+                    <span class="lvx-act-score-val">+20</span>
+                    <span class="lvx-act-score-cap">上限 20分</span>
+                  </div>
+                  <button class="lvx-act-btn btn-done" onclick="handleDailyAction('login')">已达成 ✓</button>
+                </div>
+              </div>
+
+              <!-- 2. 发布内容 -->
+              <div class="lvx-act-row" id="act-row-publish">
+                <div class="lvx-act-left">
+                  <div class="lvx-act-icon">📝</div>
+                  <div class="lvx-act-info">
+                    <div class="lvx-act-name-row">
+                      <span class="lvx-act-name">发布内容</span>
+                    </div>
+                    <div class="lvx-act-guide">每次 +30分 · 今日还需发 <span class="highlight">1</span> 条达满分 (1/2)</div>
+                  </div>
+                </div>
+                <div class="lvx-act-right">
+                  <div class="lvx-act-score">
+                    <span class="lvx-act-score-val">+30</span>
+                    <span class="lvx-act-score-cap">上限 60分</span>
+                  </div>
+                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('publish')">去发布 ›</button>
+                </div>
+              </div>
+
+              <!-- 3. 点赞互动 -->
+              <div class="lvx-act-row" id="act-row-like">
+                <div class="lvx-act-left">
+                  <div class="lvx-act-icon">❤️</div>
+                  <div class="lvx-act-info">
+                    <div class="lvx-act-name-row">
+                      <span class="lvx-act-name">点赞互动</span>
+                    </div>
+                    <div class="lvx-act-guide">每次 +2分 · 今日还需赞 <span class="highlight">2</span> 次达满分 (4/6)</div>
+                  </div>
+                </div>
+                <div class="lvx-act-right">
+                  <div class="lvx-act-score">
+                    <span class="lvx-act-score-val">+8</span>
+                    <span class="lvx-act-score-cap">上限 12分</span>
+                  </div>
+                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('like')">去点赞 ›</button>
+                </div>
+              </div>
+
+              <!-- 4. 发表评论 -->
+              <div class="lvx-act-row" id="act-row-comment">
+                <div class="lvx-act-left">
+                  <div class="lvx-act-icon">💬</div>
+                  <div class="lvx-act-info">
+                    <div class="lvx-act-name-row">
+                      <span class="lvx-act-name">发表评论</span>
+                    </div>
+                    <div class="lvx-act-guide">每次 +2分 · 今日还需评 <span class="highlight">2</span> 条达满分 (2/4)</div>
+                  </div>
+                </div>
+                <div class="lvx-act-right">
+                  <div class="lvx-act-score">
+                    <span class="lvx-act-score-val">+4</span>
+                    <span class="lvx-act-score-cap">上限 8分</span>
+                  </div>
+                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('comment')">去评论 ›</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <!-- 阶段大进度轴 -->
-        <div class="lvx-stepper" id="level-stepper-track" data-od-id="level-stage-stepper">
-        <div class="lvx-step-line"><div class="lvx-step-line-fill" style="width:14.285714285714285%"></div></div>
-        <button class="lvx-step achieved " onclick="switchLevelTier(0, true)" aria-label="初来乍到 Lv.1 – 9">
-          <span class="lvx-step-dot">🌱</span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.1</span>
-        </button>
-        <button class="lvx-step current viewing" onclick="switchLevelTier(1, true)" aria-label="偶遇知音 Lv.10 – 19">
-          <span class="lvx-step-dot">🎵</span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.10</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(2, true)" aria-label="赏金乐人 Lv.20 – 29">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.20</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(3, true)" aria-label="拾金伯爵 Lv.30 – 39">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.30</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(4, true)" aria-label="璀璨公爵 Lv.40 – 49">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.40</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(5, true)" aria-label="旷世王爵 Lv.50 – 59">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.50</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(6, true)" aria-label="圣殿庇护者 Lv.60 – 69">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.60</span>
-        </button>
-        <button class="lvx-step locked " onclick="switchLevelTier(7, true)" aria-label="不朽缔造者 Lv.70">
-          <span class="lvx-step-dot"></span>
-          <span class="lvx-step-indicator"></span>
-          <span class="lvx-step-lv">Lv.70</span>
-        </button>
-      </div>
+
       </div>
 
         <!-- 称号卡片：左右滑动 -->
@@ -6007,7 +6189,7 @@
 
             <div class="rule-block">
               <div class="rule-block-title">六、附则与最终解释权</div>
-              <div>社区将根据平台发展与用户反馈适时优化等级任务与特权配置，相关变更将提前进行公告。规则最终解释权归平台运营团队所有。</div>
+              <div>社区将根据平台发展与用户反馈适时优化等级成长机制与特权配置，相关变更将提前进行公告。规则最终解释权归平台运营团队所有。</div>
             </div>
           </div>
         </div>
@@ -6054,6 +6236,36 @@
   function closeLevelRulesModal(e) {
     const modal = document.getElementById('level-rules-modal');
     if (modal) modal.classList.remove('open');
+  }
+
+  
+  // 活跃行为引导互动处理
+  function handleDailyAction(type) {
+    if (type === 'login') {
+      showMatrixToast('今日登录奖励已达上限 (+20分)，明日 00:00 重置');
+      return;
+    }
+    if (type === 'publish') {
+      showMatrixToast('跳转至内容发布器，今日再发布 1 条即可斩获 +30 分');
+      setTimeout(() => {
+        // 可选快捷模拟切换或者提示
+      }, 400);
+      return;
+    }
+    if (type === 'like') {
+      showMatrixToast('正在前往推荐流，点赞优质内容每次 +2 分');
+      setTimeout(() => {
+        switchPage('feed');
+      }, 600);
+      return;
+    }
+    if (type === 'comment') {
+      showMatrixToast('正在前往推荐流，参与讨论每次 +2 分');
+      setTimeout(() => {
+        switchPage('feed');
+      }, 600);
+      return;
+    }
   }
 
   function goBackFromLevel() {
