@@ -2561,6 +2561,308 @@
   }
 
 
+  
+  
+  /* ═══════════════════════════════════════════════════════════════════
+   * 高价值礼物等级解锁限制体系（大舞台 & Feed 首页通用）
+   * ═══════════════════════════════════════════════════════════════════ */
+  
+  /* Feed 首页礼物卡片锁定与解锁样式 */
+  #screen-feed .gift-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 160ms ease;
+  }
+  #screen-feed .gift-card.is-locked {
+    opacity: 0.72;
+    background: rgba(15, 23, 42, 0.45);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  #screen-feed .gift-card.is-locked:hover {
+    opacity: 0.92;
+    border-color: rgba(251, 191, 36, 0.35);
+    background: rgba(30, 27, 75, 0.4);
+  }
+  #screen-feed .gift-card.is-locked .gift-icon {
+    filter: grayscale(0.2) contrast(0.9);
+  }
+  /* 等级锁定右上角角标 */
+  #screen-feed .gift-lock-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.88);
+    border: 0.5px solid rgba(251, 191, 36, 0.6);
+    color: #fbbf24;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 1.5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    z-index: 2;
+  }
+  #screen-feed .gift-lock-badge .lock-icon {
+    font-size: 7.5px;
+  }
+  /* 解锁等级专属底标（替代价格或在价格下方） */
+  #screen-feed .gift-lock-hint {
+    font-size: 8.5px;
+    color: #f59e0b;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-top: -2px;
+  }
+
+  /* 大舞台礼物打赏弹层 (stage-gift-sheet) 样式 */
+  #screen-stage .stage-gift-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 80;
+    display: none;
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  #screen-stage .stage-gift-sheet-backdrop.open {
+    display: block;
+    opacity: 1;
+  }
+  #screen-stage .stage-gift-sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    max-height: 82%;
+    background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    border-radius: 20px 20px 0 0;
+    z-index: 85;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 18px 24px;
+    box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.22);
+    transform: translateY(100%);
+    transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #screen-stage .stage-gift-sheet-backdrop.open .stage-gift-sheet {
+    transform: translateY(0);
+  }
+  #screen-stage .stage-gift-sheet .reward-handle {
+    width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 12px; flex-shrink: 0;
+  }
+  #screen-stage .stage-gift-sheet .reward-head {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;
+  }
+  #screen-stage .stage-gift-sheet .reward-title {
+    font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--fg);
+  }
+  #screen-stage .stage-gift-sheet .reward-target {
+    font-family: var(--font-body); font-size: 11.5px; color: var(--muted); margin-top: 2px;
+  }
+  #screen-stage .stage-gift-sheet .reward-close {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--border-soft); color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; transition: all 120ms ease;
+  }
+  #screen-stage .stage-gift-sheet .reward-close:hover {
+    background: var(--border); color: var(--fg);
+  }
+  
+  /* 大舞台礼物卡片锁定与等级徽标 */
+  #screen-stage .reward-gift-chip {
+    position: relative;
+    overflow: hidden;
+    transition: all 150ms ease;
+  }
+  #screen-stage .reward-gift-chip.is-locked {
+    opacity: 0.68;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  #screen-stage .reward-gift-chip.is-locked:hover {
+    opacity: 0.92;
+    border-color: #f59e0b;
+    background: #fffbeb;
+  }
+  #screen-stage .reward-gift-chip .gift-lock-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 1px 3.5px;
+    border-radius: 3px;
+    background: #1e293b;
+    border: 0.5px solid #d97706;
+    color: #f59e0b;
+    font-family: var(--font-mono);
+    font-size: 7.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  #screen-stage .reward-gift-chip .gift-lock-badge .lock-icon {
+    font-size: 7px;
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * 大舞台全员广播条系统 (Lv.70极峰荣耀全员广播)
+   * ═══════════════════════════════════════════════════════════════════ */
+  #screen-stage .stage-broadcast-wrap {
+    padding: 12px 14px 6px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+  }
+  #screen-stage .stage-broadcast-bar {
+    width: 100%;
+    max-width: 348px;
+    height: 38px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(26, 20, 48, 0.95) 0%, rgba(38, 25, 20, 0.95) 50%, rgba(20, 24, 45, 0.95) 100%);
+    border: 1.5px solid rgba(251, 191, 36, 0.7);
+    box-shadow: 
+      0 4px 18px rgba(0, 0, 0, 0.4),
+      0 0 16px rgba(251, 191, 36, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 8px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 140ms ease, box-shadow 140ms ease;
+  }
+  #screen-stage .stage-broadcast-bar:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 6px 22px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(251, 191, 36, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  #screen-stage .stage-broadcast-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: broadcastShimmer 3.5s infinite;
+    pointer-events: none;
+  }
+  @keyframes broadcastShimmer {
+    0% { transform: translateX(-100%); }
+    40%, 100% { transform: translateX(100%); }
+  }
+
+  /* 左侧徽章 / 喇叭标签 */
+  #screen-stage .stage-broadcast-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #0f172a;
+    padding: 2px 7px 2px 6px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    margin-right: 8px;
+  }
+  #screen-stage .stage-broadcast-tag .tag-ic {
+    font-size: 11px;
+    line-height: 1;
+    animation: broadcastBell 2s infinite ease-in-out;
+  }
+  @keyframes broadcastBell {
+    0%, 100% { transform: rotate(0); }
+    15% { transform: rotate(14deg); }
+    30% { transform: rotate(-12deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(0); }
+  }
+
+  /* 轮播滚动承载视窗 */
+  #screen-stage .stage-broadcast-viewport {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  #screen-stage .stage-broadcast-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 450ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  #screen-stage .stage-broadcast-item {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #screen-stage .stage-broadcast-item .bc-user {
+    font-weight: 700;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  #screen-stage .stage-broadcast-item .bc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 5px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #fbbf24 0%, #ec4899 50%, #8b5cf6 100%);
+    color: #ffffff;
+    font-size: 8.5px;
+    font-weight: 800;
+    line-height: 1.35;
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 6px rgba(236, 72, 153, 0.4);
+  }
+  #screen-stage .stage-broadcast-item .bc-text {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  #screen-stage .stage-broadcast-item .bc-highlight {
+    color: #ffd21e;
+    font-weight: 700;
+  }
+  #screen-stage .stage-broadcast-item .bc-crest {
+    font-size: 12px;
+    line-height: 1;
+    margin-left: 2px;
+  }
+
+  /* 右侧箭头 */
+  #screen-stage .stage-broadcast-arrow {
+    font-size: 14px;
+    color: rgba(255, 210, 30, 0.8);
+    margin-left: 4px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+
   /* 大舞台动态作者双等级适配样式（我们等级在前，宿主APP等级在后） */
   #screen-stage .moment-name-row {
     display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
@@ -2619,6 +2921,150 @@
     background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
     color: #ffffff;
   }
+  
+  /* ═══════════════════════════════════════════════════════════════════
+   * 70级尊贵评论气泡系统 (参照高阶用户特权设计 - image-37.png)
+   * ═══════════════════════════════════════════════════════════════════ */
+  
+  /* 尊贵头像光环与羽翼挂件 */
+  .vip-avatar-wrap {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vip-avatar-wrap .comment-avatar,
+  .vip-avatar-wrap .ad-comment-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    border: 1.5px solid #ffd21e;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  .vip-avatar-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #ffd21e, #f43f5e, #c084fc, #38bdf8, #ffd21e);
+    z-index: 1;
+    animation: vipRingRotate 4s linear infinite;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+  }
+  .vip-avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: 1.5px;
+    background: #0f172a;
+    border-radius: 50%;
+  }
+  .vip-avatar-crest {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-size: 11px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  }
+  @keyframes vipRingRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* 70级极光星辉徽章 */
+  .comment-level-badge.lv70 {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 35%, #ec4899 70%, #8b5cf6 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    padding: 1px 7px !important;
+  }
+  .comment-level-badge.lv70 .badge-ic {
+    font-size: 9px !important;
+    margin-right: 1px;
+    filter: drop-shadow(0 0 4px #fff);
+  }
+
+  /* 气泡卡片容器 */
+  .vip-comment-bubble-wrap {
+    position: relative;
+    margin-top: 5px;
+    margin-bottom: 2px;
+  }
+  .vip-comment-bubble {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 245, 248, 0.94) 0%, rgba(245, 243, 255, 0.92) 50%, rgba(254, 249, 195, 0.92) 100%);
+    border: 1.5px solid rgba(251, 191, 36, 0.6);
+    border-radius: 12px;
+    padding: 9px 14px 10px;
+    color: #1e1b4b; /* 高级深紫灰墨水色，还原截图深色文本 */
+    font-size: 13px;
+    line-height: 1.55;
+    font-weight: 500;
+    box-shadow: 0 4px 18px rgba(251, 191, 36, 0.18), 0 2px 8px rgba(0, 0, 0, 0.35);
+    overflow: visible;
+  }
+  .vip-comment-bubble .bubble-text {
+    position: relative;
+    z-index: 2;
+    color: #18181b;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  /* 对话气泡小尖角（左上指向头像） */
+  .vip-comment-bubble::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    width: 10px;
+    height: 10px;
+    background: #fff5f8;
+    border-top: 1.5px solid rgba(251, 191, 36, 0.6);
+    border-left: 1.5px solid rgba(251, 191, 36, 0.6);
+    transform: rotate(45deg);
+    z-index: 1;
+  }
+
+  /* 气泡右上角徽翼宝石饰件 (精确对标截图右上角羽翼皇冠) */
+  .vip-bubble-crest-topright {
+    position: absolute;
+    top: -11px;
+    right: -7px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.6));
+    pointer-events: none;
+    transform: scale(1.05);
+  }
+  
+  /* 气泡右下角徽翼宝石饰件 (精确对标截图右下角羽翼皇冠) */
+  .vip-bubble-crest-bottomright {
+    position: absolute;
+    bottom: -11px;
+    right: -7px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.6));
+    pointer-events: none;
+    transform: scale(1.05);
+  }
+
   #screen-feed .comment-level-badge .badge-ic {
     font-size: 8px; line-height: 1;
   }
@@ -4726,7 +5172,47 @@
         
       </div>
 
-
+      <!-- 顶部全员广播条：位于个人展示区下方、动态流卡片上方，支持多条平滑轮播（支持恭喜升为70级等） -->
+      <div class="stage-broadcast-wrap" data-od-id="stage-global-broadcast-bar">
+        <div class="stage-broadcast-bar" onclick="handleStageBroadcastClick()" title="点击查看升级荣誉与等级特权">
+          <div class="stage-broadcast-tag">
+            <span class="tag-ic">📢</span>
+            <span>全员广播</span>
+          </div>
+          <div class="stage-broadcast-viewport">
+            <div class="stage-broadcast-track" id="stage-broadcast-track">
+              <!-- 条目1：核心焦点 恭喜升级为70级不朽缔造者 -->
+              <div class="stage-broadcast-item" data-level="70" data-user="赛博探索者" data-role="不朽缔造者">
+                <span class="bc-user">
+                  <span>赛博探索者</span>
+                  <span class="bc-badge">🌌 Lv.70</span>
+                </span>
+                <span class="bc-text">荣登极峰！恭喜达成最高等级 <span class="bc-highlight">Lv.70「不朽缔造者」</span></span>
+                <span class="bc-crest">👑</span>
+              </div>
+              <!-- 条目2：更多高阶承载 恭喜神豪玩家达成Lv.70 -->
+              <div class="stage-broadcast-item" data-level="70" data-user="星河领航员" data-role="不朽缔造者">
+                <span class="bc-user">
+                  <span>星河领航员</span>
+                  <span class="bc-badge">🌌 Lv.70</span>
+                </span>
+                <span class="bc-text">全服盛典！恭喜晋升 <span class="bc-highlight">Lv.70「不朽缔造者」</span>，尊享全员广播</span>
+                <span class="bc-crest">✨</span>
+              </div>
+              <!-- 条目3：高阶圣殿庇护者 Lv.69 破阶冲刺 -->
+              <div class="stage-broadcast-item" data-level="69" data-user="极光战神" data-role="圣殿庇护者">
+                <span class="bc-user">
+                  <span>极光战神</span>
+                  <span class="bc-badge" style="background:linear-gradient(135deg,#ef4444,#f59e0b);">🛡️ Lv.69</span>
+                </span>
+                <span class="bc-text">突破极限！恭喜达成 <span class="bc-highlight">Lv.69「圣殿庇护者」</span>，距不朽仅一步</span>
+                <span class="bc-crest">🔥</span>
+              </div>
+            </div>
+          </div>
+          <div class="stage-broadcast-arrow">›</div>
+        </div>
+      </div>
 
       <!-- 大舞台动态流 -->
         <div class="moment-list">
@@ -4755,7 +5241,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item liked" onclick="toggleMomentLike(this, 46)"><span class="ic">❤</span><span class="lbl">已赞 46</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 7</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4800,7 +5286,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 212)"><span class="ic">♡</span><span class="lbl">点赞 212</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 23</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4843,7 +5329,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 68)"><span class="ic">♡</span><span class="lbl">点赞 68</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4883,7 +5369,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 34)"><span class="ic">♡</span><span class="lbl">点赞 34</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 2</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4922,7 +5408,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 127)"><span class="ic">♡</span><span class="lbl">点赞 127</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 15</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4963,7 +5449,7 @@
                 <div class="moment-popover">
                   <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 0)"><span class="ic">♡</span><span class="lbl">点赞 0</span></div>
                   <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 0</span></div>
-                  <div class="moment-popover-item reward-item"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
+                  <div class="moment-popover-item reward-item" onclick="openStageGiftSheet(this)"><span class="ic">🎁</span><span class="lbl">打赏</span></div>
                 </div>
               </div>
             </div>
@@ -4975,6 +5461,93 @@
 
 
       </div><!-- /square-page-scroll -->
+
+      <!-- 大舞台独立选择礼物打赏半屏弹层 (带等级限制体系) -->
+      <div class="stage-gift-sheet-backdrop" id="stage-gift-modal" onclick="closeStageGiftSheet(event)">
+        <div class="stage-gift-sheet" onclick="event.stopPropagation()">
+          <div class="reward-handle"></div>
+          <div class="reward-head">
+            <div>
+              <div class="reward-title">打赏给 <span id="stage-gift-target-name">阿伟</span></div>
+              <div class="reward-target">选择一款虚拟礼物打赏，对方会收到礼物提醒</div>
+            </div>
+            <div class="reward-close" onclick="closeStageGiftSheet()">×</div>
+          </div>
+
+          <!-- 礼物类目 Tab -->
+          <div class="reward-category-tabs">
+            <div class="reward-category-tab active" data-category="stage-gifts-popular" onclick="setStageGiftTab(this, 'stage-gifts-popular')">推荐</div>
+            <div class="reward-category-tab" data-category="stage-gifts-luxury" onclick="setStageGiftTab(this, 'stage-gifts-luxury')">奢华</div>
+            <div class="reward-category-tab" data-category="stage-gifts-festival" onclick="setStageGiftTab(this, 'stage-gifts-festival')">节日</div>
+          </div>
+
+          <div class="reward-gifts-wrap">
+            <div class="reward-gifts-scroll">
+              <!-- 推荐类目 -->
+              <div class="reward-gifts active" data-gift-category="stage-gifts-popular">
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🌹</span><span class="gift-label">玫瑰</span><span class="gift-price">¥1</span></div>
+                <div class="reward-gift-chip selected" onclick="selectStageGift(this)"><span class="gift-icon">🎈</span><span class="gift-label">气球</span><span class="gift-price">¥3</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🧸</span><span class="gift-label">玩偶</span><span class="gift-price">¥5</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🍰</span><span class="gift-label">蛋糕</span><span class="gift-price">¥6</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🎉</span><span class="gift-label">派对</span><span class="gift-price">¥8</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🎊</span><span class="gift-label">彩带</span><span class="gift-price">¥12</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🧧</span><span class="gift-label">红包</span><span class="gift-price">¥15</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🚀</span><span class="gift-label">火箭</span><span class="gift-price">¥18</span></div>
+                <!-- 等级限制高价值礼物 -->
+                <div class="reward-gift-chip is-locked" data-min-level="20" data-tier-name="赏金乐人" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.20</span>
+                  <span class="gift-icon">🎀</span><span class="gift-label">丝带</span><span class="gift-price">¥22</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="30" data-tier-name="拾金伯爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.30</span>
+                  <span class="gift-icon">💎</span><span class="gift-label">钻戒</span><span class="gift-price">¥28</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="40" data-tier-name="璀璨公爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.40</span>
+                  <span class="gift-icon">🎆</span><span class="gift-label">烟花</span><span class="gift-price">¥38</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="50" data-tier-name="旷世王爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.50</span>
+                  <span class="gift-icon">👑</span><span class="gift-label">皇冠</span><span class="gift-price">¥52</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="70" data-tier-name="不朽缔造者" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.70</span>
+                  <span class="gift-icon">🏰</span><span class="gift-label">城堡</span><span class="gift-price">¥99</span>
+                </div>
+              </div>
+              <!-- 奢华类目 -->
+              <div class="reward-gifts" data-gift-category="stage-gifts-luxury">
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🚀</span><span class="gift-label">火箭</span><span class="gift-price">¥18</span></div>
+                <div class="reward-gift-chip is-locked" data-min-level="30" data-tier-name="拾金伯爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.30</span>
+                  <span class="gift-icon">💎</span><span class="gift-label">钻戒</span><span class="gift-price">¥28</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="50" data-tier-name="旷世王爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.50</span>
+                  <span class="gift-icon">👑</span><span class="gift-label">皇冠</span><span class="gift-price">¥52</span>
+                </div>
+                <div class="reward-gift-chip is-locked" data-min-level="70" data-tier-name="不朽缔造者" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.70</span>
+                  <span class="gift-icon">🏰</span><span class="gift-label">城堡</span><span class="gift-price">¥99</span>
+                </div>
+              </div>
+              <!-- 节日类目 -->
+              <div class="reward-gifts" data-gift-category="stage-gifts-festival">
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🎉</span><span class="gift-label">派对</span><span class="gift-price">¥8</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🧧</span><span class="gift-label">红包</span><span class="gift-price">¥15</span></div>
+                <div class="reward-gift-chip" onclick="selectStageGift(this)"><span class="gift-icon">🎊</span><span class="gift-label">彩带</span><span class="gift-price">¥12</span></div>
+                <div class="reward-gift-chip is-locked" data-min-level="40" data-tier-name="璀璨公爵" onclick="selectStageGift(this)">
+                  <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.40</span>
+                  <span class="gift-icon">🎆</span><span class="gift-label">烟花</span><span class="gift-price">¥38</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="reward-confirm" onclick="confirmStageGift()"><span>赠送</span> <span id="stage-gift-confirm-name">气球 (¥3)</span></button>
+        </div>
+      </div>
+
 
       <!-- 底Bar：视频/图文/内容发布/大舞台/我的（大舞台为当前态） -->
       <div class="mp-tabbar">
@@ -5080,11 +5653,113 @@
                   <div class="compose-input" id="ad-compose-input">留下你的想法吧…</div>
                 </div>
 
-                <div class="ad-comment-item">
-                  <div class="ad-comment-avatar"></div>
+                <div class="ad-comment-item is-vip-bubble">
+                  <div class="vip-avatar-wrap">
+                    <div class="vip-avatar-ring"></div>
+                    <div class="ad-comment-avatar" style="background-image:url('assets/hifi/photo_cat.jpg'); background-size:cover; background-position:center;"></div>
+                    <div class="vip-avatar-crest">💎</div>
+                  </div>
                   <div class="ad-comment-body">
-                    <div class="ad-comment-name"><span>用户昵称_01</span><span class="comment-level-badge" onclick="openUserLevelDrawer(12, '用户昵称_01', '💬', '互动活跃用户')" style="cursor:pointer;" title="点击查看用户等级与特权对比"><span class="badge-ic">⚡</span>Lv.12</span></div>
-                    <div class="ad-comment-text">这个内容太好了，正是我想要的！</div>
+                    <div class="ad-comment-name">
+                      <span>赛博探索者</span>
+                      <span class="comment-level-badge lv70" onclick="openUserLevelDrawer(70, '赛博探索者', 'assets/hifi/photo_cat.jpg', '不朽缔造者')" style="cursor:pointer;" title="最高荣誉：Lv.70 不朽缔造者（点击查看尊属特权）">
+                        <span class="badge-ic">🌌</span>Lv.70
+                      </span>
+                    </div>
+                    <!-- 尊贵专属对话气泡 (带羽翼双角挂件装饰) -->
+                    <div class="vip-comment-bubble-wrap">
+                      <div class="vip-bubble-crest-topright"><svg width="34" height="22" viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左羽翼 -->
+  <path d="M12 11C8 9 2 6 0 11C2 13 8 13 12 11Z" fill="url(#wingL)"/>
+  <path d="M13 8C8 5 3 2 1 6C4 9 9 9 13 8Z" fill="url(#wingL2)"/>
+  <!-- 右羽翼 -->
+  <path d="M22 11C26 9 32 6 34 11C32 13 26 13 22 11Z" fill="url(#wingR)"/>
+  <path d="M21 8C26 5 31 2 33 6C30 9 25 9 21 8Z" fill="url(#wingR2)"/>
+  <!-- 金色外冠托架 -->
+  <path d="M17 2L20 8L23 5L21 15L17 19L13 15L11 5L14 8L17 2Z" fill="url(#goldCrown)" stroke="#b45309" stroke-width="0.5"/>
+  <!-- 核心蓝宝石晶体 -->
+  <polygon points="17,6 20,10 17,15 14,10" fill="url(#gemBlue)" stroke="#67e8f9" stroke-width="0.5"/>
+  <!-- 宝石高光 -->
+  <polygon points="17,7 19,10 17,11 15,10" fill="#ffffff" opacity="0.8"/>
+  <defs>
+    <linearGradient id="wingL" x1="0" y1="6" x2="12" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingL2" x1="1" y1="2" x2="13" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="wingR" x1="34" y1="6" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingR2" x1="33" y1="2" x2="21" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="goldCrown" x1="11" y1="2" x2="23" y2="19" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde047"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="gemBlue" x1="14" y1="6" x2="20" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8f9"/>
+      <stop offset="0.5" stop-color="#0284c7"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+</svg></div>
+                      <div class="vip-comment-bubble">
+                        <div class="bubble-text">这个内容太好了，正是我想要的！这个内容太好了正是我想要的！这个内容太好了，正是我想要的這個内容太好了，正是我想要的！</div>
+                      </div>
+                      <div class="vip-bubble-crest-bottomright"><svg width="34" height="22" viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左羽翼 -->
+  <path d="M12 11C8 9 2 6 0 11C2 13 8 13 12 11Z" fill="url(#wingL)"/>
+  <path d="M13 8C8 5 3 2 1 6C4 9 9 9 13 8Z" fill="url(#wingL2)"/>
+  <!-- 右羽翼 -->
+  <path d="M22 11C26 9 32 6 34 11C32 13 26 13 22 11Z" fill="url(#wingR)"/>
+  <path d="M21 8C26 5 31 2 33 6C30 9 25 9 21 8Z" fill="url(#wingR2)"/>
+  <!-- 金色外冠托架 -->
+  <path d="M17 2L20 8L23 5L21 15L17 19L13 15L11 5L14 8L17 2Z" fill="url(#goldCrown)" stroke="#b45309" stroke-width="0.5"/>
+  <!-- 核心蓝宝石晶体 -->
+  <polygon points="17,6 20,10 17,15 14,10" fill="url(#gemBlue)" stroke="#67e8f9" stroke-width="0.5"/>
+  <!-- 宝石高光 -->
+  <polygon points="17,7 19,10 17,11 15,10" fill="#ffffff" opacity="0.8"/>
+  <defs>
+    <linearGradient id="wingL" x1="0" y1="6" x2="12" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingL2" x1="1" y1="2" x2="13" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="wingR" x1="34" y1="6" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingR2" x1="33" y1="2" x2="21" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="goldCrown" x1="11" y1="2" x2="23" y2="19" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde047"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="gemBlue" x1="14" y1="6" x2="20" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8f9"/>
+      <stop offset="0.5" stop-color="#0284c7"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+</svg></div>
+                    </div>
                     <div class="ad-comment-meta">
                       <span class="ad-comment-time">2小时前</span><span class="ad-reply-btn" onclick="adToggleReplyTarget(this)">回复</span>
                       <div class="ad-votes">
@@ -5200,11 +5875,113 @@
               <div class="drawer-close" onclick="setState('play')">×</div>
             </div>
             <div class="comments-list">
-              <div class="comment-item">
-                <div class="comment-avatar"></div>
+              <div class="comment-item is-vip-bubble">
+                <div class="vip-avatar-wrap">
+                  <div class="vip-avatar-ring"></div>
+                  <div class="comment-avatar" style="background-image:url('assets/hifi/photo_cat.jpg'); background-size:cover; background-position:center;"></div>
+                  <div class="vip-avatar-crest">💎</div>
+                </div>
                 <div class="comment-body">
-                  <div class="comment-name"><span>用户昵称_01</span><span class="comment-level-badge" onclick="openUserLevelDrawer(12, '用户昵称_01', '💬', '互动活跃用户')" style="cursor:pointer;" title="点击查看用户等级与特权对比"><span class="badge-ic">⚡</span>Lv.12</span></div>
-                  <div class="comment-text">这个内容太好了，正是我想要的！</div>
+                  <div class="comment-name">
+                    <span>赛博探索者</span>
+                    <span class="comment-level-badge lv70" onclick="openUserLevelDrawer(70, '赛博探索者', 'assets/hifi/photo_cat.jpg', '不朽缔造者')" style="cursor:pointer;" title="最高荣誉：Lv.70 不朽缔造者（点击查看尊属特权）">
+                      <span class="badge-ic">🌌</span>Lv.70
+                    </span>
+                  </div>
+                  <!-- 尊贵专属对话气泡 (带羽翼双角挂件装饰) -->
+                  <div class="vip-comment-bubble-wrap">
+                    <div class="vip-bubble-crest-topright"><svg width="34" height="22" viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左羽翼 -->
+  <path d="M12 11C8 9 2 6 0 11C2 13 8 13 12 11Z" fill="url(#wingL)"/>
+  <path d="M13 8C8 5 3 2 1 6C4 9 9 9 13 8Z" fill="url(#wingL2)"/>
+  <!-- 右羽翼 -->
+  <path d="M22 11C26 9 32 6 34 11C32 13 26 13 22 11Z" fill="url(#wingR)"/>
+  <path d="M21 8C26 5 31 2 33 6C30 9 25 9 21 8Z" fill="url(#wingR2)"/>
+  <!-- 金色外冠托架 -->
+  <path d="M17 2L20 8L23 5L21 15L17 19L13 15L11 5L14 8L17 2Z" fill="url(#goldCrown)" stroke="#b45309" stroke-width="0.5"/>
+  <!-- 核心蓝宝石晶体 -->
+  <polygon points="17,6 20,10 17,15 14,10" fill="url(#gemBlue)" stroke="#67e8f9" stroke-width="0.5"/>
+  <!-- 宝石高光 -->
+  <polygon points="17,7 19,10 17,11 15,10" fill="#ffffff" opacity="0.8"/>
+  <defs>
+    <linearGradient id="wingL" x1="0" y1="6" x2="12" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingL2" x1="1" y1="2" x2="13" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="wingR" x1="34" y1="6" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingR2" x1="33" y1="2" x2="21" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="goldCrown" x1="11" y1="2" x2="23" y2="19" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde047"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="gemBlue" x1="14" y1="6" x2="20" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8f9"/>
+      <stop offset="0.5" stop-color="#0284c7"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+</svg></div>
+                    <div class="vip-comment-bubble">
+                      <div class="bubble-text">这个内容太好了，正是我想要的！这个内容太好了正是我想要的！这个内容太好了，正是我想要的這個内容太好了，正是我想要的！</div>
+                    </div>
+                    <div class="vip-bubble-crest-bottomright"><svg width="34" height="22" viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左羽翼 -->
+  <path d="M12 11C8 9 2 6 0 11C2 13 8 13 12 11Z" fill="url(#wingL)"/>
+  <path d="M13 8C8 5 3 2 1 6C4 9 9 9 13 8Z" fill="url(#wingL2)"/>
+  <!-- 右羽翼 -->
+  <path d="M22 11C26 9 32 6 34 11C32 13 26 13 22 11Z" fill="url(#wingR)"/>
+  <path d="M21 8C26 5 31 2 33 6C30 9 25 9 21 8Z" fill="url(#wingR2)"/>
+  <!-- 金色外冠托架 -->
+  <path d="M17 2L20 8L23 5L21 15L17 19L13 15L11 5L14 8L17 2Z" fill="url(#goldCrown)" stroke="#b45309" stroke-width="0.5"/>
+  <!-- 核心蓝宝石晶体 -->
+  <polygon points="17,6 20,10 17,15 14,10" fill="url(#gemBlue)" stroke="#67e8f9" stroke-width="0.5"/>
+  <!-- 宝石高光 -->
+  <polygon points="17,7 19,10 17,11 15,10" fill="#ffffff" opacity="0.8"/>
+  <defs>
+    <linearGradient id="wingL" x1="0" y1="6" x2="12" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingL2" x1="1" y1="2" x2="13" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="wingR" x1="34" y1="6" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="0.6" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wingR2" x1="33" y1="2" x2="21" y2="9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="goldCrown" x1="11" y1="2" x2="23" y2="19" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde047"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="gemBlue" x1="14" y1="6" x2="20" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8f9"/>
+      <stop offset="0.5" stop-color="#0284c7"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+</svg></div>
+                  </div>
                   <div class="comment-meta">
                     <span class="comment-time">2小时前</span><span class="comment-reply-btn" onclick="toggleReplies(this)">回复</span>
                     <div class="comment-votes">
@@ -5483,19 +6260,65 @@
                   <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎁</span><span class="gift-name">礼盒</span><span class="gift-price">¥9</span></div>
                   <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🍭</span><span class="gift-name">棒棒糖</span><span class="gift-price">¥2</span></div>
                   <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🧁</span><span class="gift-name">纸杯蛋糕</span><span class="gift-price">¥4</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎆</span><span class="gift-name">烟花</span><span class="gift-price">¥38</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎀</span><span class="gift-name">丝带</span><span class="gift-price">¥22</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🌈</span><span class="gift-name">彩虹</span><span class="gift-price">¥45</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">⭐</span><span class="gift-name">星星</span><span class="gift-price">¥68</span></div>
+                  <!-- Lv.20+ 等级限制高价值礼物 -->
+                  <div class="gift-card is-locked" data-min-level="20" data-tier-name="赏金乐人" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.20</span>
+                    <span class="gift-icon">🎀</span><span class="gift-name">丝带</span><span class="gift-price">¥22</span>
+                    <span class="gift-lock-hint">需Lv.20解锁</span>
+                  </div>
+                  <!-- Lv.30+ 等级限制高价值礼物 -->
+                  <div class="gift-card is-locked" data-min-level="30" data-tier-name="拾金伯爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.30</span>
+                    <span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span>
+                    <span class="gift-lock-hint">需Lv.30解锁</span>
+                  </div>
+                  <!-- Lv.40+ 等级限制高价值礼物 -->
+                  <div class="gift-card is-locked" data-min-level="40" data-tier-name="璀璨公爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.40</span>
+                    <span class="gift-icon">🎆</span><span class="gift-name">烟花</span><span class="gift-price">¥38</span>
+                    <span class="gift-lock-hint">需Lv.40解锁</span>
+                  </div>
+                  <div class="gift-card is-locked" data-min-level="45" data-tier-name="璀璨公爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.45</span>
+                    <span class="gift-icon">🌈</span><span class="gift-name">彩虹</span><span class="gift-price">¥45</span>
+                    <span class="gift-lock-hint">需Lv.45解锁</span>
+                  </div>
+                  <!-- Lv.50+ 等级限制高价值礼物 -->
+                  <div class="gift-card is-locked" data-min-level="50" data-tier-name="旷世王爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.50</span>
+                    <span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span>
+                    <span class="gift-lock-hint">需Lv.50解锁</span>
+                  </div>
+                  <!-- Lv.60+ 等级限制高价值礼物 -->
+                  <div class="gift-card is-locked" data-min-level="60" data-tier-name="圣殿庇护者" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.60</span>
+                    <span class="gift-icon">⭐</span><span class="gift-name">星星</span><span class="gift-price">¥68</span>
+                    <span class="gift-lock-hint">需Lv.60解锁</span>
+                  </div>
+                  <!-- Lv.70+ 等级限制极峰尊属礼物 -->
+                  <div class="gift-card is-locked" data-min-level="70" data-tier-name="不朽缔造者" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.70</span>
+                    <span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span>
+                    <span class="gift-lock-hint">需Lv.70解锁</span>
+                  </div>
                 </div>
                 <div class="giftpanel-grid hidden" data-cat="luxury">
                   <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🚀</span><span class="gift-name">火箭</span><span class="gift-price">¥18</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span></div>
-                  <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span></div>
+                  <div class="gift-card is-locked" data-min-level="30" data-tier-name="拾金伯爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.30</span>
+                    <span class="gift-icon">💎</span><span class="gift-name">钻戒</span><span class="gift-price">¥28</span>
+                    <span class="gift-lock-hint">需Lv.30解锁</span>
+                  </div>
+                  <div class="gift-card is-locked" data-min-level="50" data-tier-name="旷世王爵" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.50</span>
+                    <span class="gift-icon">👑</span><span class="gift-name">皇冠</span><span class="gift-price">¥52</span>
+                    <span class="gift-lock-hint">需Lv.50解锁</span>
+                  </div>
+                  <div class="gift-card is-locked" data-min-level="70" data-tier-name="不朽缔造者" onclick="selectGift(this)">
+                    <span class="gift-lock-badge"><span class="lock-icon">🔒</span>Lv.70</span>
+                    <span class="gift-icon">🏰</span><span class="gift-name">城堡</span><span class="gift-price">¥99</span>
+                    <span class="gift-lock-hint">需Lv.70解锁</span>
+                  </div>
                 </div>
                 <div class="giftpanel-grid hidden" data-cat="festival">
                   <div class="gift-card" onclick="selectGift(this)"><span class="gift-icon">🎉</span><span class="gift-name">派对</span><span class="gift-price">¥8</span></div>
@@ -6277,6 +7100,43 @@
     }
   }
 
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // 大舞台全员广播条轮播逻辑（支持多个承载，每5秒自动滚动）
+  // ═══════════════════════════════════════════════════════════════════
+  let stageBroadcastIdx = 0;
+  let stageBroadcastTimer = null;
+
+  function initStageBroadcast() {
+    const track = document.getElementById('stage-broadcast-track');
+    if (!track) return;
+    const items = track.querySelectorAll('.stage-broadcast-item');
+    if (items.length <= 1) return;
+
+    if (stageBroadcastTimer) clearInterval(stageBroadcastTimer);
+    stageBroadcastTimer = setInterval(() => {
+      stageBroadcastIdx = (stageBroadcastIdx + 1) % items.length;
+      track.style.transform = `translateY(-${stageBroadcastIdx * 38}px)`;
+    }, 4500);
+  }
+
+  function handleStageBroadcastClick() {
+    const track = document.getElementById('stage-broadcast-track');
+    if (!track) return;
+    const items = track.querySelectorAll('.stage-broadcast-item');
+    const currentItem = items[stageBroadcastIdx] || items[0];
+    if (!currentItem) return;
+
+    const lvl = parseInt(currentItem.dataset.level, 10) || 70;
+    const user = currentItem.dataset.user || '赛博探索者';
+    const role = currentItem.dataset.role || '不朽缔造者';
+
+    showMatrixToast(`全员广播：恭喜 ${user} 达成 ${role} (Lv.${lvl})！`);
+    setTimeout(() => {
+      openUserLevelDrawer(lvl, user, '🌌', role);
+    }, 400);
+  }
+
   function initLevelScreen() {
     if (typeof renderLevelStepper === 'function') renderLevelStepper();
     if (typeof renderLevelCardsCarousel === 'function') renderLevelCardsCarousel();
@@ -6799,13 +7659,85 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
     sheet.querySelectorAll('.giftpanel-grid').forEach(g => g.classList.toggle('hidden', g.dataset.cat !== cat));
   }
 
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 礼物等级限制与解锁拦截引导逻辑（当前用户默认 Lv.14 偶遇知音）
+  // ═══════════════════════════════════════════════════════════════════
+  
+  // 1. Feed 首页选择礼物拦截与选中
   function selectGift(cardEl) {
+    const minLvl = parseInt(cardEl.dataset.minLevel, 10) || 0;
+    const tierName = cardEl.dataset.tierName || '';
+    const giftName = cardEl.querySelector('.gift-name').textContent;
+
+    if (minLvl > MY_CURRENT_LEVEL) {
+      const diff = minLvl - MY_CURRENT_LEVEL;
+      showMatrixToast(`🔒 该礼物为高阶专属！需达到 Lv.${minLvl}「${tierName}」解锁（当前Lv.${MY_CURRENT_LEVEL}，还需${diff}级）`);
+      return;
+    }
+
     const sheet = cardEl.closest('.giftpanel-sheet');
     sheet.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
     cardEl.classList.add('selected');
     sheet.querySelector('#gift-confirm-icon').textContent = cardEl.querySelector('.gift-icon').textContent;
     sheet.querySelector('#gift-confirm-name').textContent = cardEl.querySelector('.gift-name').textContent;
   }
+
+  // 2. 大舞台选择礼物弹层控制与拦截
+  function openStageGiftSheet(btnEl) {
+    document.querySelectorAll('.moment-popover.open').forEach(p => p.classList.remove('open'));
+    const modal = document.getElementById('stage-gift-modal');
+    if (!modal) return;
+    
+    // 获取被赠送作者名字
+    const momentItem = btnEl ? btnEl.closest('.moment-item') : null;
+    const authorNameEl = momentItem ? momentItem.querySelector('.moment-name') : null;
+    const authorName = authorNameEl ? authorNameEl.textContent.trim() : '阿伟';
+    const targetTitle = document.getElementById('stage-gift-target-name');
+    if (targetTitle) targetTitle.textContent = authorName;
+
+    modal.classList.add('open');
+  }
+
+  function closeStageGiftSheet(e) {
+    if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('reward-close')) return;
+    const modal = document.getElementById('stage-gift-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function setStageGiftTab(tabEl, categoryId) {
+    const sheet = tabEl.closest('.stage-gift-sheet');
+    sheet.querySelectorAll('.reward-category-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    sheet.querySelectorAll('.reward-gifts').forEach(g => {
+      g.classList.toggle('active', g.dataset.giftCategory === categoryId);
+    });
+  }
+
+  function selectStageGift(chipEl) {
+    const minLvl = parseInt(chipEl.dataset.minLevel, 10) || 0;
+    const tierName = chipEl.dataset.tierName || '';
+    const giftName = chipEl.querySelector('.gift-label').textContent;
+
+    if (minLvl > MY_CURRENT_LEVEL) {
+      const diff = minLvl - MY_CURRENT_LEVEL;
+      showMatrixToast(`🔒「${giftName}」为高阶专属礼物！需达到 Lv.${minLvl}「${tierName}」解锁（当前Lv.${MY_CURRENT_LEVEL}，还需${diff}级）`);
+      return;
+    }
+
+    const sheet = chipEl.closest('.stage-gift-sheet');
+    sheet.querySelectorAll('.reward-gift-chip').forEach(c => c.classList.remove('selected'));
+    chipEl.classList.add('selected');
+    const priceText = chipEl.querySelector('.gift-price').textContent;
+    document.getElementById('stage-gift-confirm-name').textContent = `${giftName} (${priceText})`;
+  }
+
+  function confirmStageGift() {
+    const nameText = document.getElementById('stage-gift-confirm-name').textContent;
+    closeStageGiftSheet();
+    showMatrixToast(`🎉 成功打赏 ${nameText}！经验值实时已增加！`);
+  }
+
 
   function expandRewardSection(btn) {
     const wall = btn.previousElementSibling;
@@ -7214,7 +8146,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
       <!-- 1. 目标用户当前等级高光展示卡 -->
       <div class="target-user-hero-card" style="background: ${tier.gradient};">
         <div class="target-user-left">
-          <div class="target-user-avatar">${userAvatar}</div>
+          <div class="target-user-avatar">${userAvatar && (userAvatar.includes('/') || userAvatar.includes('.')) ? `<img src="${userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : userAvatar}</div>
           <div class="target-user-meta">
             <div class="target-user-name-line">
               <span class="target-user-name">${userName}</span>
@@ -7295,10 +8227,12 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
     document.addEventListener('DOMContentLoaded', initLevelScreen);
   } else {
     initLevelScreen();
+    initStageBroadcast();
   }
   // 额外在微任务/下一帧再次校准布局
   setTimeout(() => {
     initLevelScreen();
+    initStageBroadcast();
   }, 100);
 
 </script>
