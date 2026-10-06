@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "basic-features-upgrade-matrix.html",
+  "entry": "basic-features-upgrade-matrix.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-06T04:20:42.334Z",
+  "updatedAt": "2026-10-06T11:00:25.691Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
