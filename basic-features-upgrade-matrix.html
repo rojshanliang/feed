@@ -3399,16 +3399,17 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
-  /* 底部左侧创作者与剧集信息 */
+  /* 底部左侧创作者与剧集信息 (抬高至合集栏和进度条上方，避免重叠遮挡) */
   #screen-player .bottom-info {
     position: absolute;
     left: 14px;
     right: 76px;
-    bottom: 60px;
+    bottom: 58px;
     z-index: 25;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
+    pointer-events: auto;
   }
   #screen-player .bottom-danmaku-tag {
     display: inline-flex;
@@ -4099,13 +4100,13 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.6);
   }
 
-  /* 底部创作者信息 */
+  /* 底部创作者信息 (消除遮挡：保持安全底距) */
   #screen-player .bottom-info {
     position: absolute;
-    left: 12px;
-    bottom: 12px;
-    right: 68px;
-    z-index: 20;
+    left: 14px;
+    bottom: 58px;
+    right: 76px;
+    z-index: 25;
   }
   #screen-player .creator-name {
     font-family: var(--font-display);
@@ -8192,11 +8193,10 @@
           </div>
           <div class="section-gap"></div>
 
-          <!-- 内容 Tab：默认停在「上首页」 -->
+          <!-- 内容 Tab：创作者页展示「上首页」与「大舞台」（不展示收藏） -->
           <div class="content-tabs">
             <div class="content-tab active" data-target="creator-content" onclick="setContentTab(this, 'creator')">上首页</div>
             <div class="content-tab" data-target="creator-square" onclick="setContentTab(this, 'creator')">大舞台</div>
-            <div class="content-tab" data-target="creator-fav" onclick="setContentTab(this, 'creator')">收藏</div>
           </div>
 
           <!-- 内容面板（上首页样式：合集横滑卡片 + 视频图文混合网格） -->
@@ -8364,75 +8364,9 @@
 
             </div>
           </div>
-          <!-- 创作者页「收藏」Tab 内容面板：包含二级Tab（视频与已收藏的合集） -->
-          <div class="content-panel" id="creator-fav">
-            <div class="fav-subtabs-wrap">
-              <div class="fav-subtabs-scroll">
-                <div class="fav-subtab active" onclick="switchFavSubtab('videos', this)">视频</div>
-                <div class="fav-subtab" onclick="switchFavSubtab('collections', this)">已收藏的合集</div>
-              </div>
-            </div>
-
-            <!-- 二级面板 1：视频 -->
-            <div class="fav-subpanel active" id="fav-subpanel-videos">
-              <div class="fav-video-grid">
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_night.jpg" alt="走出自我的迷宫" class="fav-v-img">
-                  <div class="fav-v-corner-tag">📄</div>
-                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1248</div>
-                </div>
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_cat.jpg" alt="为什么选择分开" class="fav-v-img">
-                  <div class="fav-v-likes"><span class="v-heart">❤</span> 3725</div>
-                </div>
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_street.jpg" alt="国风大片" class="fav-v-img">
-                  <div class="fav-v-likes"><span class="v-heart">♡</span> 77.7万</div>
-                </div>
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_camp.jpg" alt="吵架的艺术" class="fav-v-img">
-                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1.6万</div>
-                </div>
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_coffee.jpg" alt="自我养育" class="fav-v-img">
-                  <div class="fav-v-likes"><span class="v-heart">♡</span> 3892</div>
-                </div>
-                <div class="fav-video-card" onclick="switchPage('player')">
-                  <img src="assets/hifi/photo_skate.jpg" alt="谁历书" class="fav-v-img">
-                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1.6万</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 二级面板 2：已收藏的合集 -->
-            <div class="fav-subpanel" id="fav-subpanel-collections">
-              <div class="fav-col-list">
-                <div class="fav-col-card" onclick="openCollectionDetail('影视氛围感哲理辩', 70)">
-                  <img src="assets/hifi/photo_street.jpg" alt="合集封面" class="fav-col-cover">
-                  <div class="fav-col-info">
-                    <div class="fav-col-title-row">
-                      <span class="fav-col-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
-                      <span class="fav-col-title">影视氛围感哲理辩</span>
-                    </div>
-                    <div class="fav-col-meta">共 70 支视频 · 更新到70集</div>
-                    <div class="fav-col-author">@星启♬ · 9623.8万次播放</div>
-                  </div>
-                </div>
-                <div class="fav-col-card" onclick="openCollectionDetail('影视宿命感心理学', 42)">
-                  <img src="assets/hifi/photo_night.jpg" alt="合集封面" class="fav-col-cover">
-                  <div class="fav-col-info">
-                    <div class="fav-col-title-row">
-                      <span class="fav-col-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
-                      <span class="fav-col-title">影视宿命感心理学</span>
-                    </div>
-                    <div class="fav-col-meta">共 42 支视频 · 更新到42集</div>
-                    <div class="fav-col-author">@心理探索家 · 4520.1万次播放</div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
+        <!-- 创作者页「收藏」Tab 内容面板：包含二级Tab（视频与已收藏的合集） -->
+          
 
         <!-- 举报创作者：点击 NavBar 举报入口打开，蒙层+底部原因面板，单选一个一级原因后立即提交 -->
         <div class="report-sheet-backdrop" onclick="closeCreatorReport()"></div>
@@ -10435,7 +10369,7 @@
         
       </div>
 
-      <!-- 顶部全员广播条：位于个人展示区下方、动态流卡片上方，支持多条平滑轮播（支持恭喜升为70级等） -->
+      <!-- 顶部全员广播条：位于个人展示区下方、Tab 上方，绝不遮挡广场/官方Tab -->
       <div class="stage-broadcast-wrap" data-od-id="stage-global-broadcast-bar">
         <div class="stage-broadcast-bar" onclick="handleStageBroadcastClick()" title="点击查看升级荣誉与等级特权">
           <div class="stage-broadcast-tag">
@@ -10477,7 +10411,14 @@
         </div>
       </div>
 
-      <!-- 大舞台动态流 -->
+      <!-- Content Tab：广场 / 官方（位于广播条下方，清爽醒目展示） -->
+      <div class="square-content-tabs chip-tabs" style="position:relative;top:auto;background:transparent;padding:6px 14px 4px;margin-bottom:6px;">
+        <div class="square-content-tab chip-tab active" data-target="panel-square" onclick="setSquareTab(this)"><span class="tab-chip-ic">🌼</span>广场</div>
+        <div class="square-content-tab chip-tab" data-target="panel-official" onclick="setSquareTab(this)"><span class="tab-chip-ic">📣</span>官方<span class="tab-unread-dot"></span></div>
+      </div>
+
+      <!-- 广场内容面板 -->
+      <div class="square-panel" id="panel-square" style="display:block;">
         <div class="moment-list">
 
           <!-- 纯文字动态 -->
@@ -10720,9 +10661,42 @@
           </div>
 
         </div>
+      </div><!-- /#panel-square -->
 
-
-
+      <!-- 官方内容面板 (对标 square-wireframe-mp.html) -->
+      <div class="square-panel" id="panel-official" style="display:none;">
+        <div class="moment-list">
+          <div class="moment-item pinned">
+            <div class="moment-header">
+              <div class="moment-avatar" style="background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;">📣</div>
+              <div class="moment-meta">
+                <div class="moment-name-row"><span class="moment-name">平台官方</span><span class="official-tag"></span></div>
+                <div class="moment-time">2 小时前</div>
+              </div>
+              <div class="pinned-badge" style="display:inline-flex;align-items:center;gap:2px;font-size:11px;color:#d97706;background:#fef3c7;padding:1px 6px;border-radius:4px;"><span class="ic">📌</span><span>置顶</span></div>
+            </div>
+            <div class="moment-row">
+              <div class="moment-body">
+                <div class="moment-text">大舞台本周精选创作者已上线，快去看看有没有你关注的朋友入选～</div>
+              </div>
+              <div class="moment-more-wrap">
+                <div class="moment-more" onclick="toggleMomentMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="moment-popover">
+                  <div class="moment-popover-item like-item" onclick="toggleMomentLike(this, 358)"><span class="ic">♡</span><span class="lbl">点赞 358</span></div>
+                  <div class="moment-popover-item"><span class="ic">💬</span><span class="lbl">评论 12</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="moment-social">
+              <div class="moment-social-row liked-row"><span class="ic">♡</span><span class="moment-social-names">阿伟、小美 等 358 人点赞</span></div>
+              <div class="moment-comments">
+                <div class="moment-comment-row"><span class="cmt-name">阿强：</span>期待入选！</div>
+                <div class="moment-comment-more">查看全部 12 条评论</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /#panel-official -->
 
       </div><!-- /square-page-scroll -->
 
@@ -11479,8 +11453,8 @@
   function playCollectionVideo(epNum, title) {
     showMatrixToast(`▶ 正在播放 第 ${epNum} 集 · ${title}`);
     setTimeout(() => {
-      switchPage('feed');
-    }, 600);
+      switchPage('player');
+    }, 350);
   }
 
   // 分享合集
