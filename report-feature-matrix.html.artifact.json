@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "report-feature-matrix.html",
+  "entry": "report-feature-matrix.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-07T06:22:52.247Z",
+  "updatedAt": "2026-10-07T06:46:52.156Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
