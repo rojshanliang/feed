@@ -6657,43 +6657,23 @@
                 </div>
               </div>
 
-              <!-- 3. 点赞互动 -->
-              <div class="lvx-act-row" id="act-row-like">
-                <div class="lvx-act-left">
-                  <div class="lvx-act-icon">❤️</div>
-                  <div class="lvx-act-info">
-                    <div class="lvx-act-name-row">
-                      <span class="lvx-act-name">点赞互动</span>
-                    </div>
-                    <div class="lvx-act-guide">每次 +2分 · 今日还需赞 <span class="highlight">2</span> 次达满分 (4/6)</div>
-                  </div>
-                </div>
-                <div class="lvx-act-right">
-                  <div class="lvx-act-score">
-                    <span class="lvx-act-score-val">+8</span>
-                    <span class="lvx-act-score-cap">上限 12分</span>
-                  </div>
-                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('like')">去点赞 ›</button>
-                </div>
-              </div>
-
-              <!-- 4. 发表评论 -->
-              <div class="lvx-act-row" id="act-row-comment">
+              <!-- 3. 内容互动（点赞与评论合并：点赞或评论每次+2，上限计10次，每日10次，共20成长值） -->
+              <div class="lvx-act-row" id="act-row-interaction">
                 <div class="lvx-act-left">
                   <div class="lvx-act-icon">💬</div>
                   <div class="lvx-act-info">
                     <div class="lvx-act-name-row">
-                      <span class="lvx-act-name">发表评论</span>
+                      <span class="lvx-act-name">内容互动</span>
                     </div>
-                    <div class="lvx-act-guide">每次 +2分 · 今日还需评 <span class="highlight">2</span> 条达满分 (2/4)</div>
+                    <div class="lvx-act-guide">点赞或评论每次+2 · 上限计10次 (6/10)</div>
                   </div>
                 </div>
                 <div class="lvx-act-right">
                   <div class="lvx-act-score">
-                    <span class="lvx-act-score-val">+4</span>
-                    <span class="lvx-act-score-cap">上限 8分</span>
+                    <span class="lvx-act-score-val">+12</span>
+                    <span class="lvx-act-score-cap">上限 20分</span>
                   </div>
-                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('comment')">去评论 ›</button>
+                  <button class="lvx-act-btn btn-action" onclick="handleDailyAction('interact')">去互动 ›</button>
                 </div>
               </div>
             </div>
@@ -7075,18 +7055,11 @@
       }, 400);
       return;
     }
-    if (type === 'like') {
-      showMatrixToast('正在前往推荐流，点赞优质内容每次 +2 分');
+    if (type === 'interact' || type === 'like' || type === 'comment') {
+      showMatrixToast('正在前往大舞台参与内容互动（点赞或评论每次 +2 成长值）');
       setTimeout(() => {
-        switchPage('feed');
-      }, 600);
-      return;
-    }
-    if (type === 'comment') {
-      showMatrixToast('正在前往推荐流，参与讨论每次 +2 分');
-      setTimeout(() => {
-        switchPage('feed');
-      }, 600);
+        switchPage('stage');
+      }, 500);
       return;
     }
   }
