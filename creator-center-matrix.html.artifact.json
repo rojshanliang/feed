@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "creator-center-matrix.html",
+  "entry": "creator-center-matrix.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-10-07T11:45:08.155Z",
+  "updatedAt": "2026-10-08T09:17:25.042Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
