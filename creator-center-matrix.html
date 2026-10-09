@@ -8801,6 +8801,11 @@
     background: #ffd21e;
     color: #0f172a;
   }
+  .work-status-badge.recommended {
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+    color: #ffffff;
+    box-shadow: 0 1px 4px rgba(234, 88, 12, 0.35);
+  }
   .work-status-badge.violation {
     background: #ef4444;
     color: #ffffff;
@@ -13153,8 +13158,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
       pubTime: '2026-10-05 18:15',
       pubTimestamp: 1791195300,
       cover: 'assets/hifi/photo_skate.jpg',
-      isPublic: true,
-      status: 'pinned',
+      status: 'recommended', // 推荐首页
       impressions: 124000,
       views: 65200,
       likes: 5120,
@@ -13334,6 +13338,8 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
       let statusBadge = '';
       if (w.status === 'pinned') {
         statusBadge = '<span class="work-status-badge pinned">📌 置顶</span>';
+      } else if (w.status === 'recommended') {
+        statusBadge = '<span class="work-status-badge recommended">🔥 推荐首页</span>';
       } else if (w.status === 'violation') {
         statusBadge = '<span class="work-status-badge violation">⚠️ 违规</span>';
       }
