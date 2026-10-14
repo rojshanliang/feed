@@ -9196,6 +9196,7 @@
     font-size: 9.5px;
     color: #64748b;
     margin-top: 1px;
+    white-space: nowrap;
   }
 
   /* 4-10名完整卡样式（展示完整信息：序号、头像、昵称、等级标、近24小时打赏热度、分值） */
@@ -9474,6 +9475,7 @@
   .content-score-lbl {
     font-size: 9px;
     color: #94a3b8;
+    white-space: nowrap;
   }
 
   /* 榜单底端固定/悬停的“我的名次”横条（提升松弛感与防折行设计） */
@@ -10310,7 +10312,7 @@
             <div class="cc-sub-section">
               <div class="cc-sub-header">
                 <div class="cc-sub-title">
-                  <span>🕸️</span><span>五维能力</span>
+                  <span>🕸️</span><span>账号数据</span>
                 </div>
                 <!-- 日期筛选：昨日（默认）、7天、30天、自定义 -->
                 <div class="cc-date-tabs" id="radar-date-tabs">
@@ -12804,7 +12806,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
     if (tabKey === 'overview') {
       renderRadarChart(currentRadarCycle);
       renderOverviewMetricsAndChart();
-      showMatrixToast('📈 已切换至【数据总览】：五维雷达图 & 整体趋势');
+      showMatrixToast('📈 已切换至【数据总览】：账号数据 & 整体趋势');
     } else if (tabKey === 'works') {
       renderWorksList();
       showMatrixToast('🎬 已切换至【作品数据】：按单条内容卡片展示');
@@ -13551,7 +13553,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
     const currentKey = currentCustomSelectedDays[targetModule] || '60d';
 
     const targetNames = {
-      radar: '五维能力雷达图',
+      radar: '账号数据',
       overview: '整体数据与趋势',
       works: '作品数据',
       fans: '粉丝数据'
@@ -13754,7 +13756,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
           </div>
           <div class="rank-top-right">
             <div class="rank-score-val">${item.score.toLocaleString()}</div>
-            <div class="rank-score-lbl">打赏分值 (分)</div>
+            <div class="rank-score-lbl">被打赏分值(分)</div>
           </div>
         </div>
       `;
@@ -13982,7 +13984,7 @@ const OB_STATES = ['ob-gender', 'ob-age', 'ob-tags'];
           </div>
           <div class="content-score-block">
             <div class="content-score-num">${item.score.toLocaleString()}</div>
-            <div class="content-score-lbl">打赏分值 (分)</div>
+            <div class="content-score-lbl">被打赏分值(分)</div>
           </div>
         </div>
       `;

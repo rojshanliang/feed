@@ -4066,15 +4066,16 @@
   /* 打赏专属高光卡槽 */
   .lvx-reward-hero {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px 9px;
     border-radius: 14px;
     background: linear-gradient(135deg, rgba(255, 210, 30, 0.18) 0%, rgba(255, 210, 30, 0.04) 70%, rgba(0, 0, 0, 0.2) 100%);
     border: 1px solid rgba(255, 210, 30, 0.38);
     box-shadow: 0 4px 20px rgba(255, 210, 30, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
   }
   .lvx-reward-hero::after {
     content: '';
@@ -4087,6 +4088,13 @@
     background: radial-gradient(circle, rgba(255, 210, 30, 0.25) 0%, transparent 70%);
     pointer-events: none;
   }
+  .lvx-reward-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
   .lvx-reward-left {
     position: relative;
     z-index: 1;
@@ -4097,7 +4105,7 @@
     gap: 6px;
   }
   .lvx-reward-name {
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 700;
     color: #fff;
   }
@@ -4110,21 +4118,71 @@
     border-radius: 4px;
   }
   .lvx-reward-rule {
-    font-size: 11px;
+    font-size: 10.5px;
     color: rgba(255, 255, 255, 0.65);
     margin-top: 4px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+  }
+  .lvx-reward-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+    text-align: right;
+  }
+  .lvx-reward-score-lbl {
+    font-size: 10px;
+    font-weight: 600;
+    color: #ffd21e;
+    letter-spacing: 0.02em;
+    margin-bottom: 1px;
+    opacity: 0.9;
   }
   .lvx-reward-val {
     font-family: var(--font-mono);
     font-size: 24px;
     font-weight: 700;
     color: #ffd21e;
-    text-shadow: 0 0 16px rgba(255, 210, 30, 0.4);
+    text-shadow: 0 0 16px rgba(255, 210, 30, 0.45);
+    line-height: 1.05;
     position: relative;
     z-index: 1;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+  .lvx-reward-unit {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 210, 30, 0.85);
+  }
+
+  /* 次级辅助条：总共累计打赏数值 */
+  .lvx-reward-foot-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 210, 30, 0.15);
+    border-radius: 8px;
+    padding: 5px 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .lvx-foot-strip-lbl {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 500;
+  }
+  .lvx-foot-strip-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.02em;
   }
 
   /* 今日活跃分值与成长指引 (无任务字样) */
@@ -6595,15 +6653,24 @@
             <span class="lvx-growth-next">还需 1,580 升至 Lv.20</span>
           </div>
           <div class="lvx-growth-bar"><div class="lvx-growth-fill" style="width:47.3%"></div></div>
-          <div class="lvx-reward-hero lvx-growth-reward" onclick="showMatrixToast('打赏记录实时计入成长值，1 钻 = 1 成长值')">
-            <div class="lvx-reward-left">
-              <div class="lvx-reward-name-row">
-                <span class="lvx-reward-name">🎁 打赏贡献</span>
-                <span class="lvx-reward-badge">核心驱动</span>
+          <div class="lvx-reward-hero lvx-growth-reward" onclick="showMatrixToast('打赏记录实时计入成长值，本次获得 +420 分，累计打赏贡献 420 钻')">
+            <div class="lvx-reward-main-row">
+              <div class="lvx-reward-left">
+                <div class="lvx-reward-name-row">
+                  <span class="lvx-reward-name">🎁 打赏贡献</span>
+                  <span class="lvx-reward-badge">核心驱动</span>
+                </div>
+                <div class="lvx-reward-rule"><span>⚡</span> 1 钻 = 1 成长值 · 不设上限</div>
               </div>
-              <div class="lvx-reward-rule"><span>⚡</span> 1 钻 = 1 成长值 · 不设上限</div>
+              <div class="lvx-reward-right">
+                <span class="lvx-reward-score-lbl">本次获得</span>
+                <div class="lvx-reward-val">+420<span class="lvx-reward-unit">分</span></div>
+              </div>
             </div>
-            <div class="lvx-reward-val">+420</div>
+            <div class="lvx-reward-foot-strip">
+              <span class="lvx-foot-strip-lbl">💎 累计打赏贡献</span>
+              <span class="lvx-foot-strip-val">420 钻</span>
+            </div>
           </div>
           <!-- 今日活跃明细与互动引导 (上限100分，无任务字样) -->
           <div class="lvx-daily-box" data-od-id="level-daily-activity-box">
