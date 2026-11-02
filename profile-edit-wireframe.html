@@ -167,7 +167,6 @@
   }
   .field-val.placeholder { color: var(--muted); }
   .field-val.bio { line-height: 1.5; white-space: pre-wrap; }
-  .field-val.readonly { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
 
   /* ─── Bottom safe area spacer ─────────────────────────────── */
   .bottom-spacer { height: 32px; }
@@ -1862,11 +1861,6 @@
             </div>
 
             <div class="field-item">
-              <span class="field-lbl">ID号</span>
-              <span class="field-val readonly">@username_unique</span>
-            </div>
-
-            <div class="field-item">
               <span class="field-lbl">简介</span>
               <span class="field-val placeholder">介绍一下自己…</span>
             </div>
@@ -1923,11 +1917,6 @@
             <div class="field-item">
               <span class="field-lbl">用户昵称</span>
               <span class="field-val">用户昵称示例</span>
-            </div>
-
-            <div class="field-item">
-              <span class="field-lbl">ID号</span>
-              <span class="field-val readonly">@username_unique</span>
             </div>
 
             <div class="field-item" style="align-items:flex-start; padding-top:14px;">
@@ -1987,7 +1976,7 @@
   </div>
   <div class="spec-row">
     <span class="spec-key">ID号</span>
-    <span class="spec-val">只读展示 · 不可更改 · 无箭头、不可点击</span>
+    <span class="spec-val">不可更改 · 编辑页不展示 · 仅在「我的」页展示</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">简介</span>
