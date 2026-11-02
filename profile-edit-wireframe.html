@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>个人资料编辑页 — 线框图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Source+Sans+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #fafafa;
@@ -26,6 +25,9 @@
     --radius-pill: 9999px;
     --wf-block: #d1d5db;
     --wf-block-dark: #9ca3af;
+    --success: #16a34a;
+    --motion-fast: 120ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -165,13 +167,7 @@
   }
   .field-val.placeholder { color: var(--muted); }
   .field-val.bio { line-height: 1.5; white-space: pre-wrap; }
-  .field-arrow { font-size: 16px; color: var(--muted); font-family: var(--font-mono); flex-shrink: 0; }
-
-  /* Username uniqueness note */
-  .field-note {
-    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
-    padding: 6px 0 0 80px; margin-top: -8px;
-  }
+  .field-val.readonly { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
 
   /* ─── Bottom safe area spacer ─────────────────────────────── */
   .bottom-spacer { height: 32px; }
@@ -184,19 +180,1644 @@
   .spec-key { font-family: var(--font-mono); font-size: 11px; color: var(--muted); flex-shrink: 0; margin-right: 16px; }
   .spec-val { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 500; text-align: right; }
   .spec-badge { display: inline-block; background: var(--surface-warm); border: 1px solid var(--accent); color: var(--fg); font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 3px; margin-right: 3px; }
+
+  /* ═══ 「我的」页（整合自 creator-center-matrix.html，选择器均限定在 #screen-profile 内或其专属类名） ═══ */
+  .mp-screen-view {
+    width: 100%; height: 100%;
+    border-radius: 44px; overflow: hidden;
+    display: none; flex-direction: column;
+    position: relative;
+    animation: fadeInScreen 200ms cubic-bezier(0.2, 0, 0, 1);}
+  .mp-screen-view.active {
+    display: flex;}
+  .matrix-toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-24px);
+    background: rgba(13, 17, 23, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    color: #ffffff; padding: 10px 24px; border-radius: 9999px;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px; z-index: 99999;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.18);
+    opacity: 0; pointer-events: none; transition: all 240ms cubic-bezier(0.2, 0, 0, 1);}
+  .matrix-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto;}
+  .matrix-toast-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--accent-on);
+    font-size: 11px; font-weight: 700; flex-shrink: 0;}
+  #screen-profile {
+    background: #ffffff; color: var(--fg);}
+  #screen-profile .state-btn { font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 4px; border: none;
+    background: transparent; color: var(--muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all var(--motion-fast) var(--ease-standard);}
+  #screen-profile .state-btn.active { background: var(--accent); color: var(--accent-on);}
+  #screen-profile .state-btn:hover:not(.active) { background: var(--border-soft); color: var(--fg);}
+  #screen-profile { width: 100%; height: 100%;
+    background: #ffffff;
+    border-radius: 34px;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    position: relative;}
+  #screen-profile.active { display: flex;}
+  #screen-profile .mp-status-bar { height: 44px; background: var(--fg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 20px; flex-shrink: 0; position: relative; z-index: 10;}
+  #screen-profile .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: #fff;}
+  #screen-profile .mp-status-icons { display: flex; align-items: center; gap: 5px;}
+  #screen-profile .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end;}
+  #screen-profile .mp-status-icons .bar { width: 3px; background: #fff; border-radius: 1px;}
+  #screen-profile .mp-status-icons .bar:nth-child(1) { height: 4px;}
+  #screen-profile .mp-status-icons .bar:nth-child(2) { height: 6px;}
+  #screen-profile .mp-status-icons .bar:nth-child(3) { height: 8px;}
+  #screen-profile .mp-status-icons .bar:nth-child(4) { height: 10px;}
+  #screen-profile .wifi-icon { width: 14px; height: 10px; position: relative;}
+  #screen-profile .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; background: white; border-radius: 50%;}
+  #screen-profile .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(255,255,255,0.8); border-radius: 2px; position: relative;}
+  #screen-profile .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0;}
+  #screen-profile .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px;
+    width: 14px; height: calc(100% - 3px); background: white; border-radius: 1px;}
+  #screen-profile .mp-nav { height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; z-index: 10;
+    border-bottom: 1px solid var(--border-soft);}
+  #screen-profile .mp-nav-back { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;
+    padding-bottom: 1px;}
+  #screen-profile .mp-nav-title { flex: 1; text-align: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.02em;}
+  #screen-profile .mp-nav-share { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--fg); cursor: pointer;
+    position: relative;}
+  #screen-profile .mp-nav-report { width: 28px; height: 28px; border-radius: 50%; background: var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--fg); cursor: pointer;}
+  #screen-profile .report-sheet-backdrop { position: absolute; inset: 0; background: rgba(13,17,23,0.35);
+    z-index: 49; display: none;}
+  #screen-profile .report-sheet-backdrop.open { display: block;}
+  #screen-profile .report-sheet { position: absolute; left: 0; right: 0; bottom: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--border-soft);
+    border-radius: 20px 20px 0 0;
+    z-index: 50;
+    display: none; flex-direction: column;
+    padding: 12px 20px 24px;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.12);}
+  #screen-profile .report-sheet.open { display: flex;}
+  #screen-profile .report-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0;}
+  #screen-profile .report-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); text-align: center; margin-bottom: 14px;}
+  #screen-profile .report-reason-list { display: flex; flex-direction: column;}
+  #screen-profile .report-reason-item { display: flex; align-items: center; justify-content: space-between;
+    height: 48px;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: var(--font-body); font-size: 14px; color: var(--fg-2);
+    cursor: pointer;}
+  #screen-profile .report-reason-item:last-child { border-bottom: none;}
+  #screen-profile .report-reason-item:active { background: var(--border-soft);}
+  #screen-profile .report-reason-arrow { color: var(--muted); font-size: 16px;}
+  #screen-profile .report-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 60;
+    background: rgba(13,17,23,0.92);
+    border-radius: var(--radius-md);
+    padding: 22px 28px;
+    display: none; flex-direction: column; align-items: center; gap: 10px;
+    min-width: 160px;}
+  #screen-profile .report-toast.visible { display: flex;}
+  #screen-profile .report-toast-icon { width: 44px; height: 44px; border-radius: 50%;
+    background: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff;}
+  #screen-profile .report-toast-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff;}
+  #screen-profile .msg-unread-badge { position: absolute; top: -4px; right: -4px;
+    min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px;
+    background: #dc2626; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 700; line-height: 1;
+    box-shadow: 0 0 0 1.5px #ffffff;}
+  #screen-profile .profile-scroll { flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;}
+  #screen-profile .profile-cover { width: 100%; height: 120px;
+    background: var(--wf-block);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;}
+  #screen-profile .profile-cover-placeholder { position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.05em;}
+  #screen-profile .profile-avatar-wrap { position: absolute;
+    bottom: -30px; left: 16px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--wf-block-dark);
+    border: 3px solid #ffffff;
+    z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;}
+  #screen-profile .profile-info { padding: 36px 16px 0;
+    background: #ffffff;}
+  #screen-profile .profile-name { font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--fg); margin-bottom: 2px;}
+  #screen-profile .profile-handle { font-family: var(--font-mono); font-size: 11px;
+    color: var(--muted); margin-bottom: 8px;}
+  #screen-profile .profile-bio { font-size: 13px; color: var(--fg-2); line-height: 1.5;
+    margin-bottom: 14px; font-family: var(--font-body);}
+  #screen-profile .stats-row { display: flex;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
+    margin: 0 -16px;
+    padding: 0 16px;}
+  #screen-profile .stat-item { flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0;
+    border-right: 1px solid var(--border-soft);}
+  #screen-profile .stat-item:last-child { border-right: none;}
+  #screen-profile .stat-num { font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+    color: var(--fg); line-height: 1;}
+  #screen-profile .stat-lbl { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-top: 3px; letter-spacing: 0.02em;}
+  #screen-profile .reward-card { margin: 14px 0 0;
+    padding: 12px 0;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex; flex-direction: column; align-items: stretch;}
+  #screen-profile .reward-stat { flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    border-right: 1px solid var(--border-soft);}
+  #screen-profile .reward-stat:last-child { border-right: none;}
+  #screen-profile .reward-stat-lbl { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 0.02em; margin-bottom: 3px;}
+  #screen-profile .reward-stat-num { display: flex; align-items: baseline; gap: 3px; line-height: 1;}
+  #screen-profile .reward-stat-num .amt { font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+    color: var(--fg);}
+  #screen-profile .reward-card { cursor: pointer;}
+  #screen-profile .reward-card-top { display: flex; align-items: center; width: 100%;}
+  #screen-profile .reward-card-toggle { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    text-align: center; padding: 6px 0 2px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;}
+  #screen-profile .reward-card-toggle .arrow { font-size: 8px; transition: transform 150ms;}
+  #screen-profile .reward-card.expanded .reward-card-toggle .arrow { transform: rotate(180deg);}
+  #screen-profile .reward-detail-panel { display: none; width: 100%; padding: 10px 14px 4px;
+    border-top: 1px solid var(--border-soft); margin-top: 8px;}
+  #screen-profile .reward-card.expanded .reward-detail-panel { display: block;}
+  #screen-profile .reward-detail-title { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    margin-bottom: 8px; letter-spacing: 0.02em;}
+  #screen-profile .reward-detail-list { display: flex; flex-wrap: wrap; gap: 10px 12px;
+    max-height: 96px; overflow-y: auto;}
+  #screen-profile .reward-detail-item { display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 11px; color: var(--fg-2);
+    background: var(--border-soft); border-radius: var(--radius-sm);
+    padding: 6px 10px 6px 6px;}
+  #screen-profile .reward-detail-icon { font-size: 20px; flex-shrink: 0; line-height: 1;}
+  #screen-profile .reward-detail-count { font-family: var(--font-mono); font-size: 11px; color: var(--fg); font-weight: 600;}
+  #screen-profile .reward-detail-name { display: none;}
+  #screen-profile .reward-detail-amount { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-left: 2px;}
+  #screen-profile .profile-actions { padding: 14px 0 0;
+    display: flex; gap: 8px;}
+  #screen-profile .btn-follow { flex: 1; height: 36px;
+    background: var(--accent); color: var(--accent-on);
+    border-radius: var(--radius-md); border: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;}
+  #screen-profile .btn-icon { width: 36px; height: 36px;
+    background: transparent; color: var(--fg);
+    border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; flex-shrink: 0;}
+  #screen-profile .section-gap { height: 8px; background: var(--border-soft); flex-shrink: 0;}
+  #screen-profile .content-tabs { display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;}
+  #screen-profile .content-tab { flex: 1; text-align: center; padding: 11px 0;
+    font-family: var(--font-display); font-size: 13px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative;}
+  #screen-profile .content-tab.active { color: var(--fg); font-weight: 600;}
+  #screen-profile .content-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: var(--accent); border-radius: 1px;}
+  #screen-profile .content-panel { display: none; background: #ffffff; flex: 1;}
+  #screen-profile .content-panel.active { display: block;}
+  #screen-profile .content-section { padding: 14px 16px 16px;}
+  #screen-profile .content-header { display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;}
+  #screen-profile .content-title { font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    color: var(--fg); letter-spacing: 0.04em;}
+  #screen-profile .content-count { font-family: var(--font-mono); font-size: 11px; color: var(--muted);}
+  .profile-collection-section {
+    padding: 10px 14px 8px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-soft);}
+  .profile-collection-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;}
+  .profile-collection-scroll::-webkit-scrollbar {
+    display: none;}
+  .profile-collection-card {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px 7px 10px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 140ms cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);}
+  .profile-collection-card:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);}
+  .profile-collection-card:active {
+    transform: translateY(0);}
+  .collection-stack-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;}
+  .collection-stack-icon svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;}
+  .collection-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;}
+  .collection-title {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;}
+  .collection-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.2;}
+  #screen-profile .video-grid { display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;}
+  #screen-profile .video-thumb { aspect-ratio: 9/16;
+    background: var(--wf-block);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;}
+  #screen-profile .video-thumb::after { content: '';}
+  #screen-profile .video-thumb:nth-child(3n+2) { background: #c8ccd2;}
+  #screen-profile .thumb-type-icon { position: absolute; bottom: 4px; right: 4px;
+    font-size: 10px; color: #ffffff;
+    background: rgba(13,17,23,0.6); padding: 1px 4px;
+    border-radius: 3px; line-height: 1.3;
+    z-index: 2;}
+  #screen-profile .thumb-type-icon.img-icon { font-size: 9px;}
+  #screen-profile .thumb-pin-icon { position: absolute; top: 4px; left: 4px;
+    font-size: 9px; line-height: 1;
+    background: rgba(13,17,23,0.6); color: #fff;
+    padding: 2px 4px; border-radius: 3px; z-index: 2;}
+  #screen-profile .video-thumb:nth-child(3n+3) { background: #b8bcc4;}
+  #screen-profile .moment-list { display: flex; flex-direction: column;}
+  #screen-profile .moment-year-header { display: flex; align-items: center; gap: 4px;
+    padding: 10px 16px; background: var(--border-soft);
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg-2);}
+  #screen-profile .moment-year-header .caret { font-size: 10px; color: var(--muted);}
+  #screen-profile .moment-item { display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px; border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;}
+  #screen-profile .moment-item:last-child { border-bottom: none;}
+  #screen-profile .moment-date-badge { flex-shrink: 0; width: 40px;
+    display: flex; align-items: baseline; justify-content: flex-start; gap: 1px;
+    font-family: var(--font-display); color: var(--fg);}
+  #screen-profile .moment-date-badge .day { font-size: 22px; font-weight: 700; line-height: 1;}
+  #screen-profile .moment-date-badge .month { font-size: 11px; font-weight: 500; color: var(--muted);}
+  #screen-profile .moment-item.same-day .moment-date-badge { visibility: hidden;}
+  #screen-profile .moment-thumb { flex-shrink: 0; width: 64px; height: 64px; border-radius: 4px;
+    background: var(--wf-block);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;}
+  #screen-profile .moment-thumb.video::after { content: '▶'; font-size: 15px; color: rgba(255,255,255,0.6);}
+  #screen-profile .moment-thumb-badge { position: absolute; bottom: 2px; right: 2px;
+    background: rgba(13,17,23,0.6); color: #fff;
+    font-family: var(--font-mono); font-size: 8px; font-weight: 500;
+    padding: 1px 4px; border-radius: 3px; line-height: 1.3;}
+  #screen-profile .moment-thumb.imgs-2,
+  #screen-profile .moment-thumb.imgs-3,
+  #screen-profile .moment-thumb.imgs-4,
+  #screen-profile .moment-thumb.imgs-5,
+  #screen-profile .moment-thumb.imgs-6,
+  #screen-profile .moment-thumb.imgs-7,
+  #screen-profile .moment-thumb.imgs-8,
+  #screen-profile .moment-thumb.imgs-9 { display: grid; align-items: stretch; justify-content: stretch;
+    gap: 1px; background: var(--border-soft);}
+  #screen-profile .moment-thumb.imgs-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr;}
+  #screen-profile .moment-thumb.imgs-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;}
+  #screen-profile .moment-thumb.imgs-3 .thumb-cell:first-child { grid-row: 1 / 3;}
+  #screen-profile .moment-thumb.imgs-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;}
+  #screen-profile .moment-thumb.imgs-5,
+  #screen-profile .moment-thumb.imgs-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);}
+  #screen-profile .moment-thumb.imgs-5 .thumb-cell:nth-child(1),
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3;}
+  #screen-profile .moment-thumb.imgs-5 .thumb-cell:nth-child(2),
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(2) { grid-column: 3; grid-row: 1;}
+  #screen-profile .moment-thumb.imgs-5 .thumb-cell:nth-child(3),
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 2;}
+  #screen-profile .moment-thumb.imgs-5 .thumb-cell:nth-child(4),
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(4) { grid-column: 1; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-5 .thumb-cell:nth-child(5),
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(5) { grid-column: 2; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-6 .thumb-cell:nth-child(6) { grid-column: 3; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-7 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(1) { grid-column: 1; grid-row: 1 / 3;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(2) { grid-column: 2; grid-row: 1 / 3;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 1;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(4) { grid-column: 3; grid-row: 2;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(5) { grid-column: 1; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(6) { grid-column: 2; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-7 .thumb-cell:nth-child(7) { grid-column: 3; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-8 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(1) { grid-column: 1; grid-row: 1 / 3;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(2) { grid-column: 2; grid-row: 1;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(3) { grid-column: 3; grid-row: 1;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(4) { grid-column: 2; grid-row: 2;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(5) { grid-column: 3; grid-row: 2;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(6) { grid-column: 1; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(7) { grid-column: 2; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-8 .thumb-cell:nth-child(8) { grid-column: 3; grid-row: 3;}
+  #screen-profile .moment-thumb.imgs-9 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);}
+  #screen-profile .thumb-cell { background: var(--wf-block);}
+  #screen-profile .thumb-cell:nth-child(even) { background: var(--wf-block-dark);}
+  #screen-profile .moment-body { flex: 1; min-width: 0; display: flex; align-items: center;}
+  #screen-profile .moment-text { font-size: 13px; color: var(--fg); line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;}
+  #screen-profile .rel-nav { height: 44px; background: #ffffff;
+    display: flex; align-items: center; padding: 0 12px;
+    flex-shrink: 0; border-bottom: 1px solid var(--border-soft);}
+  #screen-profile .rel-nav-back { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--border-soft);
+    font-size: 18px; font-weight: 300; color: var(--fg); line-height: 1;}
+  #screen-profile .rel-nav-tabs { flex: 1; display: flex; align-items: center; justify-content: center; gap: 20px;}
+  #screen-profile .rel-nav-tab { font-family: var(--font-display); font-size: 14px; font-weight: 500;
+    color: var(--muted); cursor: pointer; position: relative; padding-bottom: 6px;}
+  #screen-profile .rel-nav-tab.active { color: var(--fg); font-weight: 600;}
+  #screen-profile .rel-nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--fg); border-radius: 1px;}
+  #screen-profile .rel-nav-settings { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--muted);}
+  #screen-profile .rel-search { margin: 12px 16px; height: 36px; background: var(--border-soft);
+    border-radius: 18px; display: flex; align-items: center; padding: 0 14px; gap: 8px;}
+  #screen-profile .rel-search-icon { font-size: 14px; color: var(--muted);}
+  #screen-profile .rel-search-text { font-family: var(--font-body); font-size: 13px; color: var(--muted);}
+  #screen-profile .rel-section-title { padding: 8px 16px; font-family: var(--font-body); font-size: 12px; color: var(--muted);}
+  #screen-profile .rel-list { flex: 1; display: flex; flex-direction: column;}
+  #screen-profile .rel-item { display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border-soft);}
+  #screen-profile .rel-avatar { width: 48px; height: 48px; border-radius: 50%;
+    background: var(--wf-block-dark); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;}
+  #screen-profile .rel-body { flex: 1; min-width: 0;}
+  #screen-profile .rel-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 2px;}
+  #screen-profile .rel-bio { font-family: var(--font-body); font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+  #screen-profile .rel-footer-note { padding: 16px; text-align: center;
+    font-family: var(--font-body); font-size: 12px; color: var(--muted);}
+  #screen-profile .rel-action-btn { height: 28px; padding: 0 14px; flex-shrink: 0;
+    border-radius: var(--radius-pill); border: none;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    cursor: pointer;}
+  #screen-profile .rel-action-btn.followed { background: var(--border-soft); color: var(--muted);
+    border: 1.5px solid var(--border);}
+  #screen-profile .rel-action-btn.mutual { background: var(--border-soft); color: var(--fg-2);
+    border: 1.5px solid var(--border);}
+  #screen-profile .rel-action-btn.followback { background: #ff4d6d; color: #ffffff;}
+  #screen-profile .rel-panel { display: none; flex-direction: column;}
+  #screen-profile .rel-panel.active { display: flex;}
+  #screen-profile .mp-status-bar {
+    background: #0d1117; color: #ffffff;}
+  #screen-profile .mp-status-time {
+    color: #ffffff;}
+  #screen-profile .icon-bar span {
+    background: #ffffff;}
+  #screen-profile .wifi-icon {
+    filter: invert(1);}
+  .mp-tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: #0d1117;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 0 4px calc(env(safe-area-inset-bottom, 0px));
+    z-index: 50;}
+  .mp-tabbar .tab-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; flex: 1; height: 100%;
+    cursor: pointer; text-decoration: none;
+    color: rgba(255, 255, 255, 0.55);
+    transition: all 120ms ease;
+    user-select: none;}
+  .mp-tabbar .tab-item:hover,
+  .mp-tabbar .tab-item.active {
+    color: var(--accent);}
+  .mp-tabbar .tab-icon {
+    font-size: 17px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;}
+  .mp-tabbar .tab-label {
+    font-family: var(--font-body); font-size: 10px; font-weight: 500;
+    line-height: 1;}
+  .mp-tabbar .tab-item.active .tab-label {
+    font-weight: 600;}
+  .mp-tabbar .tab-publish {
+    position: relative;}
+  .mp-tabbar .tab-publish .tab-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--accent); color: var(--accent-on);
+    font-size: 20px; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(255, 210, 30, 0.35);}
+  .mp-tabbar .tab-publish .tab-label {
+    display: none;}
+  .mp-tabbar .tab-icon-wrap {
+    position: relative; display: flex; align-items: center; justify-content: center;}
+  .mp-tabbar .tab-unread-badge {
+    position: absolute; top: -4px; right: -10px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    border-radius: 8px; box-sizing: border-box;
+    background: #ef4444; color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+    line-height: 1; text-align: center;
+    box-shadow: 0 0 0 1.5px #0d1117;
+    flex-shrink: 0; pointer-events: none;}
+  #screen-profile .profile-scroll {
+    padding-bottom: 60px;}
+  .profile-name-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 4px;}
+  .profile-name-row .profile-name {
+    margin-bottom: 0 !important;}
+  .profile-level-badges {
+    display: inline-flex; align-items: center; gap: 6px;
+    vertical-align: middle;}
+  .badge-app-level {
+    display: inline-flex; align-items: center; gap: 2.5px;
+    padding: 1px 6px 1px 5px; border-radius: 9999px;
+    background: linear-gradient(135deg, #ffd21e 0%, #f59e0b 100%);
+    color: #0d1117; font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700; line-height: 1.35;
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255,255,255,0.4);
+    letter-spacing: 0.02em; flex-shrink: 0;}
+  .badge-app-level .lvl-icon {
+    font-size: 9px; line-height: 1;}
+  .badge-tier-title {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1px 7px 1px 6px; border-radius: 9999px;
+    background: rgba(255, 210, 30, 0.12);
+    border: 1px solid rgba(255, 210, 30, 0.35);
+    color: #ffd21e; font-family: var(--font-display);
+    font-size: 10px; font-weight: 700; line-height: 1.35;
+    letter-spacing: 0.02em; flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(255, 210, 30, 0.12);
+    transition: all 140ms ease;}
+  .badge-tier-title:hover {
+    background: rgba(255, 210, 30, 0.2);
+    border-color: rgba(255, 210, 30, 0.55);}
+  .badge-tier-title .tier-dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: currentColor;
+    display: inline-block;}
+  .badge-host-level {
+    display: inline-flex; align-items: center; gap: 3.5px;
+    padding: 1px 6px; border-radius: 4px;
+    background: #f3f4f6; border: 1px solid #e5e7eb;
+    color: #4b5563; font-family: var(--font-mono);
+    font-size: 10px; font-weight: 600; line-height: 1.3;
+    flex-shrink: 0;}
+  .badge-host-level .host-dot {
+    width: 4.5px; height: 4.5px; border-radius: 50%;
+    background: #9ca3af;}
+  .user-level-drawer-backdrop {
+    position: absolute; inset: 0; background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    z-index: 120; opacity: 0; pointer-events: none;
+    transition: opacity 240ms cubic-bezier(0.2, 0, 0, 1);}
+  .user-level-drawer-backdrop.open {
+    opacity: 1; pointer-events: auto;}
+  .user-level-drawer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    max-height: 86%; height: 580px;
+    background: linear-gradient(180deg, #161a26 0%, #0d1017 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.88);
+    z-index: 121;
+    display: flex; flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    color: #ffffff; overflow: hidden;}
+  .user-level-drawer-backdrop.open .user-level-drawer {
+    transform: translateY(0);}
+  .user-level-drawer-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: rgba(255, 255, 255, 0.28);
+    margin: 10px auto 4px; flex-shrink: 0;}
+  .user-level-drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 18px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;}
+  .user-level-drawer-title-wrap {
+    display: flex; align-items: center; gap: 8px;}
+  .user-level-drawer-title {
+    font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #ffffff;
+    display: flex; align-items: center; gap: 6px;}
+  .user-level-drawer-close {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: rgba(255, 255, 255, 0.7);
+    cursor: pointer; transition: all 140ms ease;}
+  .user-level-drawer-close:hover {
+    background: rgba(255, 255, 255, 0.2); color: #ffffff;}
+  .user-level-drawer-body {
+    flex: 1; overflow-y: auto; padding: 14px 16px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+    scrollbar-width: none;}
+  .user-level-drawer-body::-webkit-scrollbar { display: none;}
+  .target-user-hero-card {
+    border-radius: 16px; padding: 16px 14px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;}
+  .target-user-left {
+    display: flex; align-items: center; gap: 12px; z-index: 2;}
+  .target-user-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #1f2430; border: 2px solid rgba(255, 255, 255, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;}
+  .target-user-meta {
+    display: flex; flex-direction: column; gap: 3px;}
+  .target-user-name-line {
+    display: flex; align-items: center; gap: 6px;}
+  .target-user-name {
+    font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #ffffff;}
+  .target-user-role-badge {
+    font-size: 10px; padding: 1px 6px; border-radius: 4px;
+    background: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.85);}
+  .target-user-tier-desc {
+    font-size: 11px; color: rgba(255, 255, 255, 0.65); font-family: var(--font-body);}
+  .target-user-badge-right {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px; z-index: 2;}
+  .target-level-pill-giant {
+    padding: 4px 12px 4px 10px; border-radius: 9999px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 800;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);}
+  .level-gap-comparison-card {
+    background: #141724; border-radius: 14px; padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex; flex-direction: column; gap: 8px;}
+  .level-gap-header {
+    display: flex; align-items: center; justify-content: space-between;}
+  .level-gap-title {
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    color: #ffffff; display: flex; align-items: center; gap: 5px;}
+  .level-gap-status-tag {
+    font-size: 10.5px; font-family: var(--font-mono); font-weight: 700;
+    padding: 2px 8px; border-radius: 9999px;}
+  .level-gap-status-tag.ahead {
+    background: rgba(34, 197, 94, 0.16); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);}
+  .level-gap-status-tag.equal {
+    background: rgba(250, 204, 21, 0.16); color: #fde047; border: 1px solid rgba(250, 204, 21, 0.3);}
+  .level-gap-status-tag.behind {
+    background: rgba(59, 130, 246, 0.16); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3);}
+  .level-gap-progress-wrap {
+    display: flex; flex-direction: column; gap: 6px;}
+  .level-gap-nodes-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255, 255, 255, 0.7);}
+  .level-gap-track {
+    width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px; overflow: hidden; position: relative;}
+  .level-gap-bar {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #ffd21e 0%, #f59e0b 100%);
+    box-shadow: 0 0 8px rgba(255, 210, 30, 0.5);
+    transition: width 300ms ease;}
+  .level-gap-tip {
+    font-size: 10.5px; color: rgba(255, 255, 255, 0.55); font-family: var(--font-body);
+    line-height: 1.4;}
+  .target-perks-section {
+    display: flex; flex-direction: column; gap: 10px;}
+  .target-perks-header {
+    display: flex; align-items: center; justify-content: space-between;}
+  .target-perks-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    color: #ffffff; display: flex; align-items: center; gap: 6px;}
+  .target-perks-sub {
+    font-size: 10px; color: rgba(255, 255, 255, 0.45);}
+  .target-perks-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;}
+  .target-perk-item {
+    background: #151824; border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px; padding: 10px;
+    display: flex; flex-direction: column; gap: 5px;
+    transition: all 160ms ease;}
+  .target-perk-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 4px;}
+  .target-perk-icon {
+    font-size: 16px;}
+  .target-perk-tag {
+    font-size: 9px; padding: 1px 5px; border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.6);}
+  .target-perk-name {
+    font-family: var(--font-display); font-size: 11.5px; font-weight: 600;
+    color: #ffffff; line-height: 1.3;}
+  .target-perk-desc {
+    font-size: 9.5px; color: rgba(255, 255, 255, 0.48); line-height: 1.35;
+    font-family: var(--font-body);}
+  .user-level-drawer-footer {
+    padding: 12px 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.35); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;}
+  .drawer-footer-tip {
+    font-size: 11px; color: rgba(255, 255, 255, 0.65);
+    display: flex; align-items: center; gap: 5px;}
+  .drawer-footer-btn {
+    padding: 8px 16px; border-radius: 9999px;
+    background: linear-gradient(135deg, #ffd21e 0%, #f59e0b 100%);
+    border: none; outline: none; cursor: pointer;
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    color: #0d1117; box-shadow: 0 4px 14px rgba(255, 210, 30, 0.4);
+    transition: all 160ms ease;}
+  .drawer-footer-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 210, 30, 0.55);}
+  #screen-profile #profile-fav {
+    background: #f8fafc;
+    min-height: 480px;
+    padding-bottom: 70px;
+    position: relative;}
+  .fav-subtabs-wrap {
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 10px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;}
+  .fav-subtabs-scroll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;}
+  .fav-subtabs-scroll::-webkit-scrollbar {
+    display: none;}
+  .fav-subtab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 140ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;}
+  .fav-subtab.active {
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 600;}
+  .fav-subpanel {
+    display: none;
+    padding: 12px 14px;}
+  .fav-subpanel.active {
+    display: block;}
+  .fav-video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;}
+  .fav-video-card {
+    position: relative;
+    aspect-ratio: 3/4;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;}
+  .fav-video-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;}
+  .fav-v-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;}
+  .fav-v-corner-tag {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 11px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 3px;
+    padding: 2px 4px;
+    line-height: 1;
+    z-index: 2;}
+  .fav-v-likes {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);}
+  .fav-v-likes .v-heart {
+    font-size: 11px;
+    color: #ffffff;}
+  .fav-col-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;}
+  .fav-col-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    transition: all 140ms ease;}
+  .fav-col-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);}
+  .fav-col-cover {
+    width: 60px;
+    height: 78px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #334155;
+    flex-shrink: 0;}
+  .fav-col-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;}
+  .fav-col-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;}
+  .fav-col-stack-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;}
+  .fav-col-stack-icon svg {
+    width: 15px;
+    height: 15px;
+    color: #3b82f6;}
+  .fav-col-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;}
+  .fav-col-meta {
+    font-size: 11.5px;
+    color: #64748b;
+    font-family: var(--font-mono);}
+  .fav-col-author {
+    font-size: 11px;
+    color: #94a3b8;}
+  .profile-hamburger-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    transition: all 140ms ease;
+    user-select: none;}
+  .profile-hamburger-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: scale(1.04);}
+  .profile-hamburger-btn:active {
+    transform: scale(0.96);}
+  .profile-hamburger-btn .hb-bar {
+    width: 15px;
+    height: 2px;
+    background: #1e293b;
+    border-radius: 1px;
+    transition: background 120ms ease;}
+  .profile-hamburger-btn:hover .hb-bar {
+    background: #0f172a;}
+  .profile-sidebar-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 95;
+    display: none;
+    opacity: 0;
+    transition: opacity 220ms ease;}
+  .profile-sidebar-backdrop.open {
+    display: block;
+    opacity: 1;}
+  .profile-sidebar-drawer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    background: #ffffff;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 10px 0 36px rgba(0, 0, 0, 0.28);
+    transform: translateX(-100%);
+    transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 0 20px 20px 0;
+    overflow: hidden;}
+  .profile-sidebar-backdrop.open + .profile-sidebar-drawer,
+  .profile-sidebar-drawer.open {
+    transform: translateX(0);}
+  .ps-header {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #ffffff;
+    flex-shrink: 0;}
+  .ps-header-title {
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: 0.01em;}
+  .ps-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 120ms ease;}
+  .ps-close-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;}
+  .ps-scroll-content.single-entry-mode {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 14px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fafafa;}
+  .ps-creator-single-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 150ms ease;
+    user-select: none;}
+  .ps-creator-single-item:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);}
+  .ps-creator-single-item:active {
+    transform: scale(0.985);}
+  .ps-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;}
+  .ps-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ffd21e 0%, #f59e0b 100%);
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+    flex-shrink: 0;}
+  .ps-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;}
+  .ps-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;}
+  .ps-item-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;}
+  .ps-item-tag {
+    font-size: 9px;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    background: #ffd21e;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;}
+  .ps-item-desc {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.3;}
+  .ps-item-right {
+    display: flex;
+    align-items: center;}
+  .ps-item-arrow {
+    color: #94a3b8;
+    font-size: 18px;
+    font-weight: 600;
+    transition: transform 120ms ease, color 120ms ease;}
+  .ps-creator-single-item:hover .ps-item-arrow {
+    color: #0f172a;
+    transform: translateX(2px);}
+  @keyframes fadeInScreen {
+    from { opacity: 0; transform: scale(0.99); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ─── 编辑资料入口（本稿新增） ───────────────────────────── */
+  #screen-profile .profile-info { position: relative; }
+  .profile-edit-entry {
+    position: absolute; top: 6px; right: 16px;
+    height: 30px; padding: 0 14px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+    color: var(--fg); background: var(--surface);
+    border: 1px solid var(--fg); border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--ease-standard);
+  }
+  .profile-edit-entry::after { content: ''; position: absolute; inset: -7px -4px; }
+  .profile-edit-entry:active { background: var(--border-soft); }
+  .profile-edit-entry:focus-visible, .nav-back:focus-visible, .nav-save:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  @media (hover: hover) { .profile-edit-entry:hover { background: var(--accent); } .nav-back { cursor: pointer; } }
+
+  /* ─── 「我的」页导航栏：左汉堡 · 中标题 · 右胶囊（标题始终居中） ─── */
+  #screen-profile .mp-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+  #screen-profile .mp-nav .profile-hamburger-btn { justify-self: start; }
+  #screen-profile .mp-nav-title { flex: none; }
+  .mp-capsule {
+    justify-self: end; width: 44px; height: 32px;
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  }
+  .mp-capsule-btn {
+    position: relative; flex: 1; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 0; border-radius: var(--radius-pill); color: var(--fg); cursor: pointer;
+  }
+  .mp-capsule-btn::after { content: ''; position: absolute; inset: -6px 0; }
+  .mp-capsule-btn:active { background: var(--border-soft); }
+  .mp-capsule-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: -2px; }
+  .mp-capsule-ring {
+    width: 16px; height: 16px; border: 2px solid var(--fg); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mp-capsule-ring::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--fg); }
+
+  /* ─── 退出小程序确认弹窗（盖在抽屉与等级半屏之上） ─── */
+  .exit-confirm-backdrop {
+    position: absolute; inset: 0; z-index: 130;
+    display: flex; align-items: center; justify-content: center; padding: 0 40px;
+    background: rgba(13, 17, 23, 0.55);
+    opacity: 0; visibility: hidden;
+    transition: opacity 200ms var(--ease-standard), visibility 0s linear 200ms;
+  }
+  .exit-confirm-backdrop.open { opacity: 1; visibility: visible; transition: opacity 200ms var(--ease-standard); }
+  .exit-confirm {
+    width: 100%; background: var(--surface); border-radius: var(--radius-md);
+    padding: 24px 20px 16px;
+    transform: scale(0.96); transition: transform 200ms var(--ease-standard);
+  }
+  .exit-confirm-backdrop.open .exit-confirm { transform: scale(1); }
+  .exit-confirm-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--fg); text-align: center; }
+  .exit-confirm-desc { font-size: 13px; line-height: 1.55; color: var(--fg-2); text-align: center; margin-top: 8px; }
+  .exit-confirm-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .exit-btn {
+    flex: 1; height: 44px; border-radius: var(--radius-md);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap;
+    color: var(--fg); background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+  }
+  .exit-btn:active { background: var(--border-soft); }
+  .exit-btn-primary { color: #ffffff; background: var(--fg); border-color: var(--fg); }
+  .exit-btn-primary:active { background: var(--fg-2); }
+  .exit-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  /* ─── 入口 → 编辑页 的联动高亮 ─────────────────────────────── */
+  .devices-row { flex-wrap: wrap; justify-content: center; }
+  .device-wrapper .mp-device { transition: outline-color var(--motion-base, 200ms) var(--ease-standard); outline: 3px solid transparent; outline-offset: 6px; }
+  .device-wrapper.flash .mp-device { outline-color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) {
+    #screen-profile, #screen-profile * { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 
 <div class="page-header">
   <h1>个人资料编辑页 — 线框图</h1>
-  <p>小程序 · 两种状态：空 / 已填写</p>
+  <p>小程序 · 「我的」页入口 + 编辑页两种状态：空 / 已填写</p>
 </div>
 
 <div class="devices-row">
 
+
+  <!-- ⓪ 「我的」页（含编辑资料入口） -->
+  <div class="device-wrapper" id="dev-profile">
+    <div class="device-label">「我的」页 · 编辑资料入口</div>
+    <div class="mp-device">
+    <div class="mp-screen-view active" id="screen-profile" style="display:flex;">
+      <div class="mp-status-bar">
+          <span class="mp-status-time">9:41</span>
+          <div class="mp-status-icons">
+            <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+            <div class="wifi-icon"></div><div class="battery-icon"></div>
+          </div>
+        </div>
+        <div class="mp-nav">
+          <!-- 左上角三个横杆汉堡菜单入口，点击从左向右呼出抽屉 -->
+          <div class="profile-hamburger-btn" role="button" tabindex="0" aria-label="打开更多菜单" onclick="openProfileSideDrawer()" title="打开更多菜单">
+            <span class="hb-bar"></span>
+            <span class="hb-bar"></span>
+            <span class="hb-bar"></span>
+          </div>
+          <div class="mp-nav-title">我的</div>
+          <!-- 右上角：类微信小程序胶囊（仅关闭），点关闭先弹确认 -->
+          <div class="mp-capsule">
+            <button type="button" class="mp-capsule-btn" aria-label="关闭小程序" onclick="openExitConfirm(this)"><span class="mp-capsule-ring" aria-hidden="true"></span></button>
+          </div>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-cover">
+            <div class="profile-cover-placeholder">个人页头图</div>
+            <div class="profile-avatar-wrap">👤</div>
+          </div>
+          <div class="profile-info">
+            <button type="button" class="profile-edit-entry" onclick="openProfileEdit()" aria-label="编辑个人资料">✎ 编辑资料</button>
+            <div class="profile-name-row">
+              <div class="profile-name">用户昵称</div>
+              <div class="profile-level-badges">
+                <span class="badge-tier-title" onclick="openUserLevelDrawer(14, '用户昵称', '👤', '我本人')" style="cursor:pointer;" title="当前成长段位称谓：偶遇知音（点击查看等级与权益）"><span class="tier-dot"></span>偶遇知音</span>
+                <span class="badge-app-level" onclick="openUserLevelDrawer(14, '用户昵称', '👤', '我本人')" style="cursor:pointer;" title="查看我的等级与权益"><span class="lvl-icon">⚡</span>Lv.14</span>
+                <span class="badge-host-level" title="宿主等级：Lv.7"><span class="host-dot"></span>Lv.7</span>
+              </div>
+            </div>
+            <div class="profile-handle">@username_unique</div>
+            <div class="profile-bio">这里是个人简介，最多展示两行，超出截断显示…</div>
+            <div class="stats-row">
+              <div class="stat-item"><span class="stat-num">14.2w</span><span class="stat-lbl">获赞</span></div>
+              <div class="stat-item"><span class="stat-num">86</span><span class="stat-lbl">互关</span></div>
+              <div class="stat-item"><span class="stat-num">128</span><span class="stat-lbl">关注</span></div>
+              <div class="stat-item"><span class="stat-num">3,421</span><span class="stat-lbl">粉丝</span></div>
+            </div>
+
+            <!-- 打赏额度卡：点击展开/收起礼物明细 -->
+            <div class="reward-card" onclick="toggleRewardDetail(this)">
+              <div class="reward-card-top">
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">七日被打赏额</span>
+                  <span class="reward-stat-num"><span class="amt">86.00</span></span>
+                </div>
+                <div class="reward-stat">
+                  <span class="reward-stat-lbl">总被打赏额</span>
+                  <span class="reward-stat-num"><span class="amt">1,024.00</span></span>
+                </div>
+              </div>
+              <div class="reward-card-toggle"><span>礼物明细</span><span class="arrow">▾</span></div>
+              <div class="reward-detail-panel">
+                <div class="reward-detail-list">
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🌹</span>
+                    <span class="reward-detail-name">玫瑰</span>
+                    <span class="reward-detail-count">×32</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎈</span>
+                    <span class="reward-detail-name">气球</span>
+                    <span class="reward-detail-count">×18</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧸</span>
+                    <span class="reward-detail-name">玩偶</span>
+                    <span class="reward-detail-count">×8</span>
+                    <span class="reward-detail-amount">¥40</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🚀</span>
+                    <span class="reward-detail-name">火箭</span>
+                    <span class="reward-detail-count">×3</span>
+                    <span class="reward-detail-amount">¥54</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">👑</span>
+                    <span class="reward-detail-name">皇冠</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥52</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🍰</span>
+                    <span class="reward-detail-name">蛋糕</span>
+                    <span class="reward-detail-count">×5</span>
+                    <span class="reward-detail-amount">¥30</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🏰</span>
+                    <span class="reward-detail-name">城堡</span>
+                    <span class="reward-detail-count">×1</span>
+                    <span class="reward-detail-amount">¥99</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">💎</span>
+                    <span class="reward-detail-name">钻戒</span>
+                    <span class="reward-detail-count">×2</span>
+                    <span class="reward-detail-amount">¥56</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🎉</span>
+                    <span class="reward-detail-name">派对</span>
+                    <span class="reward-detail-count">×4</span>
+                    <span class="reward-detail-amount">¥32</span>
+                  </div>
+                  <div class="reward-detail-item">
+                    <span class="reward-detail-icon">🧧</span>
+                    <span class="reward-detail-name">红包</span>
+                    <span class="reward-detail-count">×6</span>
+                    <span class="reward-detail-amount">¥90</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            
+
+            <div style="height:14px;"></div>
+          </div>
+          <div class="section-gap"></div>
+
+          <!-- 内容 Tab：平行支持「上首页」、「大舞台」、「收藏」、「历史」与「喜欢」 -->
+          <div class="content-tabs">
+            <div class="content-tab active" data-target="profile-content" onclick="setContentTab(this, 'profile')">上首页</div>
+            <div class="content-tab" data-target="profile-square" onclick="setContentTab(this, 'profile')">大舞台</div>
+            <div class="content-tab" data-target="profile-fav" onclick="setContentTab(this, 'profile')">收藏</div>
+            <div class="content-tab" data-target="profile-history" onclick="setContentTab(this, 'profile')">历史</div>
+            <div class="content-tab" data-target="profile-likes" onclick="setContentTab(this, 'profile')">喜欢</div>
+          </div>
+
+          <!-- 内容面板（上首页样式：合集横滑卡片 + 视频图文混合网格） -->
+          <div class="content-panel active" id="profile-content">
+            <!-- 影视与主题合集展示栏（对标 image-38.png） -->
+            <div class="profile-collection-section">
+              <div class="profile-collection-scroll">
+                <div class="profile-collection-card" onclick="openCollectionDetail('影视宿命感心理学', 42)">
+                  <span class="collection-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                  <div class="collection-meta">
+                    <span class="collection-title">影视宿命感心理学</span>
+                    <span class="collection-count">更新到42集</span>
+                  </div>
+                </div>
+                <div class="profile-collection-card" onclick="openCollectionDetail('影视氛围感哲理辩', 28)">
+                  <span class="collection-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                  <div class="collection-meta">
+                    <span class="collection-title">影视氛围感哲理辩</span>
+                    <span class="collection-count">更新到28集</span>
+                  </div>
+                </div>
+                <div class="profile-collection-card" onclick="openCollectionDetail('音乐&amp;共鸣剪辑志', 35)">
+                  <span class="collection-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                  <div class="collection-meta">
+                    <span class="collection-title">音乐&amp;共鸣剪辑志</span>
+                    <span class="collection-count">更新到35集</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <div class="video-grid">
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb"><span class="thumb-type-icon">▶</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 大舞台面板：仿照微信「相册时光轴」方式展示（见参考图 image-16.png），整条卡片可点击，
+               点击后跳转至动态详情页（另一独立页面，本图未展示）；
+               示例覆盖：纯文字 / 单图 / 多图（最多 9 张）/ 单视频 四种内容形式，
+               外加同一天发布多条（日期角标不重复）、跨月、跨年三种时间场景 -->
+          <div class="content-panel" id="profile-square">
+            <div class="moment-list">
+
+              <div class="moment-year-header">2026年<span class="caret">⌄</span></div>
+
+              <!-- 同一天发布的第 1 条：纯文字，无缩略图 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">25</span><span class="month">7月</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">今天天气不错，出门走了很久，随手记录一下心情</div>
+                </div>
+              </div>
+
+              <!-- 同一天发布的第 2 条：单图+文字，日期角标留空（不重复展示 25 7月） -->
+              <div class="moment-item same-day" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">25</span><span class="month">7月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">摆摊收摊后拍的夜景，今天人挺多</div>
+                </div>
+              </div>
+
+              <!-- 2 张图：大方块左右两栅等分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">20</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-2"><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">两张对比图，装修前后差别挺大</div>
+                </div>
+              </div>
+
+              <!-- 3 张图：左侧 1 张竖图占满整高，右侧 2 张上下堆叠 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">18</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-3"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末爬山拍的三张，山顶风景真不错</div>
+                </div>
+              </div>
+
+              <!-- 4 张图：四宫格平分 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">16</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-4"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末拍的一组图，分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 5 张图：2 行 × 3 列网格，最后一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">14</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-5"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">路边随手拍的五张小景</div>
+                </div>
+              </div>
+
+              <!-- 6 张图：2 行 × 3 列网格，正好铺满 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">12</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-6"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">今天摆摊的六张现场照片</div>
+                </div>
+              </div>
+
+              <!-- 7 张图：3 行 × 3 列网格，末尾两格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">10</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-7"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">这周拍的七张随手照</div>
+                </div>
+              </div>
+
+              <!-- 8 张图：3 行 × 3 列网格，末尾一格留空 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">09</span><span class="month">7月</span></div>
+                <div class="moment-thumb imgs-8"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">摆摊一天拍了八张记录</div>
+                </div>
+              </div>
+
+              <!-- 跨月：从 7 月回退到 6 月，仍在 2026 年内 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">15</span><span class="month">6月</span></div>
+                <div class="moment-thumb"></div>
+                <div class="moment-body">
+                  <div class="moment-text">周末拍的一张图，分享给大家</div>
+                </div>
+              </div>
+
+              <!-- 单视频，带时长角标 -->
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">08</span><span class="month">6月</span></div>
+                <div class="moment-thumb video"><span class="moment-thumb-badge">00:32</span></div>
+                <div class="moment-body">
+                  <div class="moment-text">随手拍的一个小视频</div>
+                </div>
+              </div>
+
+              <!-- 跨年：新起一个「2025年」分组标题，与上方「2026年」区隔；9 张图（数量上限）：3 行 × 3 列铺满 -->
+              <div class="moment-year-header">2025年<span class="caret">⌄</span></div>
+
+              <div class="moment-item" onclick="goToMomentDetail(this)">
+                <div class="moment-date-badge"><span class="day">31</span><span class="month">12月</span></div>
+                <div class="moment-thumb imgs-9"><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div><div class="thumb-cell"></div></div>
+                <div class="moment-body">
+                  <div class="moment-text">跨年夜的最后一条动态，九张图记录这一年</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 收藏 Tab 内容面板：精简保留「视频」与「已收藏的合集」两个二级Tab -->
+          <div class="content-panel" id="profile-fav">
+            <!-- 二级 Tab 切换导航（仅保留视频与已收藏的合集） -->
+            <div class="fav-subtabs-wrap">
+              <div class="fav-subtabs-scroll">
+                <div class="fav-subtab active" onclick="switchFavSubtab('videos', this)">视频 </div>
+                <div class="fav-subtab" onclick="switchFavSubtab('collections', this)">已收藏的合集</div>
+              </div>
+            </div>
+
+            <!-- 二级面板 1：视频（默认展示，对标 截屏-2026-10-06-下午2.58.08.png 瀑布流/三列视频） -->
+            <div class="fav-subpanel active" id="fav-subpanel-videos">
+              <div class="fav-video-grid">
+                <!-- 视频1 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_night.jpg" alt="走出自我的迷宫" class="fav-v-img">
+                  <div class="fav-v-corner-tag">📄</div>
+                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1248</div>
+                </div>
+                <!-- 视频2 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_cat.jpg" alt="为什么选择分开" class="fav-v-img">
+                  <div class="fav-v-likes"><span class="v-heart">❤</span> 3725</div>
+                </div>
+                <!-- 视频3 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_street.jpg" alt="国风大片" class="fav-v-img">
+                  <div class="fav-v-likes"><span class="v-heart">♡</span> 77.7万</div>
+                </div>
+                <!-- 视频4 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_camp.jpg" alt="吵架的艺术" class="fav-v-img">
+                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1.6万</div>
+                </div>
+                <!-- 视频5 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_coffee.jpg" alt="自我养育" class="fav-v-img">
+                  <div class="fav-v-likes"><span class="v-heart">♡</span> 3892</div>
+                </div>
+                <!-- 视频6 -->
+                <div class="fav-video-card" onclick="switchPage('player')">
+                  <img src="assets/hifi/photo_skate.jpg" alt="谁历书" class="fav-v-img">
+                  <div class="fav-v-likes"><span class="v-heart">♡</span> 1.6万</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 二级面板 3：已收藏的合集 -->
+            <div class="fav-subpanel" id="fav-subpanel-collections">
+              <div class="fav-col-list">
+                <!-- 合集1 -->
+                <div class="fav-col-card" onclick="openCollectionDetail('影视氛围感哲理辩', 70)">
+                  <img src="assets/hifi/photo_street.jpg" alt="合集封面" class="fav-col-cover">
+                  <div class="fav-col-info">
+                    <div class="fav-col-title-row">
+                      <span class="fav-col-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                      <span class="fav-col-title">影视氛围感哲理辩</span>
+                    </div>
+                    <div class="fav-col-meta">共 70 支视频 · 更新到70集</div>
+                    <div class="fav-col-author">@星启♬ · 9623.8万次播放</div>
+                  </div>
+                </div>
+
+                <!-- 合集2 -->
+                <div class="fav-col-card" onclick="openCollectionDetail('影视宿命感心理学', 42)">
+                  <img src="assets/hifi/photo_night.jpg" alt="合集封面" class="fav-col-cover">
+                  <div class="fav-col-info">
+                    <div class="fav-col-title-row">
+                      <span class="fav-col-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                      <span class="fav-col-title">影视宿命感心理学</span>
+                    </div>
+                    <div class="fav-col-meta">共 42 支视频 · 更新到42集</div>
+                    <div class="fav-col-author">@心理探索家 · 4520.1万次播放</div>
+                  </div>
+                </div>
+
+                <!-- 合集3 -->
+                <div class="fav-col-card" onclick="openCollectionDetail('音乐&amp;共鸣剪辑志', 35)">
+                  <img src="assets/hifi/photo_music.jpg" alt="合集封面" class="fav-col-cover">
+                  <div class="fav-col-info">
+                    <div class="fav-col-title-row">
+                      <span class="fav-col-stack-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg></span>
+                      <span class="fav-col-title">音乐&amp;共鸣剪辑志</span>
+                    </div>
+                    <div class="fav-col-meta">共 35 支视频 · 更新到35集</div>
+                    <div class="fav-col-author">@旋律捕捉官 · 2831.4万次播放</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 历史 Tab 内容面板：展示风格与「上首页」一致（视频与图文网格），无上方合集栏 -->
+          <div class="content-panel" id="profile-history">
+            <div class="content-section">
+              <div class="video-grid">
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 喜欢 Tab 内容面板：展示风格与「上首页」一致（视频与图文网格），无上方合集栏 -->
+          <div class="content-panel" id="profile-likes">
+            <div class="content-section">
+              <div class="video-grid">
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon img-icon">📖</span></div>
+                <div class="video-thumb" onclick="switchPage('player')"><span class="thumb-type-icon">▶</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 侧边抽屉遮罩层（点击关闭） -->
+        <div class="profile-sidebar-backdrop" id="profile-sidebar-backdrop" onclick="closeProfileSideDrawer()"></div>
+
+        <!-- 个人页从右往左滑出的侧边抽屉面板（专注创作者中心唯一入口） -->
+        <div class="profile-sidebar-drawer" id="profile-sidebar-drawer">
+          <div class="ps-header">
+            <div class="ps-header-left">
+              <span class="ps-header-title">更多服务</span>
+            </div>
+            <div class="ps-close-btn" onclick="closeProfileSideDrawer()" title="关闭">×</div>
+          </div>
+
+          <div class="ps-scroll-content single-entry-mode">
+            <!-- 唯一专注入口：创作者中心横条入口卡片，点击即跳到创作者中心 -->
+            <div class="ps-creator-single-item" onclick="goToCreatorCenterFromDrawer()" title="点击进入创作者中心">
+              <div class="ps-item-main">
+                <div class="ps-item-icon">✨</div>
+                <div class="ps-item-info">
+                  <div class="ps-item-title-row">
+                    <span class="ps-item-title">创作者中心</span>
+                    <span class="ps-item-tag">PRO</span>
+                  </div>
+                  <div class="ps-item-desc">经营看板 · 内容创作 · 收益管理</div>
+                </div>
+              </div>
+              <div class="ps-item-right">
+                <span class="ps-item-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+                <!-- 全局统一底部 TabBar (我的 高亮) -->
+        <div class="mp-tabbar">
+          <div class="tab-item" onclick="switchPage('feed')"><div class="tab-icon">▶</div><span class="tab-label">首页</span></div>
+          <div class="tab-item" onclick="switchPage('stage')"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">大舞台</span></div>
+          <div class="tab-item tab-publish" onclick="showMatrixToast('点击内容发布')"><div class="tab-icon">＋</div><span class="tab-label">发布</span></div>
+          <div class="tab-item" onclick="switchPage('message')"><div class="tab-icon">✉</div><span class="tab-label">消息</span></div>
+          <div class="tab-item active" onclick="switchPage('profile')"><div class="tab-icon">◉</div><span class="tab-label">我的</span></div>
+        </div>
+
+    
+    
+    <!-- 退出小程序确认弹窗：点胶囊「关闭」后出现；取消 / 点遮罩 / Esc 关闭 -->
+    <div class="exit-confirm-backdrop" id="exit-confirm" aria-hidden="true" onclick="closeExitConfirm()">
+      <div class="exit-confirm" role="alertdialog" aria-modal="true" aria-labelledby="exit-confirm-title" aria-describedby="exit-confirm-desc" onclick="event.stopPropagation()">
+        <div class="exit-confirm-title" id="exit-confirm-title">退出小程序？</div>
+        <div class="exit-confirm-desc" id="exit-confirm-desc">确认后将关闭当前小程序。</div>
+        <div class="exit-confirm-actions">
+          <button type="button" class="exit-btn" id="exit-confirm-cancel" onclick="closeExitConfirm()">取消</button>
+          <button type="button" class="exit-btn exit-btn-primary" onclick="confirmExit()">退出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 用户等级对比与专属权益展示半屏抽屉 (User Level Profile Modal) -->
+    <div class="user-level-drawer-backdrop" id="user-level-modal" onclick="closeUserLevelDrawer(event)">
+      <div class="user-level-drawer" onclick="event.stopPropagation()">
+        <div class="user-level-drawer-handle"></div>
+        <div class="user-level-drawer-header">
+          <div class="user-level-drawer-title-wrap">
+            <span style="font-size:16px;">👑</span>
+            <span class="user-level-drawer-title">用户等级与专属权益</span>
+          </div>
+          <div class="user-level-drawer-close" onclick="closeUserLevelDrawer()">×</div>
+        </div>
+        <div class="user-level-drawer-body" id="user-level-drawer-body">
+          <!-- 动态填充内容：目标用户卡、我的差距、TA的特权清单 -->
+        </div>
+        <div class="user-level-drawer-footer">
+          <div class="drawer-footer-tip">
+            <span>⚡</span><span>我的等级：<strong>Lv.14 偶遇知音</strong></span>
+          </div>
+          <button class="drawer-footer-btn" onclick="goToLevelCenterFromDrawer()">前往等级中心 ›</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
   <!-- ① 空状态（首次填写） -->
-  <div class="device-wrapper">
+  <div class="device-wrapper" id="dev-edit-empty">
     <div class="device-label">空状态 · 首次填写</div>
     <div class="mp-device">
       <div class="mp-screen">
@@ -210,9 +1831,9 @@
         </div>
 
         <div class="mp-nav">
-          <div class="nav-back">‹</div>
+          <div class="nav-back" role="button" tabindex="0" aria-label="返回我的页面" onclick="backToProfile()">‹</div>
           <div class="nav-title">编辑个人资料</div>
-          <button class="nav-save">保存</button>
+          <button type="button" class="nav-save" onclick="saveProfileEdit()">保存</button>
         </div>
 
         <div class="page-scroll">
@@ -236,22 +1857,18 @@
           <div class="form-section">
 
             <div class="field-item">
-              <span class="field-lbl">用户名</span>
-              <span class="field-val placeholder">填写你的用户名</span>
-              <span class="field-arrow">›</span>
+              <span class="field-lbl">用户昵称</span>
+              <span class="field-val placeholder">填写你的用户昵称</span>
             </div>
 
             <div class="field-item">
               <span class="field-lbl">ID号</span>
-              <span class="field-val placeholder">设置唯一ID号</span>
-              <span class="field-arrow">›</span>
+              <span class="field-val readonly">@username_unique</span>
             </div>
-            <div class="field-note">ID号需保持唯一，可修改</div>
 
             <div class="field-item">
               <span class="field-lbl">简介</span>
               <span class="field-val placeholder">介绍一下自己…</span>
-              <span class="field-arrow">›</span>
             </div>
 
           </div>
@@ -264,7 +1881,7 @@
   </div>
 
   <!-- ② 已填写状态 -->
-  <div class="device-wrapper">
+  <div class="device-wrapper" id="dev-edit-filled">
     <div class="device-label">已填写状态</div>
     <div class="mp-device">
       <div class="mp-screen">
@@ -278,9 +1895,9 @@
         </div>
 
         <div class="mp-nav">
-          <div class="nav-back">‹</div>
+          <div class="nav-back" role="button" tabindex="0" aria-label="返回我的页面" onclick="backToProfile()">‹</div>
           <div class="nav-title">编辑个人资料</div>
-          <button class="nav-save">保存</button>
+          <button type="button" class="nav-save" onclick="saveProfileEdit()">保存</button>
         </div>
 
         <div class="page-scroll">
@@ -304,22 +1921,18 @@
           <div class="form-section">
 
             <div class="field-item">
-              <span class="field-lbl">用户名</span>
+              <span class="field-lbl">用户昵称</span>
               <span class="field-val">用户昵称示例</span>
-              <span class="field-arrow">›</span>
             </div>
 
             <div class="field-item">
               <span class="field-lbl">ID号</span>
-              <span class="field-val">@username_unique</span>
-              <span class="field-arrow">›</span>
+              <span class="field-val readonly">@username_unique</span>
             </div>
-            <div class="field-note">ID号需保持唯一，可修改</div>
 
             <div class="field-item" style="align-items:flex-start; padding-top:14px;">
               <span class="field-lbl" style="padding-top:1px;">简介</span>
               <span class="field-val bio">这里是个人简介内容，最多展示三行，超出则截断显示省略号…</span>
-              <span class="field-arrow" style="margin-top:1px;">›</span>
             </div>
 
           </div>
@@ -337,6 +1950,26 @@
 <div class="spec-panel" style="width:782px;">
   <h3>SPEC · 个人资料编辑页结构说明</h3>
   <div class="spec-row">
+    <span class="spec-key">编辑资料入口</span>
+    <span class="spec-val">「我的」页头图下方右侧 · 胶囊按钮「✎ 编辑资料」</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">入口去向</span>
+    <span class="spec-val">进入编辑页（已有资料 → 已填写状态）· 返回 / 保存均回到「我的」</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">「我的」页来源</span>
+    <span class="spec-val">整合自 creator-center-matrix.html · 保留等级半屏 / 打赏卡 / 内容 Tab / 侧边抽屉</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">「我的」导航栏</span>
+    <span class="spec-val">左：汉堡菜单（抽屉从左滑出）· 中：标题 · 右：胶囊（仅关闭）</span>
+  </div>
+  <div class="spec-row">
+    <span class="spec-key">关闭确认</span>
+    <span class="spec-val">点胶囊「关闭」→ 弹窗「退出小程序？」· 取消 / 退出</span>
+  </div>
+  <div class="spec-row">
     <span class="spec-key">顶部导航</span>
     <span class="spec-val">NavBar（返回 / 编辑个人资料 / 保存按钮）</span>
   </div>
@@ -349,12 +1982,12 @@
     <span class="spec-val">64px 圆形 · 叠加在头图下方 · 右下角编辑点触发选择</span>
   </div>
   <div class="spec-row">
-    <span class="spec-key">用户名</span>
+    <span class="spec-key">用户昵称</span>
     <span class="spec-val">可编辑 · 支持中文 · 不做唯一性校验 · 点击进入文字输入页</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">ID号</span>
-    <span class="spec-val">可编辑 · 全局唯一性校验 · 无锁定限制，可随时修改</span>
+    <span class="spec-val">只读展示 · 不可更改 · 无箭头、不可点击</span>
   </div>
   <div class="spec-row">
     <span class="spec-key">简介</span>
@@ -362,5 +1995,342 @@
   </div>
 </div>
 
-</body>
-</html>
+
+<!-- 轻量 Toast（沿用矩阵稿） -->
+<div class="matrix-toast" id="matrix-toast" role="status" aria-live="polite">
+  <div class="matrix-toast-icon">✓</div>
+  <span id="matrix-toast-msg"></span>
+</div>
+
+<script>
+  function showMatrixToast(msg, duration = 2200) {
+    const toast = document.getElementById('matrix-toast');
+    const msgEl = document.getElementById('matrix-toast-msg');
+    if (!toast || !msgEl) return;
+    msgEl.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(window.__mtoastTimer);
+    window.__mtoastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, duration);
+  }
+
+  function switchFavSubtab(subtabId, el) {
+    const parent = el.closest('.fav-subtabs-wrap');
+    if (parent) {
+      parent.querySelectorAll('.fav-subtab').forEach(t => t.classList.remove('active'));
+    }
+    el.classList.add('active');
+
+    const panel = el.closest('.content-panel') || document.getElementById('profile-fav');
+    if (panel) {
+      panel.querySelectorAll('.fav-subpanel').forEach(p => p.classList.remove('active'));
+      const target = panel.querySelector('#fav-subpanel-' + subtabId);
+      if (target) {
+        target.classList.add('active');
+      }
+    }
+  }
+
+  function setContentTab(el, scope) {
+    const container = el.closest('.profile-scroll');
+    if (!container) return;
+    container.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    container.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+    const targetPanel = container.querySelector('#' + el.dataset.target);
+    if (targetPanel) {
+      targetPanel.classList.add('active');
+    }
+  }
+
+  function toggleRewardDetail(card) {
+    card.classList.toggle('expanded');
+    const tip = card.querySelector('.reward-expand-tip');
+    if (tip) {
+      tip.textContent = card.classList.contains('expanded') ? '收起明细 ▲' : '点击展开明细 ▼';
+    }
+  }
+
+  function goToMomentDetail() {
+    showMatrixToast('查看大舞台动态详情');
+  }
+
+  function openProfileSideDrawer() {
+    const backdrop = document.getElementById('profile-sidebar-backdrop');
+    const drawer = document.getElementById('profile-sidebar-drawer');
+    if (backdrop) backdrop.classList.add('open');
+    if (drawer) drawer.classList.add('open');
+  }
+
+  function closeProfileSideDrawer() {
+    const backdrop = document.getElementById('profile-sidebar-backdrop');
+    const drawer = document.getElementById('profile-sidebar-drawer');
+    if (backdrop) backdrop.classList.remove('open');
+    if (drawer) drawer.classList.remove('open');
+  }
+
+  const LEVEL_TIERS = [
+    { min: 1,  max: 9,  title: '初来乍到',   icon: '🌱', color: '#9ca3af', gradient: 'linear-gradient(135deg,#2a2f3a 0%,#15181f 100%)', bg: 'assets/templates/tpl_minimal_clean.jpg',
+      decorations: ['默认黑色等级样式'], communityPerks: [] },
+    { min: 10, max: 19, title: '偶遇知音',   icon: '🎵', color: '#cbd5e1', gradient: 'linear-gradient(135deg,#4b5563 0%,#1f2937 100%)', bg: 'assets/hifi/photo_music.jpg',
+      decorations: ['灰色等级样式'], communityPerks: [] },
+    { min: 20, max: 29, title: '赏金乐人',   icon: '🎻', color: '#60a5fa', gradient: 'linear-gradient(135deg,#1e40af 0%,#0f1d4a 100%)', bg: 'assets/templates/tpl_sunset_sky.jpg',
+      decorations: ['蓝色等级样式', '蓝色静态头像挂件', '20级礼物等级权益'], communityPerks: [] },
+    { min: 30, max: 39, title: '拾金伯爵',   icon: '🎩', color: '#facc15', gradient: 'linear-gradient(135deg,#a16207 0%,#3f2a05 100%)', bg: 'assets/templates/tpl_retro_film.jpg',
+      decorations: ['黄色等级样式', '黄色静态头像挂件', '黄色静态评论气泡', '30级礼物等级权益', '30级背景图挂件', '首页评论区头像挂件'], communityPerks: [] },
+    { min: 40, max: 49, title: '璀璨公爵',   icon: '💎', color: '#c084fc', gradient: 'linear-gradient(135deg,#78350f 0%,#2d1406 100%)', bg: 'assets/templates/tpl_dark_glow.jpg',
+      decorations: ['棕色等级样式', '紫色动态头像挂件', '紫色动态评论气泡', '紫色动态评论挂件', '40级专属礼物打赏权限', '40级背景图挂件', '首页评论区头像挂件'], communityPerks: [] },
+    { min: 50, max: 59, title: '旷世王爵',   icon: '👑', color: '#34d399', gradient: 'linear-gradient(135deg,#047857 0%,#022c22 100%)', bg: 'assets/templates/tpl_botanical.jpg',
+      decorations: ['绿色等级样式', '绿色专属勋章', '绿色动态头像挂件', '绿色动态评论气泡', '绿色动态评论挂件', '50级专属礼物打赏权限', '50级背景图挂件', '首页评论区头像挂件'],
+      communityPerks: [['专属秘书', '待开放'], ['优先当话题主理人', '待开放'], ['举报优先处理', '']] },
+    { min: 60, max: 69, title: '圣殿庇护者', icon: '🛡️', color: '#f87171', gradient: 'linear-gradient(135deg,#b91c1c 0%,#3b0a0a 100%)', bg: 'assets/hifi/photo_night.jpg',
+      decorations: ['红色流光动态等级样式', '红色专属勋章', '红色动态头像挂件', '红色动态评论气泡', '红色动态评论挂件', '专属评论底纹', '60级专属礼物打赏权限', '60级背景图挂件', '首页评论区头像挂件'],
+      communityPerks: [['专属秘书', '待开放'], ['优先当话题主理人', '待开放'], ['举报优先处理', '']] },
+    { min: 70, max: 70, title: '不朽缔造者', icon: '🌌', color: '#fbbf24', gradient: 'linear-gradient(135deg,#b45309 0%,#1c1206 100%)', bg: 'assets/hifi/photo_street.jpg',
+      decorations: ['金色流光动态等级样式', '金色专属勋章', '金色动态头像挂件', '金色动态评论气泡', '金色动态评论挂件', '专属评论底纹', '专属主页背景图', '70级专属礼物打赏权限', '70级背景图挂件', '升级时大舞台全员广播', '首页评论区头像挂件'],
+      communityPerks: [['专属客服', ''], ['优先当话题主理人', ''], ['举报优先处理', '']] }
+  ];
+  // 兼容半屏对比抽屉 / 大舞台胶囊读取的字段
+  LEVEL_TIERS.forEach((t, i) => {
+    t.tierIdx = i;
+    t.levelRangeStr = t.min === t.max ? `Lv.${t.min}` : `Lv.${t.min} – ${t.max}`;
+    t.stageLabel = t.levelRangeStr;
+    t.badgeGradient = t.gradient;
+    t.textColor = '#ffffff';
+    t.periodStr = '升级后永久保留';
+  });
+
+  const MY_CURRENT_LEVEL = 14;
+  const MY_CURRENT_TIER_TITLE = '偶遇知音';
+
+  function getTierByLevel(lvl) {
+    if (lvl >= 70) return LEVEL_TIERS[7];
+    if (lvl >= 60) return LEVEL_TIERS[6];
+    if (lvl >= 50) return LEVEL_TIERS[5];
+    if (lvl >= 40) return LEVEL_TIERS[4];
+    if (lvl >= 30) return LEVEL_TIERS[3];
+    if (lvl >= 20) return LEVEL_TIERS[2];
+    if (lvl >= 10) return LEVEL_TIERS[1];
+    return LEVEL_TIERS[0];
+  }
+
+  function openUserLevelDrawer(targetLevel, userName = '用户', userAvatar = '👤', roleName = '社区达人') {
+    const modal = document.getElementById('user-level-modal');
+    const body = document.getElementById('user-level-drawer-body');
+    if (!modal || !body) return;
+
+    const tier = getTierByLevel(targetLevel);
+    const diff = targetLevel - MY_CURRENT_LEVEL;
+    // 个人页点自己的等级：不做"与自己对比"，改为展示我的成长进度
+    const isSelf = roleName === '我本人';
+
+    // 1. 差距状态文案与样式
+    let gapTagHtml = '';
+    let gapTipText = '';
+    let gapProgressWidth = '50%';
+    let gapTitleText = '等级梯队对比';
+    let gapLeftNode = `我 (Lv.${MY_CURRENT_LEVEL})`;
+    let gapRightNode = `${userName} (Lv.${targetLevel})`;
+
+    if (isSelf) {
+      const nextTier = LEVEL_TIERS[Math.min(tier.tierIdx + 1, LEVEL_TIERS.length - 1)];
+      gapTitleText = '我的成长进度';
+      gapTagHtml = `<span class="level-gap-status-tag behind">还需 1,580 升至 Lv.${nextTier.min}</span>`;
+      gapTipText = `当前成长值 <strong>1,420 / 3,000</strong>，升至 <strong>Lv.${nextTier.min} ${nextTier.title}</strong> 即可解锁下一阶段装扮与权益。`;
+      gapProgressWidth = '47.3%';
+      gapLeftNode = `Lv.${MY_CURRENT_LEVEL} ${tier.title}`;
+      gapRightNode = `Lv.${nextTier.min} ${nextTier.title}`;
+    } else if (diff > 0) {
+      gapTagHtml = `<span class="level-gap-status-tag behind">距离TA还差 ${diff} 级</span>`;
+      gapTipText = `您当前为 <strong>Lv.${MY_CURRENT_LEVEL} ${MY_CURRENT_TIER_TITLE}</strong>，距离 ${userName} 的 <strong>Lv.${targetLevel} ${tier.title}</strong> 还差 <strong>${diff} 级</strong>。通过大舞台打赏赠礼与日常发布互动可快速追赶！`;
+      const ratio = Math.min(100, Math.max(15, Math.round((MY_CURRENT_LEVEL / targetLevel) * 100)));
+      gapProgressWidth = `${ratio}%`;
+    } else if (diff === 0) {
+      gapTagHtml = `<span class="level-gap-status-tag equal">与您同级 · Lv.${MY_CURRENT_LEVEL}</span>`;
+      gapTipText = `您与 ${userName} 当前处于同一等级阶梯 <strong>Lv.${MY_CURRENT_LEVEL} ${tier.title}</strong>，共享该段位同等专属特权礼遇！`;
+      gapProgressWidth = '100%';
+    } else {
+      gapTagHtml = `<span class="level-gap-status-tag ahead">您已领先 ${Math.abs(diff)} 级</span>`;
+      gapTipText = `您当前为 <strong>Lv.${MY_CURRENT_LEVEL} ${MY_CURRENT_TIER_TITLE}</strong>，已领先 ${userName} (Lv.${targetLevel}) <strong>${Math.abs(diff)} 级</strong>，享有更高阶的尊属身份与装扮！`;
+      gapProgressWidth = '100%';
+    }
+
+    // 2. 目标段位特权卡片列表（优先读取 rewards 和 personas，兼容旧字段）
+    const perksList = [];
+    
+    if (tier.rewards && tier.rewards.length > 0) {
+      tier.rewards.forEach(r => {
+        let icon = '🎁';
+        let tag = '等级特权';
+        if (r.name.toLowerCase().includes('badge')) { icon = '⚡'; tag = '专属徽章'; }
+        else if (r.name.toLowerCase().includes('bubble')) { icon = '💬'; tag = '发言气泡'; }
+        else if (r.name.toLowerCase().includes('frame') || r.name.toLowerCase().includes('ring')) { icon = '🖼️'; tag = '头像挂件'; }
+        else if (r.name.toLowerCase().includes('spotlight') || r.name.toLowerCase().includes('beam')) { icon = '✨'; tag = '大舞台光束'; }
+        else if (r.name.toLowerCase().includes('gift')) { icon = '💎'; tag = '专属打赏'; }
+        else if (r.name.toLowerCase().includes('butler') || r.name.toLowerCase().includes('secretary')) { icon = '👩‍💼'; tag = '专属服务'; }
+        else if (r.name.toLowerCase().includes('moderator') || r.name.toLowerCase().includes('priority')) { icon = '👑'; tag = '治理特权'; }
+        else if (r.name.toLowerCase().includes('report')) { icon = '🛡️'; tag = '安全通道'; }
+        else if (r.name.toLowerCase().includes('broadcast')) { icon = '📢'; tag = '全员广播'; }
+
+        perksList.push({ name: r.name, icon, tag, desc: r.desc });
+      });
+    } else if (tier.decorations) {
+      tier.decorations.forEach(d => {
+        perksList.push({ name: d, icon: '🎨', tag: '专属特权', desc: '该等级已生效专属装扮与权益' });
+      });
+    }
+
+    // 渲染卡片 HTML
+    body.innerHTML = `
+      <!-- 1. 目标用户当前等级高光展示卡 -->
+      <div class="target-user-hero-card" style="background: ${tier.gradient};">
+        <div class="target-user-left">
+          <div class="target-user-avatar">${userAvatar && (userAvatar.includes('/') || userAvatar.includes('.')) ? `<img src="${userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : userAvatar}</div>
+          <div class="target-user-meta">
+            <div class="target-user-name-line">
+              <span class="target-user-name">${userName}</span>
+              <span class="target-user-role-badge">${roleName}</span>
+            </div>
+            <div class="target-user-tier-desc">${tier.stageLabel} · ${tier.title}</div>
+          </div>
+        </div>
+        <div class="target-user-badge-right">
+          <span class="target-level-pill-giant" style="background:${tier.badgeGradient}; color:${tier.textColor};">
+            <span>${tier.icon}</span> Lv.${targetLevel}
+          </span>
+          <span style="font-size:10px; color:rgba(255,255,255,0.7);">${tier.periodStr}</span>
+        </div>
+      </div>
+
+      <!-- 2. 我的等级距离TA的等级还差多少 -->
+      <div class="level-gap-comparison-card">
+        <div class="level-gap-header">
+          <div class="level-gap-title">
+            <span>🎯</span> ${gapTitleText}
+          </div>
+          ${gapTagHtml}
+        </div>
+        <div class="level-gap-progress-wrap">
+          <div class="level-gap-nodes-row">
+            <span>${gapLeftNode}</span>
+            <span>${gapRightNode}</span>
+          </div>
+          <div class="level-gap-track">
+            <div class="level-gap-bar" style="width: ${gapProgressWidth};"></div>
+          </div>
+        </div>
+        <div class="level-gap-tip">${gapTipText}</div>
+      </div>
+
+      <!-- 3. 在TA那个等级下能享受什么样的权益 -->
+      <div class="target-perks-section">
+        <div class="target-perks-header">
+          <div class="target-perks-title">
+            <span>✨</span> <strong>Lv.${targetLevel} [${tier.title}]</strong> 专享权益清单
+          </div>
+          <span class="target-perks-sub">共 ${perksList.length} 项权益生效</span>
+        </div>
+        <div class="target-perks-grid">
+          ${perksList.map(p => `
+            <div class="target-perk-item" onclick="showMatrixToast('权益详情：${p.name}')">
+              <div class="target-perk-top">
+                <span class="target-perk-icon">${p.icon}</span>
+                <span class="target-perk-tag">${p.tag}</span>
+              </div>
+              <div class="target-perk-name">${p.name}</div>
+              <div class="target-perk-desc">${p.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('open');
+  }
+
+  function closeUserLevelDrawer(e) {
+    const modal = document.getElementById('user-level-modal');
+    if (modal) {
+      modal.classList.remove('open');
+    }
+  }
+
+  function goToLevelCenterFromDrawer() {
+    closeUserLevelDrawer();
+    showMatrixToast('等级中心功能正在升级中，当前已为您保留基础成长记录');
+  }
+
+// ═══ 本稿胶水：补齐矩阵稿里「我的」页依赖、但本页不展开的跳转 ═══
+const PAGE_NAMES = { feed: '首页', stage: '大舞台', message: '消息', player: '播放页', 'creator-center': '创作者中心', profile: '我的' };
+function switchPage(id) {
+  showMatrixToast(id === 'profile' ? '当前已在「我的」页' : '此处跳转至「' + (PAGE_NAMES[id] || id) + '」（本稿不展开）');
+}
+function openCollectionDetail(title) { showMatrixToast('查看合集「' + title + '」'); }
+function goToCreatorCenterFromDrawer() {
+  closeProfileSideDrawer();
+  setTimeout(() => switchPage('creator-center'), 120);
+}
+
+// ═══ 编辑资料入口 ↔ 编辑页 联动 ═══
+const flashTimers = new Map();
+function focusDevice(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+  el.classList.add('flash');
+  clearTimeout(flashTimers.get(id));
+  flashTimers.set(id, setTimeout(() => el.classList.remove('flash'), 1600));
+}
+function openProfileEdit() { showMatrixToast('进入「编辑个人资料」'); focusDevice('dev-edit-filled'); }
+function backToProfile() { focusDevice('dev-profile'); }
+function saveProfileEdit() { showMatrixToast('资料已保存'); focusDevice('dev-profile'); }
+
+// ═══ 胶囊「关闭」→ 退出确认 ═══
+let exitConfirmOpener = null;
+function openExitConfirm(trigger) {
+  const layer = document.getElementById('exit-confirm');
+  if (!layer) return;
+  closeProfileSideDrawer();
+  closeUserLevelDrawer();
+  exitConfirmOpener = trigger || null;
+  layer.classList.add('open');
+  layer.setAttribute('aria-hidden', 'false');
+  const cancel = document.getElementById('exit-confirm-cancel');
+  if (cancel) cancel.focus();
+}
+function closeExitConfirm() {
+  const layer = document.getElementById('exit-confirm');
+  if (!layer || !layer.classList.contains('open')) return;
+  layer.classList.remove('open');
+  layer.setAttribute('aria-hidden', 'true');
+  if (exitConfirmOpener && exitConfirmOpener.isConnected) exitConfirmOpener.focus();
+  exitConfirmOpener = null;
+}
+function confirmExit() {
+  closeExitConfirm();
+  showMatrixToast('已退出小程序（示意）');
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeExitConfirm(); closeUserLevelDrawer(); closeProfileSideDrawer(); return; }
+  if (e.key === 'Tab') {
+    const layer = document.getElementById('exit-confirm');
+    if (layer && layer.classList.contains('open')) {
+      const btns = layer.querySelectorAll('button');
+      const first = btns[0], last = btns[btns.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      return;
+    }
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[role="button"]')) {
+    e.preventDefault();
+    e.target.click();
+  }
+});
+</script>
+
+
+</body></html>
