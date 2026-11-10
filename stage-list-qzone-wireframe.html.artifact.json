@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "stage-list-qzone-wireframe.html",
+  "entry": "stage-list-qzone-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-11-09T05:49:08.137Z",
+  "updatedAt": "2026-11-09T05:49:08.137Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

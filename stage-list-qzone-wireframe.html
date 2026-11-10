@@ -1,0 +1,1673 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大舞台列表 · QQ 空间式互动 — 线框图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-warm: #fff4cc;
+    --fg: #0d1117;
+    --fg-2: #374151;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-soft: #f3f4f6;
+    --accent: #ffd21e;
+    --accent-on: #0d1117;
+    --accent-hover: #f59e0b;
+    --success: #16a34a;
+    --warn: #f59e0b;
+    --danger: #dc2626;
+    --font-display: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-body: "Source Sans Pro", Inter, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-pill: 9999px;
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wf-block: #d1d5db;
+    --wf-block-dark: #9ca3af;
+    --wf-line: #e5e7eb;
+    --wf-overlay: rgba(13,17,23,0.45);
+  }
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0;
+}
+body {
+    background: #121316;
+    background-image: 
+      radial-gradient(circle at 50% 15%, rgba(255, 210, 30, 0.06) 0%, transparent 60%),
+      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+    font-family: var(--font-body);
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 24px 16px 40px; gap: 20px;
+    color: #ffffff;
+}
+.matrix-header {
+    text-align: center; max-width: 860px; width: 100%;
+}
+.matrix-header h1 {
+    font-family: var(--font-display); font-size: 19px; font-weight: 600;
+    color: #ffffff; letter-spacing: -0.01em; margin-bottom: 6px;
+}
+.matrix-header p {
+    font-family: var(--font-mono); font-size: 13px; color: #9ca3af;
+    line-height: 1.5;
+}
+.device-shell {
+    width: 375px; height: 780px; background: #000000;
+    border-radius: 44px; padding: 0;
+    box-shadow: 
+      0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 0 0 7px #1c1e22,
+      0 28px 72px rgba(0, 0, 0, 0.75),
+      0 10px 24px rgba(0, 0, 0, 0.45);
+    flex-shrink: 0; position: relative;
+    overflow: hidden;
+}
+.matrix-toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-24px);
+    background: rgba(13, 17, 23, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    color: #ffffff; padding: 10px 24px; border-radius: 9999px;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px; z-index: 99999;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.18);
+    opacity: 0; pointer-events: none; transition: all 240ms cubic-bezier(0.2, 0, 0, 1);
+}
+.matrix-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto;
+}
+.matrix-toast-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--accent-on);
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+@keyframes fadeInScreen {
+    from { opacity: 0; transform: scale(0.99); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes caret-blink { 50% { opacity: 0; }
+}
+.mp-screen-view {
+    width: 100%; height: 100%;
+    border-radius: 44px; overflow: hidden;
+    display: none; flex-direction: column;
+    position: relative;
+    
+}
+.mp-screen-view.active {
+    display: flex;
+}
+.delete-confirm-backdrop {
+    position: absolute; inset: 0; z-index: 130;
+    display: flex; align-items: center; justify-content: center; padding: 0 40px;
+    background: rgba(13, 17, 23, 0.55);
+    opacity: 0; visibility: hidden;
+    transition: opacity 200ms var(--ease-standard), visibility 0s linear 200ms;
+}
+.delete-confirm-backdrop.open { opacity: 1; visibility: visible; transition: opacity 200ms var(--ease-standard);
+}
+.delete-confirm {
+    width: 100%; background: var(--surface); color: var(--fg); border-radius: var(--radius-md);
+    padding: 24px 20px 16px;
+    transform: scale(0.96); transition: transform 200ms var(--ease-standard);
+}
+.delete-confirm-backdrop.open .delete-confirm { transform: scale(1);
+}
+.delete-confirm-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; text-align: center;
+}
+.delete-confirm-desc { font-size: 13px; line-height: 1.55; color: var(--fg-2); text-align: center; margin-top: 8px;
+}
+.delete-confirm-actions { display: flex; gap: 8px; margin-top: 20px;
+}
+.delete-btn {
+    flex: 1; height: 44px; border-radius: var(--radius-md);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer;
+    color: var(--fg); background: var(--surface); border: 1px solid var(--border);
+}
+.delete-btn:active { background: var(--border-soft);
+}
+.delete-btn-danger { color: #ffffff; background: var(--danger); border-color: var(--danger);
+}
+.delete-btn-danger:active { background: color-mix(in oklab, var(--danger), black 20%);
+}
+.delete-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px;
+}
+#screen-stage-list .mp-screen {
+      width: 100%; height: 100%; background: var(--bg);
+      border-radius: 34px; overflow: hidden;
+      display: flex; flex-direction: column; position: relative;
+}
+#screen-stage-list .mp-status-bar {
+      height: 44px; background: #ffffff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px 0 20px; flex-shrink: 0;
+}
+#screen-stage-list .mp-status-time { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg);
+}
+#screen-stage-list .mp-status-icons { display: flex; align-items: center; gap: 5px;
+}
+#screen-stage-list .mp-status-icons .icon-bar { display: flex; gap: 2px; align-items: flex-end;
+}
+#screen-stage-list .mp-status-icons .bar { width: 3px; background: var(--fg); border-radius: 1px;
+}
+#screen-stage-list .mp-status-icons .bar:nth-child(1) { height: 4px;
+}
+#screen-stage-list .mp-status-icons .bar:nth-child(2) { height: 6px;
+}
+#screen-stage-list .mp-status-icons .bar:nth-child(3) { height: 8px;
+}
+#screen-stage-list .mp-status-icons .bar:nth-child(4) { height: 10px;
+}
+#screen-stage-list .wifi-icon { width: 14px; height: 10px; position: relative;
+}
+#screen-stage-list .wifi-icon::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--fg); border-radius: 50%;
+}
+#screen-stage-list .battery-icon { width: 22px; height: 11px; border: 1.5px solid rgba(13,17,23,0.7); border-radius: 2px; position: relative;
+}
+#screen-stage-list .battery-icon::before { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 2px; height: 5px; background: rgba(13,17,23,0.7); border-radius: 0 1px 1px 0;
+}
+#screen-stage-list .battery-icon::after { content: ''; position: absolute; top: 1.5px; left: 1.5px; width: 14px; height: calc(100% - 3px); background: var(--fg); border-radius: 1px;
+}
+#screen-stage-list .mp-nav {
+      height: 44px; background: #ffffff;
+      display: flex; align-items: center; padding: 0 12px;
+      flex-shrink: 0; border-bottom: 1px solid var(--border-soft);
+}
+#screen-stage-list .mp-nav-spacer { width: 28px; height: 28px; flex-shrink: 0;
+}
+#screen-stage-list .mp-nav-title {
+      flex: 1; text-align: center;
+      font-family: var(--font-display); font-size: 16px; font-weight: 600;
+      color: var(--fg); letter-spacing: 0.02em;
+}
+#screen-stage-list .square-page-scroll { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg);
+}
+#screen-stage-list .profile-header {
+      position: relative; flex-shrink: 0;
+      height: 190px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding-bottom: 14px;
+}
+#screen-stage-list .profile-cover {
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%; background: var(--wf-block);
+      display: flex; align-items: center; justify-content: center;
+}
+#screen-stage-list .profile-cover::after { content: '头图'; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 0.05em;
+}
+#screen-stage-list .profile-identity {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 5px; padding: 0 16px;
+}
+#screen-stage-list .profile-identity-group {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+#screen-stage-list .profile-avatar {
+      width: 52px; height: 52px; border-radius: 6px; background: var(--wf-block-dark);
+      border: 2px solid #ffffff; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+#screen-stage-list .profile-name { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); text-align: center;
+}
+#screen-stage-list .square-content-tabs {
+      display: flex; background: #ffffff;
+      border-bottom: 1px solid var(--border-soft); flex-shrink: 0;
+      position: sticky; top: 0; z-index: 10;
+}
+#screen-stage-list .square-content-tab {
+      flex: 1; padding: 10px 0; text-align: center;
+      font-family: var(--font-display); font-size: 13px; font-weight: 500;
+      color: var(--muted); position: relative; cursor: pointer;
+}
+#screen-stage-list .square-content-tab.active { color: var(--fg); font-weight: 600;
+}
+#screen-stage-list .square-content-tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 24px; height: 2px; background: var(--accent); border-radius: 1px;
+}
+#screen-stage-list .square-content-tabs.chip-tabs {
+      justify-content: flex-start; gap: 8px; padding: 10px 16px 8px;
+}
+#screen-stage-list .square-content-tab.chip-tab {
+      flex: none; padding: 6px 14px; border-radius: var(--radius-pill);
+      display: flex; align-items: center; gap: 4px;
+      background: var(--border-soft); color: var(--muted); font-weight: 500;
+}
+#screen-stage-list .square-content-tab.chip-tab .tab-chip-ic { font-size: 13px; line-height: 1;
+}
+#screen-stage-list .square-content-tab.chip-tab.active {
+      background: #cdeaff; color: #0369a1; font-weight: 600;
+}
+#screen-stage-list .square-content-tab.chip-tab.active::after { content: none;
+}
+#screen-stage-list .square-content-tab.chip-tab { position: relative;
+}
+#screen-stage-list .tab-unread-dot {
+      position: absolute; top: 2px; right: 4px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #dc2626; box-shadow: 0 0 0 1.5px #ffffff;
+}
+#screen-stage-list .official-tag {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #1d9bf0; color: #fff; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 9px; line-height: 1;
+}
+#screen-stage-list .official-tag::after { content: '✓';
+}
+#screen-stage-list .square-panel { background: var(--bg);
+}
+#screen-stage-list .moment-list { display: flex; flex-direction: column;
+}
+#screen-stage-list .moment-item {
+      padding: 14px 16px; background: #ffffff;
+      border-bottom: 8px solid var(--border-soft);
+}
+#screen-stage-list .moment-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+}
+#screen-stage-list .moment-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: var(--wf-block-dark);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+}
+#screen-stage-list .moment-meta { flex: 1; min-width: 0;
+}
+#screen-stage-list .moment-name-row { display: flex; align-items: center; gap: 5px;
+}
+#screen-stage-list .moment-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--fg);
+}
+#screen-stage-list .moment-item.pinned { background: var(--surface-warm);
+}
+#screen-stage-list .pinned-badge {
+      display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-hover);
+}
+#screen-stage-list .pinned-badge .ic { font-size: 11px;
+}
+#screen-stage-list .creator-level {
+      font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--accent-hover);
+      background: var(--surface-warm); border: 1px solid var(--accent);
+      padding: 1px 5px; border-radius: 3px; line-height: 1.3; flex-shrink: 0;
+}
+#screen-stage-list .moment-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px;
+}
+#screen-stage-list .moment-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; margin-bottom: 10px;
+}
+#screen-stage-list .moment-text .inline-topic { color: #2563eb; font-weight: 600;
+}
+#screen-stage-list .moment-images {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 4px; width: 100%; margin-bottom: 10px;
+}
+#screen-stage-list .moment-images.count-1 { grid-template-columns: 150px;
+}
+#screen-stage-list .moment-images.count-1 .moment-image { aspect-ratio: 4/3;
+}
+#screen-stage-list .moment-image { aspect-ratio: 1/1; background: var(--wf-block); border-radius: 4px;
+}
+#screen-stage-list .moment-video {
+      width: 160px; aspect-ratio: 9/16; background: var(--wf-block);
+      border-radius: 6px; position: relative; margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: center;
+}
+#screen-stage-list .moment-video::after { content: '▶'; font-size: 17px; color: rgba(255,255,255,0.55);
+}
+#screen-stage-list .moment-video-dur {
+      position: absolute; bottom: 6px; right: 6px;
+      background: rgba(13,17,23,0.55); color: #fff;
+      font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+      padding: 1px 6px; border-radius: var(--radius-pill);
+}
+#screen-stage-list .moment-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 8px;
+}
+#screen-stage-list .moment-body { flex: 1; min-width: 0;
+}
+#screen-stage-list .moment-body .moment-text:last-child,
+#screen-stage-list .moment-body .moment-images:last-child,
+#screen-stage-list .moment-body .moment-video:last-child { margin-bottom: 0;
+}
+#screen-stage-list .moment-more-wrap { position: relative; flex-shrink: 0;
+}
+#screen-stage-list .moment-more {
+      width: 26px; height: 18px; border-radius: var(--radius-pill);
+      background: var(--border-soft);
+      display: flex; align-items: center; justify-content: center; gap: 2px;
+      cursor: pointer;
+}
+#screen-stage-list .moment-more .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted);
+}
+#screen-stage-list .moment-popover {
+      position: absolute; top: 100%; right: 0;
+      margin-top: 8px;
+      background: rgba(13,17,23,0.94);
+      border-radius: var(--radius-sm);
+      padding: 0 4px;
+      display: none; align-items: stretch; z-index: 20;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+}
+#screen-stage-list .moment-popover.open { display: flex;
+}
+#screen-stage-list .moment-popover::after {
+      content: ''; position: absolute; top: -4px; right: 15px;
+      width: 8px; height: 8px; background: rgba(13,17,23,0.94); transform: rotate(45deg);
+}
+#screen-stage-list .moment-popover-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 9px 12px;
+      font-family: var(--font-body); font-size: 11px; font-weight: 500; color: #fff;
+      cursor: pointer; white-space: nowrap;
+}
+#screen-stage-list .moment-popover-item + .moment-popover-item { border-left: 1px solid rgba(255,255,255,0.12);
+}
+#screen-stage-list .moment-popover-item .ic { font-size: 15px; width: auto; text-align: center;
+}
+#screen-stage-list .moment-popover-item.like-item.liked { color: #ff6b6b;
+}
+#screen-stage-list .moment-popover-item.like-item.liked .ic { color: #ff6b6b;
+}
+#screen-stage-list .moment-popover-item.reward-item .ic { font-size: 15px;
+}
+#screen-stage-list .moment-popover-item.report-item .ic { font-size: 13px; opacity: 0.85;
+}
+#screen-stage-list .report-sheet {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--border-soft);
+      border-radius: 20px 20px 0 0;
+      z-index: 50;
+      display: none; flex-direction: column;
+      padding: 12px 20px 24px;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.12);
+}
+#screen-stage-list .report-sheet.open { display: flex;
+}
+#screen-stage-list .report-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0;
+}
+#screen-stage-list .report-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); text-align: center; margin-bottom: 14px;
+}
+#screen-stage-list .report-reason-list { display: flex; flex-direction: column;
+}
+#screen-stage-list .report-reason-item {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 48px;
+      border-bottom: 1px solid var(--border-soft);
+      font-family: var(--font-body); font-size: 14px; color: var(--fg-2);
+      cursor: pointer;
+}
+#screen-stage-list .report-reason-item:last-child { border-bottom: none;
+}
+#screen-stage-list .report-reason-item:active { background: var(--border-soft);
+}
+#screen-stage-list .report-reason-arrow { color: var(--muted); font-size: 16px;
+}
+#screen-stage-list .report-sheet-backdrop {
+      position: absolute; inset: 0; background: rgba(13,17,23,0.35);
+      z-index: 49; display: none;
+}
+#screen-stage-list .report-sheet-backdrop.open { display: block;
+}
+#screen-stage-list .report-toast {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 60;
+      background: rgba(13,17,23,0.92);
+      border-radius: var(--radius-md);
+      padding: 22px 28px;
+      display: none; flex-direction: column; align-items: center; gap: 10px;
+      min-width: 160px;
+}
+#screen-stage-list .report-toast.visible { display: flex;
+}
+#screen-stage-list .report-toast-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--success);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff;
+}
+#screen-stage-list .report-toast-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff;
+}
+#screen-stage-list .mp-tabbar {
+      height: 56px; background: rgba(13,17,23,0.95);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: space-around;
+      flex-shrink: 0; padding-bottom: 4px;
+}
+#screen-stage-list .tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer;
+}
+#screen-stage-list .tab-icon-wrap { position: relative; display: flex;
+}
+#screen-stage-list .tab-icon { font-size: 20px; line-height: 1; color: rgba(255,255,255,0.45);
+}
+#screen-stage-list .tab-item.active .tab-icon { color: var(--accent);
+}
+#screen-stage-list .tab-label { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.01em;
+}
+#screen-stage-list .tab-item.active .tab-label { color: var(--accent);
+}
+#screen-stage-list .tab-publish .tab-icon { font-size: 22px; color: rgba(255,255,255,0.7);
+}
+#screen-stage-list .tab-unread-badge {
+      position: absolute; top: -4px; right: -8px;
+      min-width: 14px; height: 14px; padding: 0 3px; border-radius: 7px;
+      background: #dc2626; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 9px; font-weight: 700; line-height: 1;
+      box-shadow: 0 0 0 1.5px rgba(13,17,23,0.95);
+}
+#screen-stage-list { background: #ffffff; color: var(--fg);
+}
+#screen-stage-list .mp-screen { border-radius: 0;
+}
+#screen-stage-list .square-page-scroll:focus { outline: none;
+}
+#screen-stage-list .moment-time.has-delete { display: flex; align-items: center; gap: 8px;
+}
+#screen-stage-list .moment-delete {
+    position: relative; flex-shrink: 0; width: 20px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; border: 0; border-radius: var(--radius-sm); background: none;
+    font-size: 12px; line-height: 1; cursor: pointer; filter: grayscale(1);
+}
+#screen-stage-list .moment-delete::after { content: ''; position: absolute; inset: -15px -12px;
+}
+#screen-stage-list .moment-delete:active { background: var(--border-soft);
+}
+#screen-stage-list .moment-delete:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px;
+}
+
+  /* ═══ 页面补充 ═══ */
+  [hidden] { display: none !important; }
+  .spec-panel { width: min(782px, 100%); }
+  #screen-stage-list { background: #ffffff; color: var(--fg); }
+  #screen-stage-list .square-page-scroll:focus { outline: none; }
+
+  /* ═══ 第二期：点赞 / 评论 / 打赏平铺在动态右下，底部一条淡输入条（参考 QQ 空间） ═══ */
+  /* 一行：发布时间（自己的带小垃圾桶）在左；右侧三个互动图标各自独立、间距均匀，最右是「···」（仅举报） */
+  #screen-stage-list .qz-bar { display: flex; align-items: center; gap: 2px; margin-top: 8px; }
+  #screen-stage-list .qz-bar .moment-time { flex: 1; min-width: 0; margin-top: 0; white-space: nowrap; }
+  #screen-stage-list .qz-actions { display: flex; align-items: center; flex-shrink: 0; }
+  #screen-stage-list .qz-act {
+    width: 36px; height: 32px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 0; border-radius: var(--radius-md);
+    color: var(--muted); cursor: pointer;
+  }
+  #screen-stage-list .qz-act .ic { font-size: 17px; line-height: 1; }
+  /* 💬 🎁 是彩色 emoji，不受 color 控制：默认灰度 + 降透明度，和 ♡ 保持同一档轻量灰 */
+  #screen-stage-list .qz-comment .ic,
+  #screen-stage-list .qz-reward .ic { filter: grayscale(1) opacity(0.65); }
+  #screen-stage-list .qz-act.liked .ic { color: var(--danger); }
+  #screen-stage-list .qz-act:active { background: var(--border-soft); }
+  #screen-stage-list .qz-act:focus-visible { outline: 2px solid var(--fg); outline-offset: -2px; }
+  #screen-stage-list .qz-bar .moment-more-wrap { flex-shrink: 0; margin-left: 4px; }
+
+  /* 时间行挪到了正文下方，头部只剩头像 + 昵称等级，两者垂直居中对齐 */
+  #screen-stage-list .moment-header { align-items: center; }
+
+  /* 每条动态底部的输入条：左边是用户自己的头像；默认只有一条淡淡的输入条，点开才出现「发送」 */
+  #screen-stage-list .qz-compose { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  #screen-stage-list .qz-compose-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--wf-block-dark);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+  #screen-stage-list .qz-compose-input {
+    flex: 1; min-width: 0; height: 30px; padding: 0 12px;
+    border: 1px solid var(--border-soft); border-radius: var(--radius-pill); background: var(--bg);
+    font-family: var(--font-body); font-size: 12px; color: var(--fg); outline: none;
+    transition: border-color 120ms var(--ease-standard), box-shadow 120ms var(--ease-standard), background-color 120ms var(--ease-standard);
+  }
+  #screen-stage-list .qz-compose-input::placeholder { color: var(--muted); }
+  #screen-stage-list .qz-compose:focus-within .qz-compose-input { border-color: var(--fg); background: #ffffff; box-shadow: 0 0 0 3px rgba(13, 17, 23, 0.1); }
+  #screen-stage-list .qz-send {
+    display: none; flex-shrink: 0; align-items: center; height: 28px; padding: 0 12px;
+    border: 0; border-radius: var(--radius-pill);
+    background: var(--accent); color: var(--accent-on); cursor: pointer; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  }
+  #screen-stage-list .qz-compose:focus-within .qz-send,
+  #screen-stage-list .qz-compose.has-text .qz-send { display: flex; }
+  #screen-stage-list .qz-send:disabled { background: var(--border-soft); color: var(--muted); cursor: default; }
+  #screen-stage-list .qz-send:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  /* 「···」菜单里只剩举报：单项 */
+  #screen-stage-list .qz-bar .moment-popover { right: calc(100% + 6px); }
+
+  /* ═══ 微博式互动详情（第二版）：卡片上保留灰区预览（打赏 / 点赞 / 前几条评论），点任意一行从底部弹出浮层；
+  浮层是一整页：打赏 → 点赞 → 评论依次排开，不分 Tab，底部固定一条评论输入条 ═══ */
+#screen-stage-list .moment-social {
+      background: var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      margin-bottom: 8px;
+      display: flex; flex-direction: column; gap: 4px;
+}
+#screen-stage-list .moment-social-row { display: flex; align-items: baseline; gap: 5px; font-size: 12px; line-height: 1.5; cursor: pointer;
+}
+#screen-stage-list .moment-social-row .ic { font-size: 11px; flex-shrink: 0;
+}
+#screen-stage-list .moment-social-row.liked-row .ic { color: #dc2626;
+}
+#screen-stage-list .moment-social-row.reward-row .ic { font-size: 13px;
+}
+#screen-stage-list .moment-social-names { font-family: var(--font-body); color: #576b95;
+}
+#screen-stage-list .moment-social-row.reward-row .moment-social-names { color: var(--fg-2);
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatars {
+      display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatar {
+      position: relative;
+      width: 18px; height: 18px; border-radius: 5px; background: var(--wf-block-dark);
+      display: flex; align-items: center; justify-content: center; font-size: 10px;
+      box-shadow: 0 0 0 1.5px var(--border-soft);
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatar .mini-crown {
+      position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+      width: 11px; height: 11px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; line-height: 1; box-shadow: 0 0 0 1px var(--border-soft);
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatar .mini-crown.gold { background: #fde047; box-shadow: 0 0 0 1px #ca8a04;
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatar .mini-crown.silver { background: #e5e7eb; box-shadow: 0 0 0 1px #9ca3af;
+}
+#screen-stage-list .moment-social-row.reward-row .reward-mini-avatar .mini-crown.bronze { background: #f0b27a; box-shadow: 0 0 0 1px #b45309;
+}
+#screen-stage-list .moment-social-row.reward-row .reward-total-amount {
+      font-family: var(--font-body); font-size: 12px; color: var(--fg-2);
+}
+#screen-stage-list .moment-social-row.reward-row .reward-total-amount .amt {
+      font-family: var(--font-mono); font-weight: 700; color: var(--accent-hover);
+}
+#screen-stage-list .moment-comments {
+      display: flex; flex-direction: column; gap: 4px;
+      padding-top: 5px; margin-top: 1px;
+      border-top: 1px solid rgba(13,17,23,0.08);
+}
+#screen-stage-list .moment-comment-row { font-size: 12px; line-height: 1.5; color: var(--fg-2);
+}
+#screen-stage-list .moment-comment-row .cmt-name { font-family: var(--font-body); font-weight: 600; color: #576b95; margin-right: 2px;
+}
+#screen-stage-list .moment-comment-more { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 1px; cursor: pointer;
+}
+  #screen-stage-list .moment-social > .moment-comments:first-child { padding-top: 0; margin-top: 0; border-top: 0; }
+  #screen-stage-list .moment-comment-row { cursor: pointer; }
+  #screen-stage-list .moment-social-row:focus-visible,
+  #screen-stage-list .moment-comment-row:focus-visible,
+  #screen-stage-list .moment-comment-more:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  /* 浮层：盖住整屏的半透明蒙层 + 底部白底面板；比举报面板低一层，评论里点「举报」时举报面板叠在它上面 */
+  #screen-stage-list .eng-backdrop {
+    position: absolute; inset: 0; z-index: 39; background: var(--wf-overlay);
+    opacity: 0; visibility: hidden;
+    transition: opacity 200ms var(--ease-standard), visibility 0s linear 200ms;
+  }
+  #screen-stage-list .eng-backdrop.open { opacity: 1; visibility: visible; transition: opacity 200ms var(--ease-standard); }
+  #screen-stage-list .eng-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 76%; z-index: 40;
+    display: flex; flex-direction: column; background: #ffffff;
+    border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(100%); visibility: hidden;
+    transition: transform 240ms var(--ease-standard), visibility 0s linear 240ms;
+  }
+  #screen-stage-list .eng-sheet.open { transform: translateY(0); visibility: visible; transition: transform 240ms var(--ease-standard); }
+  #screen-stage-list .eng-handle { flex-shrink: 0; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  #screen-stage-list .eng-handle::before { content: ''; width: 36px; height: 4px; background: var(--border); border-radius: 2px; }
+  #screen-stage-list .eng-head { flex-shrink: 0; display: flex; align-items: center; border-bottom: 1px solid var(--border-soft); }
+  #screen-stage-list .eng-head-spacer { flex-shrink: 0; width: 44px; height: 44px; }
+  #screen-stage-list .eng-title { flex: 1; text-align: center; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--fg); }
+  #screen-stage-list .eng-close {
+    flex-shrink: 0; width: 44px; height: 44px; padding: 0; background: none; border: 0; border-radius: var(--radius-md);
+    font-size: 15px; line-height: 1; color: var(--muted); cursor: pointer;
+  }
+  #screen-stage-list .eng-close:active { background: var(--border-soft); }
+  #screen-stage-list .eng-close:focus-visible,
+  #screen-stage-list .eng-body:focus-visible,
+  #screen-stage-list .eng-cmt-op:focus-visible,
+  #screen-stage-list .avatar-wall-more-btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  #screen-stage-list .eng-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px 24px; }
+  #screen-stage-list .eng-empty { padding: 20px 0 8px; text-align: center; font-size: 13px; line-height: 1.55; color: var(--muted); }
+
+  /* 浮层底部固定的评论输入条：沿用卡片底部那条淡输入条的样子，高度放到 36px 方便点 */
+  #screen-stage-list .eng-compose { flex-shrink: 0; margin-top: 0; padding: 10px 16px 16px; background: #ffffff; border-top: 1px solid var(--border-soft); }
+  #screen-stage-list .eng-compose .qz-compose-avatar { width: 28px; height: 28px; }
+  #screen-stage-list .eng-compose .qz-compose-input { height: 36px; }
+  #screen-stage-list .eng-compose .qz-send { height: 32px; }
+
+  /* 评论分段：头像 + 昵称 + 正文 + 回复 / 举报；不放单条评论的点赞数和表情 */
+  #screen-stage-list .eng-cmt { display: flex; gap: 10px; padding: 10px 0; }
+  #screen-stage-list .eng-cmt + .eng-cmt { border-top: 1px solid var(--border-soft); }
+  #screen-stage-list .eng-cmt-av {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--wf-block-dark); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  #screen-stage-list .eng-cmt-main { flex: 1; min-width: 0; }
+  #screen-stage-list .eng-cmt-name { font-family: var(--font-body); font-size: 12px; font-weight: 600; color: #576b95; }
+  #screen-stage-list .eng-cmt-text { margin-top: 2px; font-size: 13px; line-height: 1.5; color: var(--fg-2); overflow-wrap: anywhere; }
+  #screen-stage-list .eng-cmt-ops { display: flex; gap: 8px; margin-top: 2px; }
+  #screen-stage-list .eng-cmt-op {
+    min-width: 32px; padding: 6px 0; background: none; border: 0;
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted); cursor: pointer; text-align: left;
+  }
+
+  /* 打赏 / 点赞分段：标题 + 头像墙（6 列，默认 4 行，每次「展开更多」再出 4 行）+ 礼物聚合 */
+  #screen-stage-list .engagement-full-section { display: flex; flex-direction: column; }
+  #screen-stage-list .engagement-full-section + .engagement-full-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-soft); }
+  #screen-stage-list .engagement-full-heading { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 12px; }
+  #screen-stage-list .engagement-full-section .reward-aggregate-list { margin-top: 14px; }
+  #screen-stage-list .engagement-wall-wrap { display: flex; flex-direction: column; }
+  #screen-stage-list .engagement-avatar-wall { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px 6px; }
+  #screen-stage-list .engagement-avatar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+  #screen-stage-list .engagement-avatar-item.has-lv { gap: 8px; }
+  #screen-stage-list .engagement-avatar-item .av {
+    position: relative; width: 40px; height: 40px; border-radius: 6px; background: var(--wf-block-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+  }
+  #screen-stage-list .engagement-avatar-item .av-name {
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  }
+  #screen-stage-list .avatar-wall-more-btn {
+    display: flex; align-items: center; gap: 4px; align-self: flex-start; margin-top: 8px; min-height: 36px; padding: 0;
+    background: none; border: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--fg-2); cursor: pointer;
+  }
+#screen-stage-list .reward-crown-badge {
+      position: absolute; top: -3px; right: -3px;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: #ffffff; display: flex; align-items: center; justify-content: center;
+      font-size: 9px; box-shadow: 0 0 0 1px var(--border-soft);
+}
+#screen-stage-list .reward-crown-badge.gold { background: #fde047; box-shadow: 0 0 0 1px #ca8a04;
+}
+#screen-stage-list .reward-crown-badge.silver { background: #e5e7eb; box-shadow: 0 0 0 1px #9ca3af;
+}
+#screen-stage-list .reward-crown-badge.bronze { background: #f0b27a; box-shadow: 0 0 0 1px #b45309;
+}
+#screen-stage-list .reward-user-level {
+      position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 1px;
+      height: 12px; padding: 0 4px; border-radius: 6px;
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      box-shadow: 0 0 0 1.5px #ffffff;
+      white-space: nowrap;
+}
+#screen-stage-list .reward-user-level .ic { font-size: 7px; line-height: 1;
+}
+#screen-stage-list .reward-user-level .lv-num { font-family: var(--font-mono); font-size: 8px; font-weight: 700; color: #fde68a; line-height: 1;
+}
+#screen-stage-list .reward-aggregate-list { display: flex; flex-wrap: wrap; gap: 8px;
+}
+#screen-stage-list .reward-aggregate-row {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--border-soft); border-radius: 8px; padding: 5px 8px 5px 5px;
+}
+#screen-stage-list .reward-aggregate-icon {
+      width: 26px; height: 26px; border-radius: 6px; background: var(--surface-warm);
+      border: 1px solid var(--accent); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+#screen-stage-list .reward-aggregate-info { display: flex; flex-direction: column; gap: 0;
+}
+#screen-stage-list .reward-aggregate-name { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: var(--fg); line-height: 1.3;
+}
+#screen-stage-list .reward-aggregate-count { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent-hover); flex-shrink: 0; margin-left: 2px;
+}
+
+  @media (prefers-reduced-motion: reduce) {
+    .device-shell, .device-shell * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="matrix-toast" id="matrix-toast" role="status" aria-live="polite">
+  <div class="matrix-toast-icon">✓</div>
+  <span id="matrix-toast-msg"></span>
+</div>
+
+<div class="matrix-header" data-od-id="matrix-header">
+  <h1>大舞台列表 · QQ 空间式互动</h1>
+</div>
+
+<div class="device-shell">
+
+<div class="mp-screen-view active" id="screen-stage-list" data-od-id="screen-stage-list-view">
+    <div class="mp-screen">
+
+          <div class="mp-status-bar">
+            <span class="mp-status-time">9:41</span>
+            <div class="mp-status-icons">
+              <div class="icon-bar"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+              <div class="wifi-icon"></div><div class="battery-icon"></div>
+            </div>
+          </div>
+
+          <!-- 小程序 NavBar：大舞台为底Bar根页面，无上一页可返回，故不展示返回箭头；用等宽占位块让标题保持居中 -->
+          <div class="mp-nav">
+            <div class="mp-nav-spacer"></div>
+            <div class="mp-nav-title">大舞台</div>
+            <div class="mp-nav-spacer" aria-hidden="true"></div>
+          </div>
+
+          <!-- 整体滚动容器：头图/头像/昵称 + Tab + 内容列表，作为同一个滚动区域一起上滑 -->
+          <div class="square-page-scroll" tabindex="-1">
+
+          <!-- 个人资料头部：头图 + 头像/昵称，参考微信朋友圈首页样式；随内容一起滚动，而非固定悬浮 -->
+          <div class="profile-header">
+            <div class="profile-cover"></div>
+            <div class="profile-identity">
+              <div class="profile-identity-group">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name">阿伟</div>
+              </div>
+            </div>
+
+          </div>
+
+
+
+          <!-- Content Tab：广场 / 官方 -->
+          <div class="square-content-tabs chip-tabs">
+            <div class="square-content-tab chip-tab active" data-target="panel-square" onclick="slSetSquareTab(this)"><span class="tab-chip-ic">🌼</span>广场</div>
+            <div class="square-content-tab chip-tab" data-target="panel-official" onclick="slSetSquareTab(this)"><span class="tab-chip-ic">📣</span>官方<span class="tab-unread-dot"></span></div>
+          </div>
+
+          <!-- 广场面板 -->
+          <div class="square-panel" id="panel-square">
+            <div class="moment-list">
+
+              <!-- 自己发的动态（纯文字）：排在广场 Tab 第一条，打开列表即可看到；发布时间右侧带小垃圾桶 -->
+              <div class="moment-item" data-mid="mine">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">用户昵称</span><span class="creator-level">Lv.1</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">刚下班，好饿。</div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time has-delete">昨天 22:10<button type="button" class="moment-delete" aria-label="删除这条动态" onclick="openDeleteConfirm('list-moment', this)">🗑️</button></div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="0" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div></div>
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <!-- 纯文字动态 -->
+              <div class="moment-item" data-mid="hike">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">阿伟</span><span class="creator-level">Lv.5</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">周末爬山，山顶风好大，人也好少，安静得只剩风声，纯文字动态最多展示五行超出折叠…</div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">12 分钟前</div><div class="qz-actions"><button type="button" class="qz-act qz-like liked" data-base="45" aria-pressed="true" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">❤</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div><div class="moment-more-wrap"><div class="moment-more" role="button" tabindex="0" aria-label="更多" onclick="qzToggleMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="moment-popover"><div class="moment-popover-item report-item" role="button" tabindex="0" onclick="slOpenMomentReport(this)"><span class="ic">🚩</span><span class="lbl">举报</span></div></div></div></div>
+
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <!-- 图片+文字动态（多图） -->
+              <div class="moment-item" id="moment-brunch" data-mid="brunch">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">Lucy</span><span class="creator-level">Lv.12</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">今天做的brunch，拍了几张随手图</div>
+                    <div class="moment-images">
+                      <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                      <div class="moment-image"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">38 分钟前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="212" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div><div class="moment-more-wrap"><div class="moment-more" role="button" tabindex="0" aria-label="更多" onclick="qzToggleMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="moment-popover"><div class="moment-popover-item report-item" role="button" tabindex="0" onclick="slOpenMomentReport(this)"><span class="ic">🚩</span><span class="lbl">举报</span></div></div></div></div>
+
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <!-- 视频动态 -->
+              <div class="moment-item" data-mid="skate">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">今天练习的滑板小片段，摔了好几次才拍成</div>
+                    <div class="moment-video"><span class="moment-video-dur">00:24</span></div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">1 小时前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="68" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div><div class="moment-more-wrap"><div class="moment-more" role="button" tabindex="0" aria-label="更多" onclick="qzToggleMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="moment-popover"><div class="moment-popover-item report-item" role="button" tabindex="0" onclick="slOpenMomentReport(this)"><span class="ic">🚩</span><span class="lbl">举报</span></div></div></div></div>
+
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <!-- 图片+文字动态（单图） -->
+              <div class="moment-item" data-mid="succulent">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">小美</span><span class="creator-level">Lv.3</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">养了两个月的多肉终于开花了</div>
+                    <div class="moment-images count-1">
+                      <div class="moment-image"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">3 小时前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="34" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div><div class="moment-more-wrap"><div class="moment-more" role="button" tabindex="0" aria-label="更多" onclick="qzToggleMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="moment-popover"><div class="moment-popover-item report-item" role="button" tabindex="0" onclick="slOpenMomentReport(this)"><span class="ic">🚩</span><span class="lbl">举报</span></div></div></div></div>
+
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <!-- 图片+文字动态（含话题，纯文字内联展示 #标签） -->
+              <div class="moment-item" data-mid="stall">
+                <div class="moment-header">
+                  <div class="moment-avatar">👤</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">阿强</span><span class="creator-level">Lv.8</span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">周末在公司楼下摆了个摊，第一次尝试摆摊卖手作饰品，紧张又兴奋 <span class="inline-topic">#摆摊日记</span> <span class="inline-topic">#副业记录</span></div>
+                    <div class="moment-images">
+                      <div class="moment-image"></div><div class="moment-image"></div><div class="moment-image"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">5 小时前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="127" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button><button type="button" class="qz-act qz-reward" aria-label="打赏" onclick="showMatrixToast('打赏面板（本稿不展开）')"><span class="ic">🎁</span></button></div><div class="moment-more-wrap"><div class="moment-more" role="button" tabindex="0" aria-label="更多" onclick="qzToggleMenu(this)"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="moment-popover"><div class="moment-popover-item report-item" role="button" tabindex="0" onclick="slOpenMomentReport(this)"><span class="ic">🚩</span><span class="lbl">举报</span></div></div></div></div>
+
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+            </div>
+
+
+
+
+          </div><!-- /panel-square -->
+
+          <!-- 官方面板：平台官方发布的信息，不允许打赏，也不允许举报（卡片上没有「···」菜单） -->
+          <div class="square-panel" id="panel-official" style="display:none;">
+            <div class="moment-list">
+
+              <div class="moment-item pinned" data-mid="off1">
+                <div class="moment-header">
+                  <div class="moment-avatar">📣</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">平台官方</span><span class="official-tag"></span></div>
+                    
+                  </div>
+                  <div class="pinned-badge"><span class="ic">📌</span><span>置顶</span></div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">大舞台本周精选创作者已上线，快去看看有没有你关注的朋友入选～</div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">2 小时前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="358" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button></div></div>
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <div class="moment-item" data-mid="off2">
+                <div class="moment-header">
+                  <div class="moment-avatar">📣</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">平台官方</span><span class="official-tag"></span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">大舞台社区公约更新，新增虚拟礼物打赏相关规范，请各位创作者留意查阅</div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">昨天</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="96" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button></div></div>
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+              <div class="moment-item" data-mid="off3">
+                <div class="moment-header">
+                  <div class="moment-avatar">📣</div>
+                  <div class="moment-meta">
+                    <div class="moment-name-row"><span class="moment-name">平台官方</span><span class="official-tag"></span></div>
+                    
+                  </div>
+                </div>
+                <div class="moment-row">
+                  <div class="moment-body">
+                    <div class="moment-text">本月创作者激励计划公布！符合条件的创作者可获得额外曝光和奖励，详情请查看公告页面</div>
+                  </div>
+                  
+                </div>
+         <div class="qz-bar"><div class="moment-time">3 天前</div><div class="qz-actions"><button type="button" class="qz-act qz-like" data-base="245" aria-pressed="false" aria-label="点赞" onclick="qzToggleLike(this)"><span class="ic">♡</span></button><button type="button" class="qz-act qz-comment" aria-label="评论" onclick="qzFocusCompose(this)"><span class="ic">💬</span></button></div></div>
+                <div class="qz-compose"><div class="qz-compose-avatar" aria-hidden="true">👤</div><input class="qz-compose-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="qzComposeKey(event, this)"><button type="button" class="qz-send" disabled onclick="qzSend(this)">发送</button></div>
+</div>
+
+            </div>
+          </div><!-- /panel-official -->
+
+          </div><!-- /square-page-scroll -->
+
+          <!-- 底Bar：视频/图文/内容发布/大舞台/我的（大舞台为当前态） -->
+          <div class="mp-tabbar">
+            <div class="tab-item"><div class="tab-icon">▶</div><span class="tab-label">视频</span></div>
+            <div class="tab-item"><div class="tab-icon">◻</div><span class="tab-label">图文</span></div>
+            <div class="tab-item tab-publish"><div class="tab-icon">＋</div><span class="tab-label">内容发布</span></div>
+            <div class="tab-item active"><div class="tab-icon-wrap"><div class="tab-icon">▦</div><span class="tab-unread-badge">12</span></div><span class="tab-label">大舞台</span></div>
+            <div class="tab-item"><div class="tab-icon-wrap"><div class="tab-icon">◉</div><span class="tab-unread-badge">15</span></div><span class="tab-label">我的</span></div>
+          </div>
+
+          <!-- 举报原因面板：点击任意动态「···」菜单里的「举报」打开，蒙层+底部sheet，单选一级原因后立即提交 -->
+          <div class="report-sheet-backdrop" onclick="slCloseMomentReport()"></div>
+          <div class="report-sheet">
+            <div class="report-handle"></div>
+            <div class="report-title">举报</div>
+            <div class="report-reason-list">
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>色情低俗</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>垃圾广告</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>违法违规</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>人身攻击</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>侵犯权益</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>不实信息</span><span class="report-reason-arrow">›</span></div>
+              <div class="report-reason-item" onclick="slSubmitMomentReport()"><span>其他</span><span class="report-reason-arrow">›</span></div>
+            </div>
+          </div>
+          <div class="report-toast">
+            <div class="report-toast-icon">✓</div>
+            <div class="report-toast-title">举报成功提交</div>
+          </div>
+
+                        <!-- 互动详情浮层（微博式）：点卡片灰区里的任意一行弹出；一整页依次是 打赏 → 点赞 → 评论，内容由脚本按动态数据渲染；底部固定评论输入条 -->
+          <div class="eng-backdrop" id="eng-backdrop" data-act="close-sheet"></div>
+   <div class="eng-sheet" id="eng-sheet" role="dialog" aria-modal="true" aria-labelledby="eng-title">
+            <div class="eng-handle" data-act="close-sheet" aria-hidden="true"></div>
+     <div class="eng-head">
+       <div class="eng-head-spacer" aria-hidden="true"></div>
+       <div class="eng-title" id="eng-title">互动详情</div>
+       <button type="button" class="eng-close" aria-label="关闭" data-act="close-sheet">✕</button>
+     </div>
+     <div class="eng-body" id="eng-body" tabindex="0"></div>
+     <div class="qz-compose eng-compose">
+       <div class="qz-compose-avatar" aria-hidden="true">👤</div>
+       <input class="qz-compose-input" id="eng-input" type="text" maxlength="200" placeholder="说点什么…" aria-label="写评论" oninput="qzComposeInput(this)" onkeydown="engComposeKey(event, this)">
+       <button type="button" class="qz-send" id="eng-send" disabled onclick="engSend()">发送</button>
+     </div>
+          </div>
+
+ </div>
+  </div>
+
+  <div class="delete-confirm-backdrop" id="delete-confirm" aria-hidden="true" onclick="closeDeleteConfirm()">
+    <div class="delete-confirm" role="alertdialog" aria-modal="true" aria-labelledby="delete-confirm-title" aria-describedby="delete-confirm-desc" onclick="event.stopPropagation()">
+      <div class="delete-confirm-title" id="delete-confirm-title">删除这条动态？</div>
+      <div class="delete-confirm-desc" id="delete-confirm-desc">删除后无法恢复。</div>
+      <div class="delete-confirm-actions">
+        <button type="button" class="delete-btn" id="delete-confirm-cancel" onclick="closeDeleteConfirm()">取消</button>
+ <button type="button" class="delete-btn delete-btn-danger" onclick="confirmDelete()">删除</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /device-shell -->
+
+<script>
+// ═══ 大舞台列表 · QQ 空间式互动（第二期方案） ═══
+function showMatrixToast(msg, duration) {
+  var toast = document.getElementById('matrix-toast');
+  var msgEl = document.getElementById('matrix-toast-msg');
+  if (!toast || !msgEl) return;
+  msgEl.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window.__mtoastTimer);
+  window.__mtoastTimer = setTimeout(function () { toast.classList.remove('show'); }, duration || 2200);
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+// ─── 广场 / 官方 Tab ───
+function slSetSquareTab(el) {
+  var nav = el.closest('.square-content-tabs');
+  nav.querySelectorAll('.square-content-tab').forEach(function (t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  var screen = nav.closest('.mp-screen');
+  screen.querySelectorAll('.square-panel').forEach(function (p) { p.style.display = 'none'; });
+  screen.querySelector('#' + el.dataset.target).style.display = 'block';
+  var dot = el.querySelector('.tab-unread-dot');
+  if (dot) dot.remove();
+  closeMenus();
+}
+
+// ─── 动态右下：点赞 / 评论 / 打赏（按钮只放图标，数字只在灰区出现一次） ───
+function qzCard(el) {
+  return el.closest('.moment-item');
+}
+
+// ─── 互动数据：卡片灰区预览和浮层都从这份数据渲染；点赞 / 发评论只改这里再重绘 ───
+// pv = 灰区里预览几条评论（默认 2）；自己刚发的评论一定会出现在预览里
+var QZ_ME = '用户昵称';
+var QZ_DATA = {
+  mine: { rewarders: [], gifts: [], likeNames: [], comments: [] },
+  hike: {
+    pv: 1,
+    rewardTotal: '3',
+    rewarders: [{ n: '阿强', lv: 15 }],
+    gifts: [{ ic: '🎈', n: '气球', c: 1 }],
+    likeNames: ['小美', '阿强'],
+    comments: [
+      { n: "小美", t: "好羡慕，山顶有信号吗" },
+      { n: "Lucy", t: "加油，期待你摆摊成功！" },
+      { n: "阿强", t: "回复 @小美：山顶信号很差，发朋友圈等了半天才发出去" },
+      { n: "用户_04", t: "这景色也太好了吧" },
+      { n: "用户_05", t: "求定位！" },
+      { n: "用户_06", t: "周末也想去爬山了" },
+      { n: "用户_07", t: "拍得真好看" }
+    ]
+  },
+  brunch: {
+    pv: 2,
+    rewardTotal: '28',
+    rewarders: [
+      { n: '阿伟', lv: 45, crown: 'gold' },
+      { n: '小美', lv: 33, crown: 'silver' },
+      { n: '阿强', lv: 19, crown: 'bronze' },
+      { n: '用户_10', lv: 12 },
+      { n: '用户_11', lv: 6 }
+    ],
+    gifts: [{ ic: '🚀', n: '火箭', c: 1 }, { ic: '🎈', n: '气球', c: 1 }, { ic: '🌹', n: '玫瑰', c: 2 }, { ic: '🧸', n: '玩偶', c: 1 }],
+    likeNames: ['阿伟', '小美'],
+    comments: [
+      { n: "阿伟", t: "这摆盘也太精致了" },
+      { n: "小美", t: "求教程！" },
+      { n: "阿强", t: "回复 @小美：我也想要，一起催一下" },
+      { n: "用户_09", t: "看起来好好吃，周末也要做一次" },
+      { n: "用户_12", t: "这家店在哪里呀" },
+      { n: "用户_13", t: "摄影技术也太好了" },
+      { n: "用户_14", t: "酸奶碗是自己做的吗" },
+      { n: "用户_15", t: "看饿了，晚安" },
+      { n: "用户_16", t: "求同款餐具链接" },
+      { n: "用户_17", t: "周末brunch 冲了" },
+      { n: "用户_18", t: "太诱人了吧" },
+      { n: "用户_19", t: "摆盘天花板了" },
+      { n: "用户_20", t: "已经收藏，下周尝试" },
+      { n: "用户_21", t: "这个滤镜也好好看" },
+      { n: "用户_22", t: "请问用的什么相机" },
+      { n: "用户_23", t: "看起来好治愈" },
+      { n: "用户_24", t: "水果拼盘配色绝了" },
+      { n: "用户_25", t: "已经饿到不行" },
+      { n: "用户_26", t: "求菜谱！" },
+      { n: "用户_27", t: "这也太精致了叭" },
+      { n: "用户_28", t: "早餐天花板" },
+      { n: "用户_29", t: "看着就很有食欲" },
+      { n: "用户_30", t: "已转发给朋友" }
+    ]
+  },
+  skate: { rewardTotal: '1', rewarders: [{ n: 'Lucy', lv: 30 }], gifts: [{ ic: '🌹', n: '玫瑰', c: 1 }], likeNames: ['Lucy'], comments: [] },
+  succulent: { rewarders: [], gifts: [], likeNames: ['阿伟'], comments: [] },
+  stall: {
+    pv: 1,
+    rewardTotal: '5.50',
+    rewarders: [{ n: '小美', lv: 22 }],
+    gifts: [{ ic: '🧸', n: '玩偶', c: 1 }],
+    likeNames: ['小美', 'Lucy'],
+    comments: [
+      { n: "小美", t: "饰品好好看，链接发一下" },
+      { n: "Lucy", t: "摆摊辛苦了，第一次都很不容易" },
+      { n: "阿伟", t: "这个价格可以接受，支持一下" },
+      { n: "用户_04", t: "摊位在哪个位置呀" },
+      { n: "用户_05", t: "手作真的很有心意" },
+      { n: "用户_06", t: "求同款材料包" },
+      { n: "用户_07", t: "周末也想去摆摊了" },
+      { n: "用户_08", t: "第一次就卖出去很棒了" },
+      { n: "用户_09", t: "设计感很强" },
+      { n: "用户_10", t: "支持！下次去买" },
+      { n: "用户_11", t: "摆摆着回本了吗" },
+      { n: "用户_12", t: "有教程可以学吗" },
+      { n: "用户_13", t: "颜色搭配好看" },
+      { n: "用户_14", t: "加油，越摆越好" },
+      { n: "用户_15", t: "已经关注啦" }
+    ]
+  },
+  off1: { pv: 1, rewarders: [], gifts: [], likeNames: ['阿伟', '小美'], comments: [
+      { n: "阿强", t: "期待入选！" },
+      { n: "小美", t: "希望这周能看到熟悉的名字" },
+      { n: "Lucy", t: "已经去看了，好多有意思的创作者" },
+      { n: "阿伟", t: "求推荐几个值得关注的" },
+      { n: "用户_04", t: "精选名单每周几更新呀" },
+      { n: "用户_05", t: "上次就入选过，这次继续加油" },
+      { n: "用户_06", t: "刚关注了两位，内容都很不错" },
+      { n: "用户_07", t: "官方小哥哥辛苦了" },
+      { n: "用户_08", t: "期待下周的名单" },
+      { n: "用户_09", t: "点赞支持" },
+      { n: "用户_10", t: "这个栏目做得好" },
+      { n: "用户_11", t: "已转给朋友看" }
+    ] },
+  off2: { rewarders: [], gifts: [], likeNames: ['小美'], comments: [] },
+  off3: { pv: 1, rewarders: [], gifts: [], likeNames: ['Lucy', '阿伟'], comments: [
+      { n: "Lucy", t: "太棒了！" }
+    ] }
+};
+
+function qzEl(tag, cls, text) {
+  var el = document.createElement(tag);
+  if (cls) el.className = cls;
+  if (text != null) el.textContent = text;
+  return el;
+}
+
+function qzData(card) {
+  var id = card.dataset.mid;
+  if (!QZ_DATA[id]) QZ_DATA[id] = { rewarders: [], gifts: [], likeNames: [], comments: [] };
+  return QZ_DATA[id];
+}
+
+// 点赞总数 = 基数 + 自己是否点了；基数挂在点赞按钮的 data-base 上
+function qzLikeTotal(card) {
+  var btn = card.querySelector('.qz-like');
+  if (!btn) return 0;
+  return (parseInt(btn.dataset.base, 10) || 0) + (btn.classList.contains('liked') ? 1 : 0);
+}
+
+// 卡片上的灰区预览：打赏 · 点赞 · 前几条评论 + 「查看全部 N 条评论」；每一行都能点开浮层，并定位到对应分段
+function qzOpenRow(el, sec, label) {
+  el.dataset.act = 'open';
+  el.dataset.sec = sec;
+  el.setAttribute('role', 'button');
+  el.tabIndex = 0;
+  el.setAttribute('aria-label', label);
+  return el;
+}
+
+function qzRenderPreview(card) {
+  var d = qzData(card);
+  var box = qzEl('div', 'moment-social');
+
+  if (d.rewarders.length) {
+    var rr = qzOpenRow(qzEl('div', 'moment-social-row reward-row'), 'reward', '查看打赏详情');
+    rr.appendChild(qzEl('span', 'ic', '🎁'));
+    var avs = qzEl('span', 'reward-mini-avatars');
+    d.rewarders.slice(0, 3).forEach(function (r) {
+      var av = qzEl('span', 'reward-mini-avatar', '👤');
+      if (r.crown) av.appendChild(qzEl('span', 'mini-crown ' + r.crown, '👑'));
+      avs.appendChild(av);
+    });
+    rr.appendChild(avs);
+    var total = qzEl('span', 'reward-total-amount', d.rewarders.length > 1 ? d.rewarders.length + ' 人共打赏了 ¥' : '打赏了 ¥');
+    total.appendChild(qzEl('span', 'amt', d.rewardTotal));
+    rr.appendChild(total);
+    box.appendChild(rr);
+  }
+
+  var likes = qzLikeTotal(card);
+  if (likes > 0) {
+    var liked = !!card.querySelector('.qz-like.liked');
+    var lr = qzOpenRow(qzEl('div', 'moment-social-row liked-row'), 'like', '查看点赞详情');
+    lr.appendChild(qzEl('span', 'ic', liked ? '❤' : '♡'));
+    var names = d.likeNames.length ? d.likeNames.join('、') + ' 等 ' + likes + ' 人点赞' : likes + ' 人点赞';
+    lr.appendChild(qzEl('span', 'moment-social-names', names));
+    box.appendChild(lr);
+  }
+
+  if (d.comments.length) {
+    var pv = d.pv == null ? 2 : d.pv;
+    var wrap = qzEl('div', 'moment-comments');
+    var shown = 0;
+    d.comments.forEach(function (c, i) {
+      if (i >= pv && c.n !== QZ_ME) return;
+      var row = qzOpenRow(qzEl('div', 'moment-comment-row'), 'comment', '查看 ' + c.n + ' 的评论');
+      row.appendChild(qzEl('span', 'cmt-name', c.n + '：'));
+      row.appendChild(document.createTextNode(c.t));
+      wrap.appendChild(row);
+      shown++;
+    });
+    if (d.comments.length > shown) {
+      var more = qzOpenRow(qzEl('div', 'moment-comment-more'), 'comment', '查看全部评论');
+      more.textContent = '查看全部 ' + d.comments.length + ' 条评论';
+      wrap.appendChild(more);
+    }
+    box.appendChild(wrap);
+  }
+
+  var old = card.querySelector('.moment-social');
+  if (!box.children.length) { if (old) old.remove(); return; }
+  if (old) old.replaceWith(box);
+  else card.querySelector('.qz-bar').after(box);
+}
+
+function qzToggleLike(btn) {
+  var liked = !btn.classList.contains('liked');
+  btn.classList.toggle('liked', liked);
+  btn.setAttribute('aria-pressed', String(liked));
+  btn.querySelector('.ic').textContent = liked ? '❤' : '♡';
+  qzRenderPreview(qzCard(btn));
+}
+
+// 点「评论」：焦点直接落到这条动态底部的输入条，「发送」随之出现
+function qzFocusCompose(btn) {
+  var input = qzCard(btn).querySelector('.qz-compose-input');
+  if (!input) return;
+  input.focus();
+  input.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+}
+
+function qzComposeInput(input) {
+  var wrap = input.parentElement;
+  var has = !!input.value.trim();
+  wrap.querySelector('.qz-send').disabled = !has;
+  wrap.classList.toggle('has-text', has);
+}
+
+function qzComposeKey(e, input) {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  e.preventDefault();
+  var send = input.parentElement.querySelector('.qz-send');
+  if (!send.disabled) qzSend(send);
+}
+
+function qzSend(btn) {
+  var wrap = btn.parentElement;
+  var card = qzCard(btn);
+  var input = wrap.querySelector('.qz-compose-input');
+  var text = input.value.trim();
+  if (!text) return;
+
+  // 回复某人时，正文前带「回复 @昵称：」；评论写进数据后重绘灰区预览，浮层下次打开就能看到
+  var to = input.dataset.replyTo;
+  qzData(card).comments.push({ n: QZ_ME, t: (to ? '回复 @' + to + '：' : '') + text });
+  qzRenderPreview(card);
+  qzResetReply(input);
+
+  input.value = '';
+  btn.disabled = true;
+  wrap.classList.remove('has-text');
+  input.focus();
+}
+
+function qzResetReply(input) {
+  delete input.dataset.replyTo;
+  input.placeholder = '说点什么…';
+}
+
+// ─── 「···」菜单（只有举报） ───
+function closeMenus() {
+  document.querySelectorAll('.moment-popover.open').forEach(function (p) { p.classList.remove('open'); });
+}
+
+function qzToggleMenu(el) {
+  var popover = el.nextElementSibling;
+  var wasOpen = popover.classList.contains('open');
+  closeMenus();
+  if (!wasOpen) popover.classList.add('open');
+}
+
+function slOpenMomentReport(el) {
+  closeMenus();
+  var screen = el.closest('.mp-screen');
+  screen.querySelector('.report-sheet-backdrop').classList.add('open');
+  screen.querySelector('.report-sheet').classList.add('open');
+}
+
+function slCloseMomentReport() {
+  document.querySelectorAll('#screen-stage-list .report-sheet-backdrop.open').forEach(function (b) { b.classList.remove('open'); });
+  document.querySelectorAll('#screen-stage-list .report-sheet.open').forEach(function (s) { s.classList.remove('open'); });
+}
+
+function slSubmitMomentReport() {
+  slCloseMomentReport();
+  var toast = document.querySelector('#screen-stage-list .report-toast');
+  if (!toast) return;
+  toast.classList.add('visible');
+  clearTimeout(window.__slReportTimer);
+  window.__slReportTimer = setTimeout(function () { toast.classList.remove('visible'); }, 1800);
+}
+
+// ─── 互动详情浮层（微博式）：一整页，依次是 打赏 → 点赞 → 评论；每次打开按动态数据重建 ───
+var qzSheet = { card: null, opener: null };
+
+function qzAvatarItem(u) {
+  var item = qzEl('div', 'engagement-avatar-item' + (u.lv ? ' has-lv' : ''));
+  var av = qzEl('div', 'av', '👤');
+  if (u.crown) av.appendChild(qzEl('span', 'reward-crown-badge ' + u.crown, '👑'));
+  if (u.lv) {
+    var lv = qzEl('span', 'reward-user-level');
+    lv.appendChild(qzEl('span', 'ic', '🏆'));
+    lv.appendChild(qzEl('span', 'lv-num', String(u.lv)));
+    av.appendChild(lv);
+  }
+  item.appendChild(av);
+  item.appendChild(qzEl('span', 'av-name', u.name));
+  return item;
+}
+
+// 头像墙：6 列，默认 4 行（24 个），超出折叠，每点一次「展开更多」再出 4 行
+function qzBuildWall(total, getUser) {
+  var wrap = qzEl('div', 'engagement-wall-wrap');
+  var wall = qzEl('div', 'engagement-avatar-wall');
+  wrap.appendChild(wall);
+  var shown = 0;
+  var more = null;
+  function reveal() {
+    var end = Math.min(total, shown + 24);
+    for (; shown < end; shown++) wall.appendChild(qzAvatarItem(getUser(shown)));
+    if (shown >= total && more) { more.remove(); more = null; }
+  }
+  if (total > 24) {
+    more = qzEl('button', 'avatar-wall-more-btn');
+    more.type = 'button';
+    var arrow = qzEl('span', 'ic', '▾');
+    arrow.setAttribute('aria-hidden', 'true');
+    more.appendChild(arrow);
+    more.appendChild(document.createTextNode('展开更多'));
+    more.addEventListener('click', reveal);
+    wrap.appendChild(more);
+  }
+  reveal();
+  return wrap;
+}
+
+function qzSection(title, key) {
+  var s = qzEl('div', 'engagement-full-section');
+  s.dataset.sec = key;
+  s.appendChild(qzEl('div', 'engagement-full-heading', title));
+  return s;
+}
+
+function qzBuildRewardSection(d) {
+  var s = qzSection(d.rewarders.length + ' 人打赏，共 ¥' + d.rewardTotal, 'reward');
+  s.appendChild(qzBuildWall(d.rewarders.length, function (i) {
+    var r = d.rewarders[i];
+    return { name: r.n, lv: r.lv, crown: r.crown };
+  }));
+  if (d.gifts.length) {
+    var list = qzEl('div', 'reward-aggregate-list');
+    d.gifts.forEach(function (g) {
+      var row = qzEl('div', 'reward-aggregate-row');
+      row.appendChild(qzEl('div', 'reward-aggregate-icon', g.ic));
+      var info = qzEl('div', 'reward-aggregate-info');
+      info.appendChild(qzEl('div', 'reward-aggregate-name', g.n));
+      row.appendChild(info);
+      row.appendChild(qzEl('div', 'reward-aggregate-count', '×' + g.c));
+      list.appendChild(row);
+    });
+    s.appendChild(list);
+  }
+  return s;
+}
+
+function qzBuildLikeSection(card, d) {
+  var total = qzLikeTotal(card);
+  var s = qzSection(total + ' 人点赞', 'like');
+  var named = (card.querySelector('.qz-like.liked') ? ['我'] : []).concat(d.likeNames);
+  s.appendChild(qzBuildWall(total, function (i) {
+    if (i < named.length) return { name: named[i] };
+    var n = i + 1;
+    return { name: '用户_' + (n < 10 ? '0' + n : n) };
+  }));
+  return s;
+}
+
+function qzBuildCommentSection(d) {
+  var s = qzSection(d.comments.length ? d.comments.length + ' 条评论' : '评论', 'comment');
+  if (!d.comments.length) {
+    s.appendChild(qzEl('div', 'eng-empty', '还没有评论，来说点什么吧'));
+    return s;
+  }
+  d.comments.forEach(function (c) {
+    var row = qzEl('div', 'eng-cmt');
+    row.appendChild(qzEl('div', 'eng-cmt-av', '👤'));
+    var main = qzEl('div', 'eng-cmt-main');
+    main.appendChild(qzEl('div', 'eng-cmt-name', c.n));
+    main.appendChild(qzEl('div', 'eng-cmt-text', c.t));
+    if (c.n !== QZ_ME) {
+      var ops = qzEl('div', 'eng-cmt-ops');
+      var reply = qzEl('button', 'eng-cmt-op', '回复');
+      reply.type = 'button';
+      reply.dataset.act = 'reply';
+      reply.dataset.name = c.n;
+      reply.setAttribute('aria-label', '回复 ' + c.n);
+      var report = qzEl('button', 'eng-cmt-op', '举报');
+      report.type = 'button';
+      report.dataset.act = 'report';
+      report.setAttribute('aria-label', '举报 ' + c.n + ' 的评论');
+      ops.appendChild(reply);
+      ops.appendChild(report);
+      main.appendChild(ops);
+    }
+    row.appendChild(main);
+    s.appendChild(row);
+  });
+  return s;
+}
+
+// sec：点的是灰区哪一行（reward / like / comment），打开后直接滚到对应分段
+function qzOpenSheet(card, sec, opener) {
+  var sheet = document.getElementById('eng-sheet');
+  var backdrop = document.getElementById('eng-backdrop');
+  var body = document.getElementById('eng-body');
+  if (!card || !sheet || !backdrop || !body) return;
+  closeMenus();
+  qzSheet.card = card;
+  qzSheet.opener = opener || null;
+  var d = qzData(card);
+
+  body.textContent = '';
+  if (d.rewarders.length) body.appendChild(qzBuildRewardSection(d));
+  if (qzLikeTotal(card) > 0) body.appendChild(qzBuildLikeSection(card, d));
+  body.appendChild(qzBuildCommentSection(d));
+  qzResetSheetCompose();
+
+  sheet.classList.add('open');
+  backdrop.classList.add('open');
+  var target = body.querySelector('[data-sec="' + sec + '"]');
+  body.scrollTop = target ? Math.max(0, target.offsetTop - 14) : 0;
+  body.focus({ preventScroll: true });
+}
+
+function qzCloseSheet() {
+  var sheet = document.getElementById('eng-sheet');
+  if (!sheet || !sheet.classList.contains('open')) return;
+  sheet.classList.remove('open');
+  document.getElementById('eng-backdrop').classList.remove('open');
+  var opener = qzSheet.opener;
+  var card = qzSheet.card;
+  qzSheet.card = null;
+  qzSheet.opener = null;
+  qzResetSheetCompose();
+  // 发过评论后灰区会重绘，原来那一行可能已不在；退到这张卡片上的第一个可点行或点赞按钮
+  if (opener && opener.isConnected) { opener.focus(); return; }
+  if (card && card.isConnected) {
+    var fallback = card.querySelector('[data-act="open"]') || card.querySelector('.qz-like');
+    if (fallback) fallback.focus();
+  }
+}
+
+// ─── 浮层底部的评论输入条 ───
+function qzResetSheetCompose() {
+  var input = document.getElementById('eng-input');
+  var send = document.getElementById('eng-send');
+  if (!input || !send) return;
+  input.value = '';
+  qzResetReply(input);
+  send.disabled = true;
+  input.parentElement.classList.remove('has-text');
+}
+
+// 点评论的「回复」：浮层不收起，焦点直接落到底部输入条，占位变成「回复 @昵称：」
+function qzReply(name) {
+  var input = document.getElementById('eng-input');
+  if (!input) return;
+  input.dataset.replyTo = name;
+  input.placeholder = '回复 @' + name + '：';
+  input.focus();
+}
+
+function engComposeKey(e, input) {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  e.preventDefault();
+  var send = document.getElementById('eng-send');
+  if (send && !send.disabled) engSend();
+}
+
+// 发送：写进数据 → 重绘评论分段和卡片灰区 → 滚到列表底部看到自己刚发的那条
+function engSend() {
+  var card = qzSheet.card;
+  var input = document.getElementById('eng-input');
+  var body = document.getElementById('eng-body');
+  if (!card || !input || !body) return;
+  var text = input.value.trim();
+  if (!text) return;
+  var d = qzData(card);
+  var to = input.dataset.replyTo;
+  d.comments.push({ n: QZ_ME, t: (to ? '回复 @' + to + '：' : '') + text });
+
+  var fresh = qzBuildCommentSection(d);
+  var old = body.querySelector('[data-sec="comment"]');
+  if (old) old.replaceWith(fresh); else body.appendChild(fresh);
+  qzRenderPreview(card);
+
+  qzResetSheetCompose();
+  body.scrollTop = body.scrollHeight;
+  input.focus();
+}
+
+function qzTrapTab(e) {
+  var sheet = document.getElementById('eng-sheet');
+  var items = Array.prototype.filter.call(sheet.querySelectorAll('button, input, [tabindex="0"]'), function (el) {
+    return !el.disabled && el.offsetParent !== null;
+  });
+  if (!items.length) return;
+  var first = items[0];
+  var last = items[items.length - 1];
+  if (!sheet.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+// ─── 删除自己发的动态：先确认，确认后直接从列表移除 ───
+var deleteTarget = null;
+
+function openDeleteConfirm(kind, opener) {
+  var layer = document.getElementById('delete-confirm');
+  if (!layer) return;
+  deleteTarget = { kind: kind, opener: opener || null };
+  layer.classList.add('open');
+  layer.setAttribute('aria-hidden', 'false');
+  document.getElementById('delete-confirm-cancel').focus();
+}
+
+function closeDeleteConfirm() {
+  var layer = document.getElementById('delete-confirm');
+  if (!layer || !layer.classList.contains('open')) return;
+  layer.classList.remove('open');
+  layer.setAttribute('aria-hidden', 'true');
+  var opener = deleteTarget && deleteTarget.opener;
+  deleteTarget = null;
+  if (opener && opener.isConnected) opener.focus();
+}
+
+function confirmDelete() {
+  var item = deleteTarget && deleteTarget.opener ? qzCard(deleteTarget.opener) : null;
+  if (deleteTarget) deleteTarget.opener = null;
+  closeDeleteConfirm();
+  if (item) item.remove();
+  var scroller = document.querySelector('#screen-stage-list .square-page-scroll');
+  if (scroller) scroller.focus();
+  showMatrixToast('已删除这条动态');
+}
+
+// ─── 全局：点空白收起菜单、键盘 ───
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('.moment-more-wrap')) closeMenus();
+});
+
+document.addEventListener('keydown', function (e) {
+  var layer = document.getElementById('delete-confirm');
+  var confirmOpen = !!layer && layer.classList.contains('open');
+  if (confirmOpen && e.key === 'Tab') {
+    var btns = layer.querySelectorAll('button');
+    var first = btns[0];
+    var last = btns[btns.length - 1];
+    if (!layer.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    return;
+  }
+  if (e.key === 'Tab' && qzSheet.card && !document.querySelector('#screen-stage-list .report-sheet.open')) { qzTrapTab(e); return; }
+  if (e.key === 'Escape') {
+    if (confirmOpen) { closeDeleteConfirm(); return; }
+    if (document.querySelector('#screen-stage-list .report-sheet.open')) { slCloseMomentReport(); return; }
+    if (qzSheet.card) { qzCloseSheet(); return; }
+    closeMenus();
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[role="button"]')) {
+    e.preventDefault();
+    e.target.click();
+  }
+});
+
+// ─── 绑定：灰区预览和浮层里的按钮统一在外层委托；浮层内容每次打开重建，不会重复绑定 ───
+document.getElementById('screen-stage-list').addEventListener('click', function (e) {
+  var t = e.target.closest('[data-act]');
+  if (!t) return;
+  var act = t.dataset.act;
+  if (act === 'open') qzOpenSheet(qzCard(t), t.dataset.sec, t);
+  else if (act === 'close-sheet') qzCloseSheet();
+  else if (act === 'reply') qzReply(t.dataset.name);
+  else if (act === 'report') slOpenMomentReport(t);
+});
+
+// 回复到一半清空输入又离开：退回普通评论
+document.addEventListener('focusout', function (e) {
+  var t = e.target;
+  if (t && t.matches && t.matches('.qz-compose-input') && !t.value.trim()) qzResetReply(t);
+});
+
+document.querySelectorAll('#screen-stage-list .moment-item').forEach(function (card) { qzRenderPreview(card); });
+
+</script>
+
+</body>
+</html>
